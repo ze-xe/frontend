@@ -1,5 +1,8 @@
 import React from 'react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+import AllTokens from './AllTokens'
+import TrendingTokens from './TrendingTokens';
+import NewTokens from './NewTokens';
 
 const tokens = [
     {
@@ -11,7 +14,7 @@ const tokens = [
 
 export default function TokensPanel() {
   return (
-        <Tabs variant='soft-rounded' size={"sm"} colorScheme='gray' overflow={"auto"}>
+        <Tabs variant='enclosed' size={"sm"} colorScheme='gray' overflow={"auto"}>
                     <TabList>
                         <Tab>All</Tab>
                         <Tab>Trending</Tab>
@@ -19,13 +22,13 @@ export default function TokensPanel() {
                     </TabList>
                     <TabPanels>
                         <TabPanel>
-                        <p>one!</p>
+                        <AllTokens/>
                         </TabPanel>
                         <TabPanel>
-                        <p>two!</p>
+                        <TrendingTokens/>
                         </TabPanel>
                         <TabPanel>
-                        <p>one!</p>
+                        <NewTokens/>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

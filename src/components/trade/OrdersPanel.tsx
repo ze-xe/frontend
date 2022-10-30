@@ -5,7 +5,7 @@ import OrderHistory from './OrderHistory'
 
 export default function OrdersPanel() {
   return (
-        <Tabs align='end' variant='soft-rounded' size={"sm"} colorScheme='gray' overflow={"auto"}>
+        <Tabs align='start' variant='line' size={"sm"} colorScheme='gray' overflow={"auto"}>
                     <TabList>
                         <Tab>Order Book</Tab>
                         <Tab>Order History</Tab>

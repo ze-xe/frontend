@@ -11,7 +11,8 @@ export const DarkModeSwitch = () => {
       right={4}
       icon={isDark ? <SunIcon /> : <MoonIcon />}
       aria-label="Toggle Theme"
-      bgGradient="linear(to-r, #E11860, #03ACDF)"
+      // bgGradient="linear(to-r, #E11860, #03ACDF)"
+      // bgColor={"gray"}
       onClick={toggleColorMode}
     />
   )

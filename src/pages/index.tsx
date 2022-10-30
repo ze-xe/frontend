@@ -25,14 +25,13 @@ const Index = () => {
   return <Container>
     <Hero />
     <Main >
-      <Flex justify="center" gap={1} mb={0}>
+      <Flex justify="center" gap={1} mt={0}>
       <Text  fontSize={"lg"}  color={ colorMode == 'light' ? 'gray.800' : "gray.400"} fontWeight={"bold"} mb={5} textAlign={"center"}>
         Advanced limit-order trading platform on TRON 
       </Text>
         <Image src="https://cdn.worldvectorlogo.com/logos/tron.svg" height={25} width={25} />
       </Flex>
-      <Image src="/assets/zexe-code.png" width={700}  alt="none" style={{borderRadius: 40}} />
-
+      {/* <Image src="/assets/cyborg.png" height={400} width={700}  alt="none" /> */}
       {/* <Button display={"flex"} gap="1" variant={'outline'} disabled><Text>Try Now</Text> <Text fontSize={"10px"}>Coming Soon</Text> </Button> */}
 
       

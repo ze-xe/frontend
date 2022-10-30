@@ -25,11 +25,13 @@ export const Footer = (props: FlexProps) => (
             Github <LinkIcon />
           </ChakraLink>
 
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
+          <ChakraLink isExternal href="https://twitter.com/zexeio" flexGrow={1} mr={2}>
             Twitter <LinkIcon />
           </ChakraLink>
 
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
+          <ChakraLink
+          //  isExternal
+            href="#" flexGrow={1} mr={2}>
             Discord <LinkIcon />
           </ChakraLink>
 

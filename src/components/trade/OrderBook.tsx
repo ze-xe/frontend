@@ -179,7 +179,7 @@ const buyOrders = [
 
 const Order = ({ order, index, total }) => {
 	return (
-		<Flex justify={'space-between'} px={1} width="100%" bgColor={"gray.900"} my={0.5}>
+		<Flex justify={'space-between'} width="100%" bgColor={"gray.900"} my={0.5}>
 			<Text fontSize={'sm'} color="gray.100">
 				{order.amount} T0
 			</Text>
@@ -202,7 +202,7 @@ export default function OrderBook() {
 	const totalBuy = buyOrders.reduce((acc, order) => acc + order.amount, 0);
 	return (
 
-		<Flex flexDir={'column'} justify="center" align={'end'} pl={5}>
+		<Flex flexDir={'column'} justify="center" align={'end'}>
 			{sellOrders.map((order: any, index: number) => {
                 return <Order order={order} index={index} total={totalSell} />;
 			})}

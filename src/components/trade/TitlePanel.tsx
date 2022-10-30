@@ -3,7 +3,7 @@ import React from 'react';
 
 export default function TitlePanel() {
 	return (
-		<>
+		<Box bgColor={"gray.900"} p="5">
 			<Text fontSize={'3xl'} fontWeight="bold">
 				TOKEN0/TOKEN1
 			</Text>
@@ -81,6 +81,6 @@ export default function TitlePanel() {
 					</Text>
 				</Box>
 			</Flex>
-		</>
+		</Box>
 	);
 }

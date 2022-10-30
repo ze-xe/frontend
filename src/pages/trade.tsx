@@ -4,6 +4,7 @@ import GraphPanel from '../components/trade/GraphPanel';
 import TokensPanel from '../components/trade/TokensPanel';
 import OrdersPanel from '../components/trade/OrdersPanel';
 import TitlePanel from '../components/trade/TitlePanel';
+import Swap from '../components/trade/Swap';
 
 const Trade = () => {
 	return (
@@ -15,12 +16,9 @@ const Trade = () => {
 						<TokensPanel />
 					</Box>
 					<Box height={'100%'} width="60%">
-						<Box>
-							<TitlePanel />
-						</Box>
-						<Box>
-							<GraphPanel />
-						</Box>
+                        <TitlePanel />
+                        <GraphPanel />
+                        <Swap />
 					</Box>
                     <Flex height={'100%'} flexDir={"column"} justify="center" width={"20%"}>
                         <OrdersPanel/>
