@@ -4,7 +4,10 @@ import {
   Code,
   List,
   ListIcon,
+  Image,
   ListItem,
+  Flex,
+  Button,
 } from '@chakra-ui/react'
 import { CheckCircleIcon, LinkIcon } from '@chakra-ui/icons'
 
@@ -16,40 +19,27 @@ import { CTA } from '../components/CTA'
 import { Footer } from '../components/Footer'
 
 const Index = () => (
-  <Container height="100vh">
+  <Container>
     <Hero />
-    <Main>
-      <Text color="text">
-        Example repository of <Code>Next.js</Code> + <Code>chakra-ui</Code> +{' '}
-        <Code>TypeScript</Code>.
+    <Main >
+      <Flex justify="center" gap={1} mb={0}>
+      <Text  fontSize={"lg"}  color="gray.400" fontWeight={"bold"} mb={5} textAlign={"center"}>
+        Advanced limit-order trading platform on TRON 
       </Text>
+        <Image src="https://cdn.worldvectorlogo.com/logos/tron.svg" height={25} width={25} />
+      </Flex>
+      <Image src="/assets/zexe-code.png" width={700}  alt="none" style={{borderRadius: 40}} />
 
-      <List spacing={3} my={0} color="text">
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink
-            isExternal
-            href="https://chakra-ui.com"
-            flexGrow={1}
-            mr={2}
-          >
-            Chakra UI <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
-            Next.js <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-      </List>
+      {/* <Button display={"flex"} gap="1" variant={'outline'} disabled><Text>Try Now</Text> <Text fontSize={"10px"}>Coming Soon</Text> </Button> */}
+
+      
     </Main>
 
     <DarkModeSwitch />
     <Footer>
-      <Text>Next ❤️ Chakra</Text>
+      {/* <Text color={"gray.500"}>hello@chainscore.finance</Text> */}
     </Footer>
-    <CTA />
+    {/* <CTA /> */}
   </Container>
 )
 
