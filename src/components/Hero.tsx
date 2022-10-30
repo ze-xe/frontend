@@ -1,8 +1,10 @@
-import { Flex, Heading } from '@chakra-ui/react'
+import { Flex, Heading, useColorMode } from '@chakra-ui/react'
 import Image from 'next/image'
 
-export const Hero = ({ title }: { title: string }) => (
-<>
+export const Hero = ({ title }: { title: string }) => {
+  const color = useColorMode();
+
+return <>
   <Flex
   flexDir={"column"}
     justifyContent="center"
@@ -14,11 +16,11 @@ export const Hero = ({ title }: { title: string }) => (
     bgClip="text"
     >
   {/* <Image src="/assets/zexe-text.png" width={500} height={500}  alt="none" style={{borderRadius: 0}} /> */}
-  <Heading fontSize="10vw" mt={-10} textShadow={"6px 4px #fff"}>{title}</Heading>
+  <Heading fontSize="10vw" mt={-10} textShadow={"6px 3px " + (color.colorMode == 'light' ? '#444444' : '#fff')}>{title}</Heading>
 
   </Flex>
     </>
-)
+}
 
 Hero.defaultProps = {
   title: 'zexe',

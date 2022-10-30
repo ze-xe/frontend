@@ -1,4 +1,4 @@
-import { Box, Flex, Tag, Text } from '@chakra-ui/react';
+import { Box, Flex, Tag, Text, useColorMode } from '@chakra-ui/react';
 import { Header } from '../components/Header';
 import GraphPanel from '../components/trade/GraphPanel';
 import TokensPanel from '../components/trade/TokensPanel';

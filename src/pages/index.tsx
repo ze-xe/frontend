@@ -17,13 +17,16 @@ import { Main } from '../components/Main'
 import { DarkModeSwitch } from '../components/DarkModeSwitch'
 import { CTA } from '../components/CTA'
 import { Footer } from '../components/Footer'
+import { useColorMode } from '@chakra-ui/react';
 
-const Index = () => (
-  <Container>
+const Index = () => {
+  const {colorMode} = useColorMode() 
+  
+  return <Container>
     <Hero />
     <Main >
       <Flex justify="center" gap={1} mb={0}>
-      <Text  fontSize={"lg"}  color="gray.400" fontWeight={"bold"} mb={5} textAlign={"center"}>
+      <Text  fontSize={"lg"}  color={ colorMode == 'light' ? 'gray.800' : "gray.400"} fontWeight={"bold"} mb={5} textAlign={"center"}>
         Advanced limit-order trading platform on TRON 
       </Text>
         <Image src="https://cdn.worldvectorlogo.com/logos/tron.svg" height={25} width={25} />
@@ -41,6 +44,6 @@ const Index = () => (
     </Footer>
     {/* <CTA /> */}
   </Container>
-)
+}
 
 export default Index
