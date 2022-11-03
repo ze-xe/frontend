@@ -17,13 +17,16 @@ import { DataContext } from '../../context/DataProvider';
 const Big = require('big.js');
 
 export default function WalletBalance() {
-	const { tokens } = useContext(DataContext);
-	const { tokenFormatter } = useContext(DataContext);
+
+  const {tokens} = useContext(DataContext);
+  const {tokenFormatter} = useContext(DataContext);
 
 	return (
 		<>
-			<Text fontSize={'lg'}>Wallet Balance</Text>
-			<Divider my={4} />
+			<Text fontSize={'lg'}>Trading Balance</Text>
+
+      <Divider my={4}/>
+
 			<TableContainer>
 				<Table size="sm" colorScheme={'whiteAlpha'}>
 					<Thead>
@@ -34,23 +37,16 @@ export default function WalletBalance() {
 					</Thead>
 					<Tbody>
 						{tokens.map((token, index) => {
-							return (
-								<Tr key={index}>
-									<Td>{token.name} </Td>
-									<Td isNumeric>
-										{tokenFormatter.format(
-											Big(token.balance ?? 0)
-												.div(
-													10 ** (token.decimals ?? 18)
-												)
-												.toString()
-										)}{' '}
-										{token.symbol}
-									</Td>
-								</Tr>
-							);
-						})}
+              return (
+                <Tr key={index}>
+                  <Td>{token.name} </Td>
+                  <Td isNumeric>{tokenFormatter.format(Big(token.tradingBalance ?? 0).div(10**(token.decimals ?? 18)).toString())} {token.symbol}</Td>
+                </Tr>
+              );
+            })}
+						
 					</Tbody>
+
 				</Table>
 			</TableContainer>
 		</>

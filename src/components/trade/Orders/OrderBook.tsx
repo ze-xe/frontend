@@ -24,13 +24,13 @@ const Order = ({ order, index, total, pair, orderType }) => {
 			px={4}
 			_hover={{ bgColor: 'gray.800' }}>
 			<Text fontSize={'xs'} color={'gray.300'}>
-				{tokenFormatter.format(order.amount/(10**pair.tokens[0].decimals))} {pair?.tokens[0].symbol}
+				{tokenFormatter.format(order.amount/(10**pair.tokens[0].decimals))}
 			</Text>
 			<Text fontSize={'xs'} color={'gray.300'}>
-				{tokenFormatter.format((order.amount/(10**(pair.tokens[0].decimals)))*(order.exchangeRate/(10**pair.exchangeRateDecimals)))} {pair?.tokens[1].symbol}
+				{tokenFormatter.format((order.amount/(10**(pair.tokens[0].decimals)))*(order.exchangeRate/(10**pair.exchangeRateDecimals)))}
 			</Text>
 			<Text fontSize="xs" fontWeight={'bold'}>
-				{tokenFormatter.format(order.exchangeRate/(10**pair.exchangeRateDecimals))} {pair?.tokens[1].symbol}
+				{tokenFormatter.format(order.exchangeRate/(10**pair.exchangeRateDecimals))} 
 			</Text>
 		</Flex>
 	);
@@ -58,9 +58,9 @@ export default function OrderBook({ pair }) {
 	return (
 		<Flex flexDir={'column'}>
 			<Flex justify={'space-between'} px={4} color='gray.400' py={1} mb={1} mt={-2} bgColor='gray.900'>
-				<Text fontSize={'xs'}>Amount </Text>
-				<Text fontSize={'xs'}>Amount </Text>
-				<Text fontSize={'xs'}>Price </Text>
+				<Text fontSize={'xs'}>Amount {pair?.tokens[0].symbol} </Text>
+				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
+				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
 			{sellOrders.reverse().map((order: any, index: number) => {
 				return (

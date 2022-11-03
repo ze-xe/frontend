@@ -29,6 +29,7 @@ export default function BuyModule({ pair }) {
 	const [amount, setAmount] = React.useState('0');
 	const [token0Amount, settoken0Amount] = React.useState('0');
 	const [loading, setLoading] = React.useState(false);
+	const [response, setResponse] = React.useState(null);
 
 	const [price, setPrice] = React.useState('0');
 	const [sliderValue, setSliderValue] = React.useState(NaN);
@@ -39,11 +40,13 @@ export default function BuyModule({ pair }) {
 	const { tokens } = useContext(DataContext);
 
 	useEffect(() => {
-		const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
-		const _token1 = tokens.find((t) => t.id === pair?.tokens[1].id);
-
-		setToken0(_token0);
-		setToken1(_token1);
+		if(!token0 || !token1){
+			const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
+			const _token1 = tokens.find((t) => t.id === pair?.tokens[1].id);
+			
+			setToken0(_token0);
+			setToken1(_token1);
+		}
 
 		if (
 			pair?.exchangeRate > 0 &&
@@ -72,11 +75,12 @@ export default function BuyModule({ pair }) {
 
 	const buy = () => {
 		setLoading(true);
+		setResponse('');
 		let _amount = Big(token0Amount)
 			.times(10 ** token0.decimals)
 			.toFixed(0);
-		axios
-			.get('https://api.zexe.io/matchedorders/' + pair.id, {
+		
+		axios.get('https://api.zexe.io/matchedorders/' + pair.id, {
 				params: {
 					amount: _amount,
 					exchange_rate: Big(price).times(
@@ -107,11 +111,29 @@ export default function BuyModule({ pair }) {
 					)
 					.send({})
 					.then((res: any) => {
-						setLoading(true)
-						console.log(res);
+						checkResponse(res)
 					});
 			});
 	};
+
+	// check response in intervals
+	const checkResponse = (tx_id: string) => {
+		axios.get('https://nile.trongrid.io/wallet/gettransactionbyid?value=' + tx_id)
+		.then(res => {
+			if(!res.data.ret){
+				setTimeout(() => {
+					checkResponse(tx_id);
+				}, 2000);
+			} else {
+				setLoading(false)
+				if(res.data.ret[0].contractRet == 'SUCCESS') {
+					setResponse('Transaction Successful!')
+				} else {
+					setResponse('Transaction Failed. Please try again.')
+				}
+			}
+		})
+	}
 
 	const setSlider = (e) => {
 		setSliderValue(e);
@@ -271,7 +293,7 @@ export default function BuyModule({ pair }) {
 
 			<Button
 				width={'100%'}
-				my="2"
+				mt="2"
 				bgColor={'green'}
 				onClick={buy}
 				disabled={
@@ -290,6 +312,7 @@ export default function BuyModule({ pair }) {
 					? 'Insufficient Trading Balance'
 					: 'Limit Buy'}
 			</Button>
+			<Text fontSize={'sm'} mb={2}>{response}</Text>
 		</Flex>
 	);
 }

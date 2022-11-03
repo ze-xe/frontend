@@ -76,7 +76,7 @@ export const Header = ({ title }: { title: string }) => {
 				{/* Logo */}
 				<Link href={'/'}>
 					<Box
-						bgGradient="linear(to-r, #E11860, #CB1DC3, #03ACDF)"
+						bgGradient="linear(to-r, #E11860, #CB1DC3)"
 						bgClip={'text'}>
 						<Text fontSize="3xl" fontWeight={'bold'}>
 							{title}
@@ -191,7 +191,6 @@ const WalletMenu = () => {
 					</div>
 				</MenuItem>
 
-				<MenuItem>Log out</MenuItem>
 			</MenuList>
 		</Menu>
 	);

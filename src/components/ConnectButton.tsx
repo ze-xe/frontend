@@ -65,7 +65,7 @@ const ConnectButton = ({}) => {
 			{isTronConnected ? (
 				<Box>
 					<Button 
-                    bgGradient="linear(to-r, #E11860, #CB1DC3, #03ACDF)"
+                    bgGradient="linear(to-r, #E11860, #CB1DC3)"
                     color="gray.100" size="sm" _hover={{ bg: 'gray.800' }} onClick={onOpen}>{(tronAddress)?.slice(0, 6) + "..." + (tronAddress)?.slice(-4)}</Button>
 				</Box>
 			) : (

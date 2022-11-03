@@ -29,6 +29,7 @@ export default function BuyModule({ pair }) {
 	const [amount, setAmount] = React.useState('0');
 	const [token1Amount, settoken1Amount] = React.useState('0');
 	const [loading, setLoading] = React.useState(false);
+	const [response, setResponse] = React.useState(null);
 
 	const [price, setPrice] = React.useState('0');
 	const [sliderValue, setSliderValue] = React.useState(NaN);
@@ -106,8 +107,7 @@ export default function BuyModule({ pair }) {
 					)
 					.send({})
 					.then((res: any) => {
-						setLoading(false)
-						console.log(res);
+						checkResponse(res);
 					})
 					.catch((err: any) => {
 						setLoading(false)
@@ -115,6 +115,25 @@ export default function BuyModule({ pair }) {
 					})
 			});
 	};
+
+	// check response in intervals
+	const checkResponse = (tx_id: string) => {
+		axios.get('https://nile.trongrid.io/wallet/gettransactionbyid?value=' + tx_id)
+		.then(res => {
+			if(!res.data.ret){
+				setTimeout(() => {
+					checkResponse(tx_id);
+				}, 2000);
+			} else {
+				setLoading(false)
+				if(res.data.ret[0].contractRet == 'SUCCESS') {
+					setResponse('Transaction Successful!')
+				} else {
+					setResponse('Transaction Failed. Please try again.')
+				}
+			}
+		})
+	}
 
 	const setSlider = (e) => {
 		setSliderValue(e);
@@ -125,7 +144,7 @@ export default function BuyModule({ pair }) {
 		setAmount(token0Amount.toNumber().toString());
 		if (price != '0' && price != '' && Number(price))
 			if (Number(price) > 0)
-				settoken1Amount(token0Amount.toNumber().times(price).toString());
+				settoken1Amount(token0Amount.times(price).toString());
 	};
 
 	const updateToken0Amount = (e) => {
@@ -274,7 +293,7 @@ export default function BuyModule({ pair }) {
 
 			<Button
 				width={'100%'}
-				my="2"
+				mt="2"
 				bgColor={'red'}
 				onClick={buy}
 				disabled={
@@ -293,6 +312,8 @@ export default function BuyModule({ pair }) {
 					? 'Insufficient Trading Balance'
 					: 'Limit Sell'}
 			</Button>
+			<Text fontSize={'sm'} mb={2}>{response}</Text>
+
 		</Flex>
 	);
 }
