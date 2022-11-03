@@ -37,7 +37,7 @@ export default function BuyModule({ pair }) {
 	const [token0, setToken0] = React.useState(null);
 	const [token1, setToken1] = React.useState(null);
 
-	const { tokens } = useContext(DataContext);
+	const { tokens, tokenFormatter } = useContext(DataContext);
 
 	useEffect(() => {
 		const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
@@ -241,7 +241,10 @@ export default function BuyModule({ pair }) {
 			</Flex>
 
 			<Flex flexDir={'column'} gap={1}>
+				<Flex justify={'space-between'}>
 				<Text fontSize={'sm'}>Total ({pair?.tokens[0].symbol})</Text>
+				<Text fontSize={'xs'}>Balance {tokenFormatter.format((token0?.tradingBalance ?? 0)/(10**token0?.decimals))}</Text>
+				</Flex>
 				<NumberInput
 					min={0}
 					precision={pair?.tokens[1].decimals}

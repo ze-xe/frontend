@@ -4,19 +4,19 @@ import React from 'react';
 
 export default function TitlePanel({ pair }) {
 	return (
-		<Box bgColor={'gray.1100'} px="6" pb={2} pt={3}>
+		<Box bgColor={'gray.1100'} px="4" pb={2} pt={3}>
 			<Flex justify={'space-between'}>
 			<Flex align={'center'} gap={2}>
 				<Image
 					src={
-						`https://static.okx.com/cdn/oksupport/asset/currency/icon/` +
-						pair?.tokens[0].symbol.toLowerCase() +
-						'.png'
+						`/assets/crypto_logos/` +
+								pair?.tokens[0].symbol.toLowerCase() +
+								'.png'
 					}
 					width={40}
 					height={40}
 					alt="eth"
-					style={{ maxHeight: 40 }}></Image>
+					style={{ maxHeight: 40, borderRadius: '50%' }}></Image>
 				<Text fontSize={'3xl'} fontWeight="bold">
 					{pair?.tokens[0].symbol}/{pair?.tokens[1].symbol}
 				</Text>

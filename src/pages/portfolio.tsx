@@ -19,19 +19,37 @@ import { DataContext } from '../context/DataProvider';
 import Link from 'next/link';
 
 export default function wallet() {
-	const { address } = useContext(WalletContext);
-  const { tokens, tokenFormatter } = useContext(DataContext)
+	const { address, isConnected } = useContext(WalletContext);
+  	const { tokens, tokenFormatter } = useContext(DataContext)
+	const [balance, setBalance] = React.useState(0);
+
+	React.useEffect(() => {
+		if(isConnected) _setBalance();
+	})
+	const _setBalance = async () => {
+		let _balance = await (window as any).tronWeb.trx.getBalance(address)
+		setBalance(_balance)
+	}
 
 	return (
-		<Box mt={2}>
-			<Flex bgColor={'gray.1000'} align="center" p={2} py={4}>
-				<Avatar></Avatar>
-				<Text ml={2} fontSize="lg">
+		<Flex justify={'center'}>
+		<Box mt={2} width='100%' maxW='1400px'>
+			<Flex bgColor={'gray.1000'} align="start" p={4} py={10}
+			>
+				<Avatar bgGradient={'linear(to-r, #E11860, #CB1DC3)'}></Avatar>
+				<Box>
+
+				<Text ml={4} fontSize="lg" fontWeight={'bold'}>
 					{address}
 				</Text>
+				<Text ml={4} fontSize="sm" color={'gray.400'}>
+					Balance: {tokenFormatter.format(balance/1e6)} TRX
+				</Text>
+				</Box>
 			</Flex>
 
-			<Box bgColor={'gray.1000'} mt={2}>
+			<Box bgColor={'gray.1000'} mt={2}
+			>
 				{/* <Text p={5} fontSize='lg' fontWeight={'bold'}>Trading Balance</Text> */}
 				<TableContainer>
 					<Table variant="simple">
@@ -72,5 +90,6 @@ export default function wallet() {
 				</TableContainer>
 			</Box>
 		</Box>
+		</Flex>
 	);
 }

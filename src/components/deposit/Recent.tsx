@@ -4,7 +4,7 @@ import { Text } from '@chakra-ui/react';
 export default function Recent() {
   return (
     <>
-    <Text fontSize={'lg'}>Recent Deposits</Text>
+    <Text fontSize={'md'} fontWeight='bold'>Recent Deposits</Text>
     </>
   )
 }

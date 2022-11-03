@@ -1,4 +1,14 @@
-import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Flex,
+	Heading,
+	HStack,
+	InputLeftElement,
+	Text,
+	useRadio,
+	useRadioGroup,
+} from '@chakra-ui/react';
 import Image from 'next/image';
 import React from 'react';
 import { useContext } from 'react';
@@ -7,71 +17,192 @@ import { WalletContext } from '../context/Wallet';
 import { getABI } from '../utils/contract';
 
 const mintAmount = {
-  'USDT': 10000,
-  'USDD': 10000,
-  'BTC': 10,
-  'ETH': 100,
-  'TRX': 1000000,
-  'BTT': 1000000000000,
-}
+	USDT: 10000,
+	USDD: 10000,
+	BTC: 10,
+	ETH: 100,
+	TRX: 1000000,
+	BTT: 1000000000000,
+};
 
 const Big = require('big.js');
+import { Select } from '@chakra-ui/react';
+import { Input, InputGroup, InputRightElement } from '@chakra-ui/react';
+
+function RadioCard(props) {
+	const { getInputProps, getCheckboxProps } = useRadio(props);
+
+	const input = getInputProps();
+	const checkbox = getCheckboxProps();
+
+	return (
+		<Box as="label">
+			<input {...input} />
+			<Box
+				{...checkbox}
+				// bgColor={props.isChecked ? '#E11860' : 'transparent'}
+				cursor="pointer"
+				borderWidth="1px"
+				borderRadius="md"
+				boxShadow="md"
+				_checked={{
+					bg: 'teal.600',
+					color: 'white',
+					borderColor: 'teal.600',
+				}}
+				_focus={{
+					boxShadow: 'outline',
+				}}
+				px={5}
+				py={3}>
+				{props.children}
+			</Box>
+		</Box>
+	);
+}
 
 export default function faucets() {
 	const { tokens } = useContext(DataContext);
 	const { address } = useContext(WalletContext);
 
-	const [loadingToken, setLoadingToken] = React.useState('');
+	const [selectedToken, setSelectedToken] = React.useState(0);
+	const [loading, setLoading] = React.useState(false);
+	const [error, setError] = React.useState('');
+	const [success, setSuccess] = React.useState(false);
+	const [hash, setHash] = React.useState('');
 
-	const mint = async (token: any) => {
-    setLoadingToken(token.id);
+	const { getRootProps, getRadioProps } = useRadioGroup({
+		// name: tokens[selectedToken].name,
+		// defaultValue: tokens[selectedToken].name,
+		onChange: (nextValue) => {
+			setSelectedToken(Number(nextValue));
+		},
+	});
+
+	const group = getRootProps();
+
+	const mint = async () => {
+		setLoading(true);
+		setSuccess(false);
+		setHash('');
+
+		const token = tokens[selectedToken];
 		// mint tokens
-		const tokenContract = await (window as any).tronWeb.contract(getABI('ERC20'), token.id);
-    tokenContract.methods.mint(address, Big(mintAmount[token.symbol]).times(1e18).toFixed(0))
-			.send({shouldPollResponse: true})
+		const tokenContract = await (window as any).tronWeb.contract(
+			getABI('ERC20'),
+			token.id
+		);
+		tokenContract.methods
+			.mint(address, Big(mintAmount[token.symbol]).times(1e18).toFixed(0))
+			.send({})
 			.then((res: any) => {
-        setLoadingToken('');
+				setLoading(false);
+				setSuccess(true);
+				setHash(res);
 				console.log(res);
 			});
 	};
 	return (
-		<Box mx={4} mt={6}>
-			<Heading size={'md'} mb={3}>
-				Test Tokens Faucet
-			</Heading>
-			<Flex gap={4} justify="start">
-				{tokens.map((token) => (
-					<Box key={token.id} bgColor="gray.800" minW={'15%'} p={2}>
-						<Image
-							src={
-								`/assets/crypto_logos/` +
-								token.symbol.toLowerCase() +
-								'.png'
-							}
-							width={40}
-							height={40}
-							alt={token.symbol}
-							style={{
-								maxHeight: 40,
-								borderRadius: '50%',
-							}}></Image>
-						<Text fontSize={'xl'}>{token.name}</Text>
-						<Text>{token.symbol}</Text>
+		<Flex justify={'center'}>
+			<Box
+				my={2}
+				px={4}
+				py={4}
+				bgColor="gray.1000"
+				width={'60%'}
+				maxW="1400px">
+				<Text fontSize={'2xl'} fontWeight="bold">
+					Faucet
+				</Text>
+				<Text fontSize={'sm'} mb={6} color='gray.400'>
+					It's raining free money! 💰
+				</Text>
 
-						<Text fontSize={'sm'} my={2}>Balance {token.balance/(10**token.decimals)}</Text>
+				<HStack {...group}>
+					{tokens.map((token, index) => {
+						const radio = getRadioProps({ value: index });
+						return (
+							<RadioCard key={index} {...radio} isChecked={selectedToken == index}>
+								<Box
+									key={token.id}
+									minW={'15%'}
+								>
+									<Image
+										src={
+											`/assets/crypto_logos/` +
+											token.symbol.toLowerCase() +
+											'.png'
+										}
+										width={40}
+										height={40}
+										alt={token.symbol}
+										style={{
+											maxHeight: 40,
+											borderRadius: '50%',
+										}}></Image>
+									<Text fontSize={'xl'}>{token.name}</Text>
+									<Text>{token.symbol}</Text>
 
+									<Text fontSize={'sm'} my={2}>
+										Balance{' '}
+										{token.balance / 10 ** token.decimals}
+									</Text>
+								</Box>
+							</RadioCard>
+						);
+					})}
+				</HStack>
+				<Box>
+
+					<Box my={2}>
+						<InputGroup size="lg" width={'100%'}>
+							<InputLeftElement
+								pointerEvents="none"
+								children={
+									<Image
+										src={
+											`/assets/crypto_logos/` +
+											tokens[
+												selectedToken
+											]?.symbol.toLowerCase() +
+											'.png'
+										}
+										width={30}
+										height={30}
+										alt={tokens[selectedToken]?.symbol}
+										style={{
+											maxHeight: 30,
+											borderRadius: '50%',
+										}}></Image>
+								}
+							/>
+							<Input
+								disabled
+								// borderRadius={'8px 0 0 8px'}
+								pr="4.5rem"
+								type={'Amount'}
+								placeholder="Enter Amount"
+								// disabled={needsApproval()}
+								value={
+									mintAmount[tokens[selectedToken]?.symbol] + ' ' + tokens[selectedToken]?.symbol
+								}
+							/>
+						</InputGroup>
+					</Box>
+
+					<Box>
 						<Button
 							width={'100%'}
-							mt={2}
-							onClick={() => mint(token)}
-              loadingText='Minting'
-              isLoading={loadingToken === token.id}
-              >
+							mt={6}
+							onClick={() => mint()}
+							loadingText="Confirm in your wallet"
+							isLoading={loading}>
 							Mint
 						</Button>
+						{success && <Text fontSize={'sm'} mt={2}>Transaction Successful!</Text>}
 					</Box>
-				))}
-			</Flex>
-		</Box>
+				</Box>
+			</Box>
+		</Flex>
 	);
 }

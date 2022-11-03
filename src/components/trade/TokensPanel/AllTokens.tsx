@@ -27,14 +27,14 @@ export default function AllTokens() {
 						<Flex align="center">
 							<Image
 								src={
-									`https://static.okx.com/cdn/oksupport/asset/currency/icon/` +
-									pair.tokens[0].symbol.toLowerCase() +
-									'.png'
+									`/assets/crypto_logos/` +
+								pair.tokens[0].symbol.toLowerCase() +
+								'.png'
 								}
 								width={30}
 								height={30}
 								alt="eth"
-								style={{ maxHeight: 35 }}></Image>
+								style={{ maxHeight: 30, maxWidth: 30, borderRadius: "50%" }}></Image>
 							<Box ml={2}>
 								<Text>{pair.tokens[0].name}</Text>
 								<Text fontSize={'xs'}>

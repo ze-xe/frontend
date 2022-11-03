@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Text } from '@chakra-ui/react';
+import { Divider, Flex, Text } from '@chakra-ui/react';
 import { useContext } from 'react';
 
 import {
@@ -14,6 +14,7 @@ import {
 	TableContainer,
 } from '@chakra-ui/react';
 import { DataContext } from '../../context/DataProvider';
+import Image from 'next/image';
 const Big = require('big.js');
 
 export default function WalletBalance() {
@@ -22,10 +23,9 @@ export default function WalletBalance() {
 
 	return (
 		<>
-			<Text fontSize={'lg'}>Wallet Balance</Text>
-			<Divider my={4} />
+			<Text fontSize={'md'} mb={4} fontWeight='bold'>Wallet Balance</Text>
 			<TableContainer>
-				<Table size="sm" colorScheme={'whiteAlpha'}>
+				<Table size="sm" colorScheme={'gray'}>
 					<Thead>
 						<Tr>
 							<Th>Asset</Th>
@@ -36,7 +36,25 @@ export default function WalletBalance() {
 						{tokens.map((token, index) => {
 							return (
 								<Tr key={index}>
-									<Td>{token.name} </Td>
+									<Td>
+										<Flex align={'center'} gap={1}>
+
+										<Image
+											src={
+												`/assets/crypto_logos/` +
+												token.symbol.toLowerCase() +
+												'.png'
+											}
+											width={20}
+											height={20}
+											alt={token.symbol}
+											style={{
+												maxHeight: 20,
+												borderRadius: '50%',
+											}}></Image>
+										{token.name}
+											</Flex>
+									</Td>
 									<Td isNumeric>
 										{tokenFormatter.format(
 											Big(token.balance ?? 0)

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Text } from '@chakra-ui/react';
+import { Divider, Flex, Text } from '@chakra-ui/react';
 import { useContext } from 'react';
 
 import {
@@ -15,20 +15,18 @@ import {
 } from '@chakra-ui/react';
 import { DataContext } from '../../context/DataProvider';
 const Big = require('big.js');
+import Image from 'next/image';
 
 export default function WalletBalance() {
-
-  const {tokens} = useContext(DataContext);
-  const {tokenFormatter} = useContext(DataContext);
+	const { tokens } = useContext(DataContext);
+	const { tokenFormatter } = useContext(DataContext);
 
 	return (
 		<>
-			<Text fontSize={'lg'}>Trading Balance</Text>
-
-      <Divider my={4}/>
+			<Text fontSize={'md'} fontWeight='bold' mb={4}>Trading Balance</Text>
 
 			<TableContainer>
-				<Table size="sm" colorScheme={'whiteAlpha'}>
+				<Table size="sm" colorScheme={'gray'}>
 					<Thead>
 						<Tr>
 							<Th>Asset</Th>
@@ -37,16 +35,41 @@ export default function WalletBalance() {
 					</Thead>
 					<Tbody>
 						{tokens.map((token, index) => {
-              return (
-                <Tr key={index}>
-                  <Td>{token.name} </Td>
-                  <Td isNumeric>{tokenFormatter.format(Big(token.tradingBalance ?? 0).div(10**(token.decimals ?? 18)).toString())} {token.symbol}</Td>
-                </Tr>
-              );
-            })}
-						
-					</Tbody>
+							return (
+								<Tr key={index}>
+									<Td>
+										<Flex align={'center'} gap={1}>
 
+										<Image
+											src={
+												`/assets/crypto_logos/` +
+												token.symbol.toLowerCase() +
+												'.png'
+											}
+											width={20}
+											height={20}
+											alt={token.symbol}
+											style={{
+												maxHeight: 20,
+												borderRadius: '50%',
+											}}></Image>
+										{token.name}
+											</Flex>
+									</Td>
+									<Td isNumeric>
+										{tokenFormatter.format(
+											Big(token.tradingBalance ?? 0)
+												.div(
+													10 ** (token.decimals ?? 18)
+												)
+												.toString()
+										)}{' '}
+										{token.symbol}
+									</Td>
+								</Tr>
+							);
+						})}
+					</Tbody>
 				</Table>
 			</TableContainer>
 		</>
