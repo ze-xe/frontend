@@ -128,7 +128,7 @@ const Order = ({ order, index }) => {
 	return (
 		<Flex justify={'space-between'} width="100%"
             color={order.type == 'BUY' ? 'green' : 'red'}
-            bgColor="gray.900"
+            bgColor="gray.1100"
             my={0.5}
         >
 			<Text fontSize={'sm'}>
@@ -140,7 +140,7 @@ const Order = ({ order, index }) => {
 				textAlign="right"
 				>
 				<Text fontSize="sm" fontWeight={"bold"}>
-					{order.price.toFixed(4)} T1
+					{order.exchangeRate?.toFixed(4)} T1
 				</Text>
 			</Box>
 		</Flex>
@@ -151,7 +151,7 @@ export default function OrderHistory() {
 	return (
 		<Flex flexDir={'column'} justify="flex-end" align={'end'}>
 			{orders.map((order: any, index: number) => {
-				return <Order order={order} index={index} />;
+				return <Order order={order} index={index} key={index} />;
 			})}
 		</Flex>
 	);

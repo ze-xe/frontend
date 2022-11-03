@@ -18,9 +18,9 @@ import { DarkModeSwitch } from '../components/DarkModeSwitch'
 import { CTA } from '../components/CTA'
 import { Footer } from '../components/Footer'
 import { useColorMode } from '@chakra-ui/react';
-
+import { useEffect }  from 'react';
 const Index = () => {
-  const {colorMode} = useColorMode() 
+  const {colorMode, toggleColorMode} = useColorMode();
   
   return <Container>
     <Hero />

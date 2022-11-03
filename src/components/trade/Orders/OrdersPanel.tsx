@@ -1,0 +1,30 @@
+import React from 'react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Box } from '@chakra-ui/react';
+import OrderBook from './OrderBook';
+import OrderHistory from './OrderHistory';
+
+export default function OrdersPanel({ pair }) {
+	return (
+		<Box bgColor={'gray.1100'} pt={0}>
+			<Tabs
+				align="start"
+				variant="line"
+				size={'sm'}
+				colorScheme="gray"
+				overflow={'auto'}>
+				<TabList>
+					<Tab>Order Book</Tab>
+					<Tab>Order History</Tab>
+				</TabList>
+				<TabPanels>
+					<TabPanel px={0}>
+						<OrderBook pair={pair} />
+					</TabPanel>
+					<TabPanel>
+						<OrderHistory />
+					</TabPanel>
+				</TabPanels>
+			</Tabs>
+		</Box>
+	);
+}

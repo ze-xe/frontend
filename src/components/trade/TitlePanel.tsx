@@ -1,13 +1,43 @@
-import { Box, Text, Flex } from '@chakra-ui/react';
+import { Box, Text, Flex, Divider } from '@chakra-ui/react';
+import Image from 'next/image';
 import React from 'react';
 
-export default function TitlePanel() {
+export default function TitlePanel({ pair }) {
 	return (
-		<Box bgColor={"gray.900"} p="5">
-			<Text fontSize={'3xl'} fontWeight="bold">
-				TOKEN0/TOKEN1
-			</Text>
-			<Flex justify={'space-between'} mt={2}>
+		<Box bgColor={'gray.1100'} px="6" pb={2} pt={3}>
+			<Flex justify={'space-between'}>
+			<Flex align={'center'} gap={2}>
+				<Image
+					src={
+						`https://static.okx.com/cdn/oksupport/asset/currency/icon/` +
+						pair?.tokens[0].symbol.toLowerCase() +
+						'.png'
+					}
+					width={40}
+					height={40}
+					alt="eth"
+					style={{ maxHeight: 40 }}></Image>
+				<Text fontSize={'3xl'} fontWeight="bold">
+					{pair?.tokens[0].symbol}/{pair?.tokens[1].symbol}
+				</Text>
+				<Box>
+					<Text fontSize={'xs'} color="gray.500">
+						{pair?.tokens[0].name}
+					</Text>
+					<Text fontSize={'xs'} color="gray.500">
+						{pair?.tokens[1].name}
+					</Text>
+				</Box>
+			</Flex>
+			<Box textAlign={'right'}>
+				{/* <Text fontSize={'xs'} textTransform='uppercase'>Price</Text> */}
+				<Text fontSize={'3xl'} fontWeight='bold' color='green'>{pair?.exchangeRate / (10**pair?.exchangeRateDecimals)} </Text>
+				<Text fontSize={'sm'} color='green'>+2.2%</Text>
+
+			</Box>
+			</Flex>
+			<Divider mt={2} mb={4} />
+			<Flex justify={'space-between'} mb={2}>
 				<Box>
 					<Text
 						fontSize={'xs'}

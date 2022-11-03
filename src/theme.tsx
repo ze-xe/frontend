@@ -11,11 +11,12 @@ const breakpoints = createBreakpoints({
 })
 
 const config: ThemeConfig = {
-	initialColorMode: 'dark',
+  useSystemColorMode: false,
+	initialColorMode: 'light',
 };
 
 const theme = extendTheme({
-  config,
+  config: config,
   semanticTokens: {
     colors: {
       text: {
@@ -36,7 +37,23 @@ const theme = extendTheme({
     },
   },
   colors: {
-    black: '#16161D',
+    black: '#000',
+    gray: {
+      50: '#fafafa',
+      100: '#f5f5f5',
+      200: '#eeeeee',
+      300: '#e0e0e0',
+      400: '#bdbdbd',
+      500: '#9e9e9e',
+      600: '#757575',
+      700: '#616161',
+      800: '#424242',
+      900: '#212121',
+      1000: '#161616',
+      1100: '#161616'
+    },
+    // green: '#0CAD4B',
+    // red: '#C53027'
   },
   fonts,
   breakpoints,
