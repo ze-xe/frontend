@@ -42,7 +42,7 @@ const ConnectButton = ({}) => {
 	const _connectTron = () => {
 		connectTron((_address: string|null, _err: string) => {
 			if(!isDataReady && !isFetchingData && _address) {
-				fetchData()
+				fetchData((window as any).tronWeb, _address);
 			}
 		});
 		console.log("should close")
