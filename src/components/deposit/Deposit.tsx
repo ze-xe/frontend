@@ -15,6 +15,7 @@ import { Select } from '@chakra-ui/react';
 import { DataContext } from '../../context/DataProvider';
 import Image from 'next/image';
 import { getABI, getAddress } from '../../utils/contract';
+import { MdOpenInNew } from 'react-icons/md';
 const Big = require('big.js');
 const ethers = require('ethers');
 
@@ -100,9 +101,18 @@ export default function Deposit() {
 	return (
 		<Flex flexDir={'column'} justify="space-between" height={'100%'}>
 			<Box>
+				<Flex justify={'space-between'} align='start'>
+
 				<Text fontSize={'2xl'} fontWeight="bold" mb={2}>
 					Choose an asset to deposit
 				</Text>
+				<Link href='/faucet'>
+				<Button variant={'ghost'} >
+					<Text mr={'2'} fontSize='sm'>Get Test Tokens</Text> 
+					<MdOpenInNew />
+				</Button>
+				</Link>
+				</Flex>
 				<Box mt={4}>
 					<Select
 						size="lg"

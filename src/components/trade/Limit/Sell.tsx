@@ -21,13 +21,15 @@ import { DataContext } from '../../../context/DataProvider';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { getABI, getAddress } from '../../../utils/contract';
+import SellModal from './SellModal';
 const Big = require('big.js');
 
 const MIN_T0_ORDER = '10000000000000000';
 
 export default function BuyModule({ pair }) {
+	const [pairNow, setPairNow] = React.useState(null);
 	const [amount, setAmount] = React.useState('0');
-	const [token0Amount, settoken0Amount] = React.useState('0');
+	const [token1Amount, settoken1Amount] = React.useState('0');
 	const [loading, setLoading] = React.useState(false);
 	const [response, setResponse] = React.useState(null);
 
@@ -39,13 +41,18 @@ export default function BuyModule({ pair }) {
 
 	const { tokens, tokenFormatter } = useContext(DataContext);
 
+
 	useEffect(() => {
-		if(!token0 || !token1){
+		// if there is change in pair
+		if(pair && pairNow !== pair?.id) {
 			const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
 			const _token1 = tokens.find((t) => t.id === pair?.tokens[1].id);
-			
 			setToken0(_token0);
 			setToken1(_token1);
+			const newExchangeRate = (pair?.exchangeRate/(10**pair?.exchangeRateDecimals))			
+			setPrice(newExchangeRate.toFixed(pair?.exchangeRateDecimals));
+			settoken1Amount(Big(amount).mul(newExchangeRate).toNumber().toFixed(pair?.exchangeRateDecimals ?? 0));
+			setPairNow(pair?.id);
 		}
 
 		if (
@@ -60,61 +67,17 @@ export default function BuyModule({ pair }) {
 			setPrice(_price.toString());
 			setSliderValue(20);
 			if (_price.toNumber() > 0) {
-				const token1Amount = Big(30)
-					.times(token1.tradingBalance)
+				const token0Amount = Big(30)
+					.times(token0.tradingBalance)
 					.div(100)
 					.div(10 ** token1.decimals);
-
-				setAmount(token1Amount.toNumber().toFixed(pair.exchangeRateDecimals));
-				settoken0Amount(
-					token1Amount.div(_price).toNumber().toFixed(pair.exchangeRateDecimals)
+				setAmount(token0Amount.toNumber().toFixed(pair.exchangeRateDecimals));
+				settoken1Amount(
+					token0Amount.div(_price).toNumber().toFixed(pair.exchangeRateDecimals)
 				);
 			}
 		}
 	});
-
-	const buy = () => {
-		setLoading(true);
-		setResponse('');
-		let _amount = Big(token0Amount)
-			.times(10 ** token0.decimals)
-			.toFixed(0);
-		
-		axios.get('https://api.zexe.io/matchedorders/' + pair.id, {
-				params: {
-					amount: _amount,
-					exchange_rate: Big(price).times(
-						10 ** pair.exchangeRateDecimals
-					),
-					order_type: 1,
-				},
-			})
-			.then((resp) => {
-				let orders = resp.data.data;
-				let ordersToExecute = [];
-				for (let i in orders) {
-					ordersToExecute.push('0x' + orders[i].id);
-				}
-				console.log(ordersToExecute);
-				(window as any).tronWeb
-					.contract(getABI('Exchange'), getAddress('Exchange'))
-					.methods.executeAndPlaceOrder(
-						pair.tokens[0].id,
-						pair.tokens[1].id,
-						_amount,
-						(
-							Number(price) *
-							10 ** pair.exchangeRateDecimals
-						).toFixed(0),
-						1,
-						ordersToExecute
-					)
-					.send({})
-					.then((res: any) => {
-						checkResponse(res)
-					});
-			});
-	};
 
 	// check response in intervals
 	const checkResponse = (tx_id: string) => {
@@ -137,17 +100,17 @@ export default function BuyModule({ pair }) {
 
 	const setSlider = (e) => {
 		setSliderValue(e);
-		const token1Amount = Big(e)
-			.times(token1?.tradingBalance ?? 0)
+		const token0Amount = Big(e)
+			.times(token0?.tradingBalance ?? 0)
 			.div(100)
 			.div(10 ** token1?.decimals);
-		setAmount(token1Amount.toString());
+		setAmount(token0Amount.toNumber().toString());
 		if (price != '0' && price != '' && Number(price))
 			if (Number(price) > 0)
-				settoken0Amount(token1Amount.div(price).toString());
+				settoken1Amount(token0Amount.times(price).toString());
 	};
 
-	const updateToken1Amount = (e) => {
+	const updateToken0Amount = (e) => {
 		setAmount(e);
 		if (
 			price != '0' &&
@@ -157,11 +120,11 @@ export default function BuyModule({ pair }) {
 			e != '' &&
 			Number(e)
 		)
-			settoken0Amount(Big(e).div(price).toString());
+			settoken1Amount(Big(e).times(price).toString());
 	};
 
-	const updateToken0Amount = (e) => {
-		settoken0Amount(e);
+	const updateToken1Amount = (e) => {
+		settoken1Amount(e);
 		if (
 			price != '0' &&
 			price != '' &&
@@ -170,28 +133,16 @@ export default function BuyModule({ pair }) {
 			e != '' &&
 			Number(e)
 		)
-			setAmount(Big(e).times(price).toString());
+			setAmount(Big(e).div(price).toString());
 	};
 
 	const onPriceChange = (e) => {
 		setPrice(e);
 		if (amount != '0' && amount != '' && e != '0' && e != '' && Number(e))
-			settoken0Amount(Big(amount).div(e).toString());
+			settoken1Amount(Big(amount).div(e).toString());
 	};
 
-	const amountExceedsBalance = () => {
-		if (amount == '0' || amount == '') return false;
-		if (Number(amount))
-			return Big(amount).gt(
-				Big(token1.tradingBalance).div(10 ** token1.decimals)
-			);
-	};
-
-	const amountExceedsMin = () => {
-		if (token0Amount == '0' || token0Amount == '') return false;
-		if (Number(token0Amount))
-			return Big(token0Amount).lt(Big(MIN_T0_ORDER).div(10 ** token0.decimals));
-	};
+	
 
 	const labelStyles = {
 		mt: '2',
@@ -222,12 +173,12 @@ export default function BuyModule({ pair }) {
 			</Flex>
 
 			<Flex flexDir={'column'} gap={1}>
-				<Text fontSize={'sm'}>Amount ({pair?.tokens[0].symbol})</Text>
+				<Text fontSize={'sm'}>Amount ({pair?.tokens[1].symbol})</Text>
 				<NumberInput
 					min={0}
 					precision={pair?.exchangeRateDecimals}
-					value={token0Amount}
-					onChange={updateToken0Amount}
+					value={token1Amount}
+					onChange={updateToken1Amount}
 					variant="filled"
 					border={'1px'}
 					borderRadius="6"
@@ -242,15 +193,14 @@ export default function BuyModule({ pair }) {
 
 			<Flex flexDir={'column'} gap={1}>
 				<Flex justify={'space-between'}>
-				<Text fontSize={'sm'}>Total ({pair?.tokens[1].symbol})</Text>
-				<Text fontSize={'xs'}>Balance {tokenFormatter.format((token1?.tradingBalance ?? 0)/(10**token1?.decimals))}</Text>
+				<Text fontSize={'sm'}>Total ({pair?.tokens[0].symbol})</Text>
+				<Text fontSize={'xs'}>Balance {tokenFormatter.format((token0?.tradingBalance ?? 0)/(10**token0?.decimals))}</Text>
 				</Flex>
-
 				<NumberInput
 					min={0}
 					precision={pair?.tokens[1].decimals}
 					value={amount}
-					onChange={updateToken1Amount}
+					onChange={updateToken0Amount}
 					variant="filled"
 					border={'1px'}
 					borderRadius="6"
@@ -289,34 +239,14 @@ export default function BuyModule({ pair }) {
 						{isNaN(sliderValue) ? 0 : sliderValue}%
 					</SliderMark>
 					<SliderTrack>
-						<SliderFilledTrack bgColor="green.300" />
+						<SliderFilledTrack bgColor="red.300" />
 					</SliderTrack>
 					<SliderThumb />
 				</Slider>
 			</Flex>
 
-			<Button
-				width={'100%'}
-				mt="2"
-				bgColor={'green'}
-				onClick={buy}
-				disabled={
-					loading ||
-					Number(amount) <= 0 ||
-					amountExceedsBalance() ||
-					amountExceedsMin() ||
-					price == '' ||
-					Number(price) <= 0
-				}
-				loadingText='Please sign the transaction'
-				isLoading={loading}>
-				{amountExceedsMin()
-					? 'Amount is too less'
-					: amountExceedsBalance()
-					? 'Insufficient Trading Balance'
-					: 'Limit Buy'}
-			</Button>
-			<Text fontSize={'sm'} mb={2}>{response}</Text>
+			
+			<SellModal amount={amount} token0={token0} token1={token1} token1Amount={token1Amount} pair={pair} price={price} />
 		</Flex>
 	);
 }

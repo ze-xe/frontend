@@ -26,7 +26,6 @@ const Swap = ({pair}) => {
 						</Flex>
 					</TabPanel>
 					<TabPanel>
-						<></>
 					</TabPanel>
 				</TabPanels>
 			</Tabs>

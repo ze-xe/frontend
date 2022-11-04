@@ -2,7 +2,7 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { useContext } from 'react';
 import { WalletContext } from '../context/Wallet';
-import { Avatar, Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Avatar, Box, Button, Flex, Progress, Text } from '@chakra-ui/react';
 
 import {
 	Table,
@@ -21,7 +21,7 @@ import Link from 'next/link';
 export default function wallet() {
 	const { address, isConnected } = useContext(WalletContext);
   	const { tokens, tokenFormatter } = useContext(DataContext)
-	const [balance, setBalance] = React.useState(0);
+	const [ balance, setBalance ] = React.useState(0);
 
 	React.useEffect(() => {
 		if(isConnected) _setBalance();
@@ -58,6 +58,7 @@ export default function wallet() {
 								<Th>Asset</Th>
 								<Th>Trading Balance</Th>
 								<Th>Wallet Balance</Th>
+								{/* <Th></Th> */}
 								<Th></Th>
 							</Tr>
 						</Thead>
@@ -73,6 +74,7 @@ export default function wallet() {
                       </Td>
                     <Td>{tokenFormatter.format(token.tradingBalance/(10**token.decimals))} {token.symbol}</Td>
                     <Td>{tokenFormatter.format(token.balance/(10**token.decimals))} {token.symbol}</Td>
+					{/* <Td><Progress value={(token.tradingBalance/(10**token.decimals))} height='2' width={40} rounded={20} colorScheme='green' /></Td> */}
                     <Td textAlign={'right'}>
                         <Link href={'/deposit'}>
                         <Button size={'sm'} variant='ghost'>Deposit</Button>

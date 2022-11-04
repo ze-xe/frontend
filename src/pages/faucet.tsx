@@ -110,16 +110,17 @@ export default function faucets() {
 				px={4}
 				py={4}
 				bgColor="gray.1000"
-				width={'60%'}
-				maxW="1400px">
-				<Text fontSize={'2xl'} fontWeight="bold">
+				// width={'70%'}
+				// maxW="1400px"
+				>
+				<Text fontSize={'3xl'} fontWeight="bold">
 					Faucet
 				</Text>
 				<Text fontSize={'sm'} mb={6} color="gray.400">
 					It's raining free money! 💰
 				</Text>
 
-				<Text fontSize={'sm'} mb={6} color="gray.400">
+				<Text fontSize={'lg'} fontWeight='bold' mb={2}>
 					Choose an asset
 				</Text>
 				<HStack {...group}>
@@ -131,7 +132,7 @@ export default function faucets() {
 								{...radio}
 								minW="150px"
 								isChecked={selectedToken == index}>
-								<Box key={token.id} minW={'15%'}>
+								<Box key={token.id} minW={'150px'} minH={'160px'}> 
 									<Image
 										src={
 											`/assets/crypto_logos/` +
@@ -225,6 +226,8 @@ export default function faucets() {
 							mt={6}
 							onClick={() => mint()}
 							loadingText="Confirm in your wallet"
+							bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
+							size='lg'
 							isLoading={loading}>
 							Mint
 						</Button>

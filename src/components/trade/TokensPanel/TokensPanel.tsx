@@ -15,6 +15,8 @@ import NewTokens from './NewTokens';
 import { Divider } from '@chakra-ui/react';
 
 export default function TokensPanel() {
+	const [search, setSearch] = React.useState('');
+
 	return (
 		<Box >
             <Box pt={3} px={4}>
@@ -22,7 +24,7 @@ export default function TokensPanel() {
             </Box>
             <Divider my={3}/>
 			<Box mt={4} >
-			<Input size={'md'} fontSize='sm' placeholder="Search token" mb={0} borderRadius={0} variant={'outlined'}  bgColor='gray.900'></Input>
+			<Input size={'md'} fontSize='sm' placeholder="Search token" mb={0} borderRadius={0} variant={'outlined'} onChange={(e) => setSearch(e.target.value)} bgColor='gray.900'></Input>
 			</Box>
 			<Tabs
                 mt={3}
@@ -37,7 +39,7 @@ export default function TokensPanel() {
 				</TabList>
 				<TabPanels>
 					<TabPanel px={0}>
-						<AllTokens />
+						<AllTokens search={search} />
 					</TabPanel>
 					<TabPanel>
 						<TrendingTokens />

@@ -24,15 +24,17 @@ export default function TitlePanel({ pair }) {
 					<Text fontSize={'xs'} color="gray.500">
 						{pair?.tokens[0].name}
 					</Text>
-					<Text fontSize={'xs'} color="gray.500">
+					<Text fontSize={'xs'} color="gray.500" mt={-0.5}>
 						{pair?.tokens[1].name}
 					</Text>
 				</Box>
 			</Flex>
-			<Box textAlign={'right'}>
+			<Box textAlign={'right'} color={pair?.priceDiff < 0 ? 'red' : 'green'}>
 				{/* <Text fontSize={'xs'} textTransform='uppercase'>Price</Text> */}
-				<Text fontSize={'3xl'} fontWeight='bold' color='green'>{pair?.exchangeRate / (10**pair?.exchangeRateDecimals)} </Text>
-				<Text fontSize={'sm'} color='green'>+2.2%</Text>
+				<Text fontSize={'3xl'} fontWeight='bold'>{pair?.exchangeRate / (10**pair?.exchangeRateDecimals)} </Text>
+				<Text fontSize={'sm'}>{2.33
+				// (pair?.priceDiff)/(10**pair?.exchangeRateDecimals)
+				}%</Text>
 
 			</Box>
 			</Flex>

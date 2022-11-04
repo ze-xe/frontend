@@ -15,12 +15,12 @@ import { EditIcon } from '@chakra-ui/icons';
 import {MdOutlineCancel} from 'react-icons/md';
 export default function PlacedOrders() {
 	return (
-		<Box px={4} py={4} mt={2} bgColor="gray.1100">
+		<Box bgColor="gray.1100">
 			<TableContainer>
-				<Table size="sm" borderColor={'gray.800'}>
+				<Table size="sm" borderColor={'gray.800'} >
 					<Thead>
 						<Tr>
-							<Th>Placed Order</Th>
+							<Th>Order</Th>
 							<Th>Amount</Th>
 							<Th isNumeric></Th>
 						</Tr>

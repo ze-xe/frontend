@@ -1,4 +1,4 @@
-import { ArrowUpIcon } from '@chakra-ui/icons';
+import { ArrowDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
 import { Box, Flex, Spacer, Text, Divider } from '@chakra-ui/react';
 import React from 'react';
 import { useContext } from 'react';
@@ -62,7 +62,7 @@ export default function OrderBook({ pair }) {
 				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
-			{sellOrders.map((order: any, index: number) => {
+			{sellOrders.reverse().map((order: any, index: number) => {
 				return (
 					<Order
 						order={order}
@@ -75,15 +75,15 @@ export default function OrderBook({ pair }) {
 				);
 			})}
 			<Divider mt={2} bgColor="transparent" />
-			<Flex py={2} align="end" gap={2} color={'green'} justify="end">
+			<Flex py={2} align="end" gap={2} color={pair?.priceDiff < 0 ? 'red' : 'green'} justify="end">
 				<Flex textAlign={'right'} mb={1.5} mr={-1}>
-				<ArrowUpIcon width={3}/>
-				<Text fontSize="xs">
-					0.12
-				</Text>
+				
+				{pair?.priceDiff < 0 ? <ArrowDownIcon width={3}/> : <ArrowUpIcon width={3}/>}
+				<Text fontSize={'xs'}>{pair?.priceDiff/ (10**pair?.exchangeRateDecimals)}</Text>
+
 				</Flex>
 				<Text
-					fontSize={'2xl'}
+					fontSize={'3xl'}
 					fontWeight="bold"
 					textAlign={'right'}
 					mr={4}>

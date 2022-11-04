@@ -4,12 +4,16 @@ import Link from 'next/link';
 import React, { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 
-export default function AllTokens() {
+export default function AllTokens({search}) {
 	const { pairs } = useContext(DataContext);
+
+	const filteredPairs = pairs.filter((pair) => {
+		return pair?.tokens[0].symbol.toLowerCase().includes(search.toLowerCase()) || pair?.tokens[1].symbol.toLowerCase().includes(search.toLowerCase()) || pair?.tokens[0].name.toLowerCase().includes(search.toLowerCase()) || pair?.tokens[1].name.toLowerCase().includes(search.toLowerCase());
+	})
 
 	return (
 		<Flex flexDir={'column'} gap={0} mt={-2}>
-			{pairs.map((pair, index) => (
+			{filteredPairs.map((pair, index) => (
 				<Link
 					key={index}
 					href={
@@ -37,7 +41,7 @@ export default function AllTokens() {
 								style={{ maxHeight: 30, maxWidth: 30, borderRadius: "50%" }}></Image>
 							<Box ml={2}>
 								<Text>{pair.tokens[0].name}</Text>
-								<Text fontSize={'xs'}>
+								<Text fontSize={'xs'} color='gray.400'>
 									{pair.tokens[0].symbol}/
 									{pair.tokens[1].symbol}
 								</Text>
