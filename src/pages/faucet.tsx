@@ -28,6 +28,7 @@ const mintAmount = {
 const Big = require('big.js');
 import { Select } from '@chakra-ui/react';
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react';
+import Link from 'next/link';
 
 function RadioCard(props) {
 	const { getInputProps, getCheckboxProps } = useRadio(props);
@@ -114,19 +115,23 @@ export default function faucets() {
 				<Text fontSize={'2xl'} fontWeight="bold">
 					Faucet
 				</Text>
-				<Text fontSize={'sm'} mb={6} color='gray.400'>
+				<Text fontSize={'sm'} mb={6} color="gray.400">
 					It's raining free money! 💰
 				</Text>
 
+				<Text fontSize={'sm'} mb={6} color="gray.400">
+					Choose an asset
+				</Text>
 				<HStack {...group}>
 					{tokens.map((token, index) => {
 						const radio = getRadioProps({ value: index });
 						return (
-							<RadioCard key={index} {...radio} isChecked={selectedToken == index}>
-								<Box
-									key={token.id}
-									minW={'15%'}
-								>
+							<RadioCard
+								key={index}
+								{...radio}
+								minW="150px"
+								isChecked={selectedToken == index}>
+								<Box key={token.id} minW={'15%'}>
 									<Image
 										src={
 											`/assets/crypto_logos/` +
@@ -151,9 +156,31 @@ export default function faucets() {
 							</RadioCard>
 						);
 					})}
+					{/* <Link href="https://tron.com" target={'_blank'}>
+						<Box
+							bgColor={'#E11518'}
+							minW="200px"
+							minH={'155px'}
+							border="1px"
+							borderColor={'gray'}
+							borderRadius="6px"
+							p={4}>
+							<Image
+								src={`/assets/crypto_logos/trx.png`}
+								width={40}
+								height={40}
+								alt={'trx'}
+								style={{
+									maxHeight: 40,
+									borderRadius: '50%',
+								}}></Image>
+							<Text fontSize={'xl'}>Tron</Text>
+							<Text fontSize={'md'}>TRX</Text>
+
+						</Box>
+					</Link> */}
 				</HStack>
 				<Box>
-
 					<Box my={2}>
 						<InputGroup size="lg" width={'100%'}>
 							<InputLeftElement
@@ -184,7 +211,9 @@ export default function faucets() {
 								placeholder="Enter Amount"
 								// disabled={needsApproval()}
 								value={
-									mintAmount[tokens[selectedToken]?.symbol] + ' ' + tokens[selectedToken]?.symbol
+									mintAmount[tokens[selectedToken]?.symbol] +
+									' ' +
+									tokens[selectedToken]?.symbol
 								}
 							/>
 						</InputGroup>
@@ -199,7 +228,11 @@ export default function faucets() {
 							isLoading={loading}>
 							Mint
 						</Button>
-						{success && <Text fontSize={'sm'} mt={2}>Transaction Successful!</Text>}
+						{success && (
+							<Text fontSize={'sm'} mt={2}>
+								Transaction Successful!
+							</Text>
+						)}
 					</Box>
 				</Box>
 			</Box>

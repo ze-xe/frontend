@@ -70,8 +70,6 @@ export default function Deposit() {
 
 	return (
 		<Flex flexDir={'column'} justify="space-between" height={'100%'}>
-
-			
 			<Box>
 				<Text fontSize={'2xl'} fontWeight="bold" mb={2}>
 					Choose an asset to withdraw
@@ -97,88 +95,84 @@ export default function Deposit() {
 						})}
 					</Select>
 				</Box>
-			<Box my={2}>
-				<InputGroup size="lg" width={'100%'}>
-					<InputLeftElement
-						pointerEvents="none"
-						children={
-							<Image
-								src={
-									`/assets/crypto_logos/` +
-									tokens[
-										selectedToken
-									]?.symbol.toLowerCase() +
-									'.png'
-								}
-								width={30}
-								height={30}
-								alt={tokens[selectedToken]?.symbol}
-								style={{
-									maxHeight: 30,
-									borderRadius: '50%',
-								}}></Image>
-						}
-					/>
-					<Input
-						// borderRadius={'8px 0 0 8px'}
-						pr="4.5rem"
-						type={'Amount'}
-						placeholder="Enter Amount"
-						// disabled={needsApproval()}
-						value={amount}
-						onChange={(e) => setAmount(e.target.value)}
-					/>
-					<InputRightElement mr={2}>
-						<Button
-							h="1.75rem"
-							size="sm"
+				<Box my={2}>
+					<InputGroup size="lg" width={'100%'}>
+						<InputLeftElement
+							pointerEvents="none"
+							children={
+								<Image
+									src={
+										`/assets/crypto_logos/` +
+										tokens[
+											selectedToken
+										]?.symbol.toLowerCase() +
+										'.png'
+									}
+									width={30}
+									height={30}
+									alt={tokens[selectedToken]?.symbol}
+									style={{
+										maxHeight: 30,
+										borderRadius: '50%',
+									}}></Image>
+							}
+						/>
+						<Input
+							// borderRadius={'8px 0 0 8px'}
+							pr="4.5rem"
+							type={'Amount'}
+							placeholder="Enter Amount"
 							// disabled={needsApproval()}
-							onClick={handleMax}
-							variant="ghost">
-							{'Max'}
-						</Button>
-					</InputRightElement>
-				</InputGroup>
+							value={amount}
+							onChange={(e) => setAmount(e.target.value)}
+						/>
+						<InputRightElement mr={2}>
+							<Button
+								h="1.75rem"
+								size="sm"
+								// disabled={needsApproval()}
+								onClick={handleMax}
+								variant="ghost">
+								{'Max'}
+							</Button>
+						</InputRightElement>
+					</InputGroup>
+				</Box>
 			</Box>
-			</Box>
-
-
-
-						<Box>
-
-						
-			<Button
-				width={'100%'}
-				mt={2}
-				disabled={Number(amount) == 0 || amountExceedsBalance()}
-				onClick={withdraw}
-				isLoading={loading}
-				loadingText="Confirm in your wallet"
-				bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
-						size="lg">
-				{Number(amount) == 0
-					? 'Enter Amount'
-					: amountExceedsBalance()
-					? 'Insufficient Balance'
-					: 'Withdraw'}
-			</Button>
 
 			<Box>
-				{error && <Text color={'red'}>{error}</Text>}
-				{success && (
-					<Box>
-						<Text>Transaction Submitted!</Text>
-						<Link
-							target={'_blank'}
-							href={
-								'https://nile.tronscan.org/#/transaction/' +
-								hash
-							}>
-							View on TronScan
-						</Link>
-					</Box>
-				)}
-			</Box>
+				<Button
+					width={'100%'}
+					mt={2}
+					disabled={Number(amount) == 0 || amountExceedsBalance()}
+					onClick={withdraw}
+					isLoading={loading}
+					loadingText="Confirm in your wallet"
+					bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
+					size="lg">
+					{Number(amount) == 0
+						? 'Enter Amount'
+						: amountExceedsBalance()
+						? 'Insufficient Balance'
+						: 'Withdraw'}
+				</Button>
+
+				<Box>
+					{error && <Text color={'red'}>{error}</Text>}
+					{success && (
+						<Box>
+							<Text>Transaction Submitted!</Text>
+							<Link
+								target={'_blank'}
+								href={
+									'https://nile.tronscan.org/#/transaction/' +
+									hash
+								}>
+								View on TronScan
+							</Link>
+						</Box>
+					)}
+				</Box>
 			</Box>
 		</Flex>
 	);

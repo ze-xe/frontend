@@ -62,7 +62,7 @@ export default function OrderBook({ pair }) {
 				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
-			{sellOrders.reverse().map((order: any, index: number) => {
+			{sellOrders.map((order: any, index: number) => {
 				return (
 					<Order
 						order={order}
