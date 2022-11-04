@@ -45,32 +45,31 @@ export default function SellModal({
 		let _amount = Big(amount)
 			.times(10 ** token0.decimals)
 			.toFixed(0);
-		
-				(window as any).tronWeb
-					.contract(getABI('Exchange'), getAddress('Exchange'))
-					.methods.executeAndPlaceOrder(
-						pair.tokens[0].id,
-						pair.tokens[1].id,
-						_amount,
-						(
-							Number(price) *
-							10 ** pair.exchangeRateDecimals
-						).toFixed(0),
-						0,
-						orders.map((order) => '0x'+order.id),
-					)
-					.send({})
-					.then((res: any) => {
-						setHash(res);
-                        setLoading(false);
-                        checkResponse(res);
-                        setResponse('Transaction sent! Waiting for confirmation...');
-					})
-					.catch((err: any) => {
-						setLoading(false)
-						console.log(err);
-					})
-			
+
+		console.log(orders.map((order) => order.amount), _amount);
+		(window as any).tronWeb
+			.contract(getABI('Exchange'), getAddress('Exchange'))
+			.methods.executeAndPlaceOrder(
+				pair.tokens[0].id,
+				pair.tokens[1].id,
+				_amount,
+				(Number(price) * 10 ** pair.exchangeRateDecimals).toFixed(0),
+				0,
+				orders.map((order) => '0x' + order.id)
+			)
+			.send({
+				feeLimit: 1000000000
+			})
+			.then((res: any) => {
+				setHash(res);
+				setLoading(false);
+				checkResponse(res);
+				setResponse('Transaction sent! Waiting for confirmation...');
+			})
+			.catch((err: any) => {
+				setLoading(false);
+				console.log(err);
+			});
 	};
 
 	// check response in intervals
@@ -115,7 +114,7 @@ export default function SellModal({
 			.then((resp) => {
 				let orders = resp.data.data;
 				let ordersToExecute = [];
-				let _orderToPlace = amount;
+				let _orderToPlace = amount*(10**token0.decimals);
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
 					ordersToExecute.push(orders[i]);
@@ -174,8 +173,7 @@ export default function SellModal({
 					amountExceedsMin() ||
 					price == '' ||
 					Number(price) <= 0
-				}
-				>
+				}>
 				{amountExceedsMin()
 					? 'Amount is too less'
 					: amountExceedsBalance()
@@ -218,7 +216,7 @@ export default function SellModal({
 							<Box py={2} my={2} bgColor="gray.900" px={2}>
 								<Text fontSize={'xs'}>OrderType: SELL</Text>
 								<Text>
-									{orderToPlace} {token0?.symbol} @ {price}{' '}
+									{orderToPlace/(10**token0?.decimals)} {token0?.symbol} @ {price}{' '}
 									{token1?.symbol}
 								</Text>
 							</Box>
@@ -239,33 +237,34 @@ export default function SellModal({
 					<ModalFooter>
 						<Flex flexDir={'column'} width={'100%'}>
 							{response ? (
-                                <Box  mb={2}>
-
-								<Flex gap={4} align="center" mb={6}>
-									{confirmed ? (
-                                        <CheckIcon />
-                                        ) : (
-                                            <AiOutlineLoading />
-                                            )}
-									<Box>
-										<Text fontSize="md" mb={0}>
-											{response}
-										</Text>
-										<Link
-											href={
-                                                'https://nile.tronscan.org/#/transaction/' +
-												hash
-											}
-											target="_blank">
-											{' '}
-											<Text fontSize={'sm'}>
-												View on TronScan
+								<Box mb={2}>
+									<Flex gap={4} align="center" mb={6}>
+										{confirmed ? (
+											<CheckIcon />
+										) : (
+											<AiOutlineLoading />
+										)}
+										<Box>
+											<Text fontSize="md" mb={0}>
+												{response}
 											</Text>
-										</Link>
-									</Box>
-								</Flex>
-                                <Button onClick={_onClose} width='100%'>Close</Button>
-                                </Box>
+											<Link
+												href={
+													'https://nile.tronscan.org/#/transaction/' +
+													hash
+												}
+												target="_blank">
+												{' '}
+												<Text fontSize={'sm'}>
+													View on TronScan
+												</Text>
+											</Link>
+										</Box>
+									</Flex>
+									<Button onClick={_onClose} width="100%">
+										Close
+									</Button>
+								</Box>
 							) : (
 								<>
 									<Button

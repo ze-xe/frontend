@@ -17,12 +17,12 @@ import { WalletContext } from '../context/Wallet';
 import { getABI } from '../utils/contract';
 
 const mintAmount = {
-	USDT: 10000,
-	USDD: 10000,
-	BTC: 10,
-	ETH: 100,
-	TRX: 1000000,
-	BTT: 1000000000000,
+	USDT: 100000,
+	USDD: 100000,
+	BTC: 100,
+	ETH: 1000,
+	TRX: 10000000,
+	BTT: 10000000000000,
 };
 
 const Big = require('big.js');

@@ -75,7 +75,9 @@ export default function BuyModal({
 				1,
 				orders.map((o) => '0x' + o.id)
 			)
-			.send({})
+			.send({
+				feeLimit: 1000000000
+			})
 			.then((res: any) => {
 				setHash(res);
 				setLoading(false);
@@ -126,7 +128,7 @@ export default function BuyModal({
 			.then((resp) => {
 				let orders = resp.data.data;
 				let ordersToExecute = [];
-				let _orderToPlace = token0Amount;
+				let _orderToPlace = token0Amount*(10**token0.decimals);
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
 					ordersToExecute.push(orders[i]);
@@ -214,7 +216,7 @@ export default function BuyModal({
 							<Box py={2} my={2} bgColor="gray.900" px={2}>
 								<Text fontSize={'xs'}>OrderType: BUY</Text>
 								<Text>
-									{orderToPlace} {token0?.symbol} @ {price}{' '}
+									{orderToPlace/(10**token0?.decimals)} {token0?.symbol} @ {price}{' '}
 									{token1?.symbol}
 								</Text>
 							</Box>
@@ -228,7 +230,7 @@ export default function BuyModal({
 							Estimated Output: {token0Amount} {token0?.symbol}
 						</Text>
 						<Text>
-							Total Amount: {expectedOutput} {token1?.symbol}
+							Total Amount: {expectedOutput/(10**token1?.decimals)} {token1?.symbol}
 						</Text>
 					</ModalBody>
 
