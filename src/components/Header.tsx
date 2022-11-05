@@ -120,7 +120,7 @@ export const Header = ({ title }: { title: string }) => {
 						</Box>
 					</Link>
 
-					<Flex display={{ base: 'none', md: 'flex' }} ml={10}>
+					<Flex display={{ base: 'none', md: 'flex' }} ml={6}>
 						<DesktopNav />
 					</Flex>
 				</Flex>

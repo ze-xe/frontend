@@ -41,7 +41,7 @@ import {
     SliderMark,
   } from '@chakra-ui/react'
 
-export default function CancelOrder({
+export default function UpdateOrder({
 	pair,
 	token1,
 	token0,
@@ -52,20 +52,57 @@ export default function CancelOrder({
 	const [loading, setLoading] = React.useState(false);
 	const [response, setResponse] = React.useState(null);
 	const [hash, setHash] = React.useState(null);
+    const [token0Amount, setToken0Amount] = React.useState('0');
+    const [maxAmount, setMaxAmount] = React.useState('0');
 	const [confirmed, setConfirmed] = React.useState(false);
+	const [orders, setOrders] = React.useState([]);
+	const [orderToPlace, setOrderToPlace] = React.useState(0);
+	const [expectedOutput, setExpectedOutput] = React.useState(0);
+    const [sliderValue, setSliderValue] = React.useState(0);
 
+    useEffect(() => {
+        if(order.orderType == '0'){
+            setMaxAmount((token0.tradingBalance/(10**token0.decimals)).toString())
+        } else {
+            setMaxAmount(((token1.tradingBalance/(order.exchangeRate/(10**pair.exchangeRateDecimals)))/(10**token1.decimals)).toString())
+        }
+    })
+
+	const amountExceedsBalance = () => {
+		if (token0Amount == '0' || token0Amount == '' || !token1.tradingBalance) return false;
+		if (Number(token0Amount))
+			return Big(token0Amount).gt(
+				Big(maxAmount)
+			);
+	};
+
+	const amountExceedsMin = () => {
+		if (token0Amount == '0' || token0Amount == '') return false;
+		if (Number(token0Amount))
+			return Big(token0Amount).lt(
+				Big(MIN_T0_ORDER).div(10 ** token0.decimals)
+			);
+	};
+
+    const changeSliderValue = (value) => {
+        setSliderValue(value)
+        setToken0Amount((value/100 * Number(maxAmount)).toString())
+    }
 
 	const update = () => {
 		setLoading(true);
 		setConfirmed(false);
 		setHash(null);
 		setResponse('');
+		let _amount = Big(token0Amount)
+			.times(10 ** token0.decimals)
+			.toFixed(0);
 
 		(window as any).tronWeb
 			.contract(getABI('Exchange'), getAddress('Exchange'))
 			.methods.updateLimitOrder(
 				'0x'+order.id,
-                '0',
+                _amount,
 			)
 			.send({
 				feeLimit: 1000000000,
@@ -106,8 +143,10 @@ export default function CancelOrder({
 	};
 
 	const _onClose = () => {
+		setOrderToPlace(0);
 		setLoading(false);
 		setResponse(null);
+		setOrders([]);
 		onClose();
 	};
 
@@ -117,7 +156,7 @@ export default function CancelOrder({
                 size={'sm'}
                 my={-2}
                 variant='ghost'
-                icon={<MdCancel />}
+                icon={<MdEdit />}
                 onClick={_onOpen}
                 aria-label={''}>
 			</IconButton>
@@ -126,17 +165,23 @@ export default function CancelOrder({
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>
-					<ModalHeader>Review</ModalHeader>
+					<ModalHeader>Review {order.orderType == '0'? 'SELL' : 'BUY'}</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-                        <Text mb={4}>You are about to cancel the following order:</Text>
-
-                        <Text>Order Amount</Text>
-                        <Text mb={2}>{order.amount/(10**token0?.decimals)} {token0?.symbol}</Text>
-                        <Text>Exchange Rate</Text>
-                        <Text mb={2}>{order.exchangeRate/(10**pair?.exchangeRateDecimals)} {token1?.symbol}/{token0?.symbol}</Text>
-                        <Text>Order Type</Text>
-                        <Text mb={2}>{order.orderType == '0' ? 'Buy' : 'Sell'}</Text>
+                        <Text mb={2}>Exchange Rate {order.exchangeRate/(10**pair?.exchangeRateDecimals)} {token1?.symbol}/{token0?.symbol}</Text>
+                        <Text fontSize={'sm'} mb={1} color='gray'>Previous Amount</Text>
+						<Input disabled value={(order.amount/(10**token0?.decimals)) + ' ' + token0?.symbol} />
+                        <Text fontSize={'sm'} my={1} color='gray'>New Amount</Text>
+						<Input placeholder='Enter Amount' value={token0Amount} onChange={(e) => setToken0Amount(e.target.value)}/>
+                        <Slider aria-label='slider-ex-1' value={sliderValue} onChange={changeSliderValue}>
+                            <SliderTrack>
+                                <SliderFilledTrack bgColor={'orange'} />
+                            </SliderTrack>
+                            <SliderThumb />
+                        </Slider>
+						<Text mt={4}>
+							Estimated Output: {Number(token0Amount)*order.exchangeRate/(10**pair.exchangeRateDecimals)} {token1?.symbol}
+						</Text>
 					</ModalBody>
 
 					<ModalFooter>
@@ -182,13 +227,14 @@ export default function CancelOrder({
 							) : (
 								<>
 									<Button
-										bgColor="gray.700"
+										bgColor="orange"
 										mr={3}
 										width="100%"
 										onClick={update}
 										loadingText="Sign the transaction in your wallet"
-										isLoading={loading}>
-										Confirm Cancel
+										isLoading={loading}
+                                        disabled={amountExceedsBalance() || !Number(token0Amount) || token0Amount == '0' || amountExceedsMin()}>
+										{amountExceedsMin() ? 'Amount is too less' : amountExceedsBalance() ? 'Insufficient Balance' : token0Amount == '0' ? 'Enter Amount' : 'Confirm Update'}
 									</Button>
 									<Button onClick={onClose} mt={2}>
 										Back
