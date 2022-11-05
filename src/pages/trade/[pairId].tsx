@@ -48,7 +48,7 @@ const Trade = () => {
 					</Flex>
 				</Flex>
 				<Box bgColor={'gray.1100'} my={2} width='100%'>
-					<PlacedOrders/>
+					<PlacedOrders pair={pair}/> 
 				</Box>
 			</Box>
 		</>

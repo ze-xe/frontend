@@ -13,9 +13,13 @@ const Graph = ({ pair }) => {
 	const { pairData } = useContext(DataContext);
 
 	const [_candleSeries, setCandleSeries] = React.useState<any>();
+	const [_volumeSeries, setVolumeSeries] = React.useState<any>();
+
 
 	if (chart.current && pair) {
-		_candleSeries.setData(pairData[pair?.id] ?? []);
+		_candleSeries.setData(pairData[pair?.id]?.exchangeRate ?? []);
+		_volumeSeries.setData(pairData[pair?.id]?.volume ?? []);
+
 	}
 	useEffect(() => {
 		chart.current = createChart(chartContainerRef.current, {
@@ -53,7 +57,6 @@ const Graph = ({ pair }) => {
 			wickUpColor: '#838ca1',
 		});
 		setCandleSeries(candleSeries);
-
 		candleSeries.setData(pairData[pair?.id] ?? []);
 
 		// const areaSeries = chart.current.addAreaSeries({
@@ -77,7 +80,7 @@ const Graph = ({ pair }) => {
 				bottom: 0,
 			},
 		});
-
+		setVolumeSeries(volumeSeries);
 		volumeSeries.setData(volumeData);
 	}, []);
 

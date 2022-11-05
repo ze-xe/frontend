@@ -2,7 +2,7 @@ import React from 'react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import PlacedOrders from './PlacedOrders'
 
-export default function index() {
+export default function index({pair}) {
   return (
     <>
     <Tabs colorScheme={'gray'} size='sm'>
@@ -14,7 +14,7 @@ export default function index() {
 
   <TabPanels>
     <TabPanel>
-      <PlacedOrders/>
+      <PlacedOrders pair={pair}/>
     </TabPanel>
     <TabPanel>
       <p>two!</p>

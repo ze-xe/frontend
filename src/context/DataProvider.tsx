@@ -37,6 +37,8 @@ function DataProvider({ children }: any) {
 	const [pairs, setPairs] = React.useState<any[]>([]);
 	const [pairData, setPairData] = React.useState<any>({});
 	const [orders, setOrders] = React.useState<any>({});
+	const [placedOrders, setPlacedOrders] = React.useState<any>({});
+
 	const [tokens, setTokens] = React.useState<any[]>([]);
 
 	const [dollarFormatter, setDollarFormatter] = React.useState<null | {}>(
@@ -93,30 +95,21 @@ function DataProvider({ children }: any) {
 			// fetch data
 			Promise.all([axios.get('https://api.zexe.io/allpairs'), axios.get('https://api.zexe.io/alltokens')]).then(async (res) => {
 				let pairs = res[0].data.data;
-				console.log('pairs', pairs);
 				setPairs(pairs);
 				fetchPairData(pairs);
 				let tokens = res[1].data.data;
-				console.log('tokens', tokens);
 				setTokens(tokens);
+
+				console.log('pairs', pairs);
+				console.log('tokens', tokens);
+				
 				for(let i in tokens){
 					let token = tokens[i];
 					token.price = await getPrice(token.symbol)
 				}
+
 				getWalletBalances(address, tokens);
-				let orderRequests = pairs.map((pair) => {
-					return axios.get(`https://api.zexe.io/orders/${pair.id}`);
-				})
-				Promise.all(orderRequests).then((res) => {
-					let newOrders = {};
-					res.forEach((order, index) => {
-						return newOrders[order.data.data.pair] = order.data.data;
-					})
-					setOrders(newOrders);
-					setIsFetchingData(false);
-					setIsDataReady(true);
-					setTimeout(() => keepListening(address, pairs, tokens), 10000);
-				})
+				fetchOrders(pairs)
 			})
 		} catch (error) {
 			setDataFetchError(error.message);
@@ -130,6 +123,12 @@ function DataProvider({ children }: any) {
 			setPairs(res.data.data)
 		})
 
+		fetchOrders(pairs)
+		fetchPairData(pairs);
+		getWalletBalances(address, tokens);
+	}
+
+	const fetchOrders = (pairs: any[]) => {
 		let orderRequests = pairs.map((pair) => {
 			return axios.get(`https://api.zexe.io/orders/${pair.id}`);
 		})
@@ -139,13 +138,20 @@ function DataProvider({ children }: any) {
 				return newOrders[order.data.data.pair] = order.data.data;
 			})
 			setOrders(newOrders);
-			setIsFetchingData(false);
-			setIsDataReady(true);
-			
-			setTimeout(() => keepListening(address, pairs, tokens), 5000);
 		})
-		fetchPairData(pairs);
-		getWalletBalances(address, tokens);
+	}
+
+	const fetchPlacedOrders = (address: string, pairs: any[]) => {
+		let orderRequests = pairs.map((pair) => {
+			return axios.get(`https://api.zexe.io/orders_placed/${pair.id}/${address}`);
+		})
+		Promise.all(orderRequests).then((res) => {
+			let newOrders = {};
+			res.forEach((order, index) => {
+				return newOrders[order.data.data.pair] = order.data.data;
+			})
+			setPlacedOrders(newOrders);
+		})
 	}
 
 	const fetchPairData = async (pairIds: any[]) => {
@@ -168,7 +174,8 @@ function DataProvider({ children }: any) {
 		tokenFormatter,
 		isFetchingData,
 		fetchData,
-		orders
+		orders,
+		placedOrders
 	};
 
 	return (
@@ -187,6 +194,7 @@ interface DataValue {
 	isFetchingData: boolean;
 	orders: any;
 	fetchData: (_:any, __:string) => void;
+	placedOrders: any
 }
 
 export { DataProvider, DataContext };

@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 import {MdOutlineCancel} from 'react-icons/md';
+import CancelOrder from './CancelOrder';
 export default function PlacedOrders() {
 	return (
 		<Box bgColor="gray.1100">
@@ -42,7 +43,7 @@ export default function PlacedOrders() {
 							<Td isNumeric>
                                 <Flex justify={'end'} gap={2}>
                                 <EditIcon/>
-                                <MdOutlineCancel/>
+                                <CancelOrder/>
                                 </Flex>
                             </Td>
 						</Tr>
