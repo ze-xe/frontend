@@ -22,13 +22,11 @@ const mintAmount = {
 	BTC: 100,
 	ETH: 1000,
 	TRX: 10000000,
-	BTT: 10000000000000,
+	BTT: 100000000000,
 };
 
 const Big = require('big.js');
-import { Select } from '@chakra-ui/react';
-import { Input, InputGroup, InputRightElement } from '@chakra-ui/react';
-import Link from 'next/link';
+import { Input, InputGroup } from '@chakra-ui/react';
 
 function RadioCard(props) {
 	const { getInputProps, getCheckboxProps } = useRadio(props);
@@ -146,10 +144,10 @@ export default function faucets() {
 											maxHeight: 40,
 											borderRadius: '50%',
 										}}></Image>
-									<Text fontSize={'xl'}>{token.name}</Text>
+									<Text fontSize={'xl'} mt={2}>{token.name}</Text>
 									<Text>{token.symbol}</Text>
 
-									<Text fontSize={'sm'} my={2}>
+									<Text fontSize={'sm'} my={2} mt={4}>
 										Balance{' '}
 										{token.balance / 10 ** token.decimals}
 									</Text>

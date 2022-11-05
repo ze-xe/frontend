@@ -10,7 +10,7 @@ export default function GraphPanel({pair}) {
   return (
     <>
     <Flex flexDir={"column"} justify="center" bgColor="gray.800" my={2}>
-        <Graph/>
+        <Graph pair={pair}/>
     </Flex>
     </>
   )

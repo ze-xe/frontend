@@ -143,7 +143,7 @@ export default function Deposit() {
 											maxHeight: 30,
 											borderRadius: '50%',
 										}}></Image>
-									{token.symbol}
+									{token.name} ({token.symbol})
 								</option>
 							);
 						})}

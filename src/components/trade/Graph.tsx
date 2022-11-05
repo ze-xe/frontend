@@ -1,13 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 import { createChart, CrosshairMode } from 'lightweight-charts';
-import { priceData } from "./priceData";
-import { volumeData } from "./volumeData";
+import { priceData } from './priceData';
+import { volumeData } from './volumeData';
+import { useContext } from 'react';
+import { DataContext } from '../../context/DataProvider';
 
-const Graph = () => {
+const Graph = ({ pair }) => {
 	const chartContainerRef = useRef<any>();
 	const chart = useRef<any>();
 	const resizeObserver = useRef<any>();
 
+	const { pairData } = useContext(DataContext);
+
+	const [_candleSeries, setCandleSeries] = React.useState<any>();
+
+	if (chart.current) {
+		_candleSeries.setData(pairData[pair?.id] ?? []);
+	}
 	useEffect(() => {
 		chart.current = createChart(chartContainerRef.current, {
 			width: chartContainerRef.current.clientWidth,
@@ -35,8 +44,6 @@ const Graph = () => {
 			},
 		});
 
-		console.log(chart.current);
-
 		const candleSeries = chart.current.addCandlestickSeries({
 			upColor: '#4bffb5',
 			downColor: '#ff4976',
@@ -45,8 +52,9 @@ const Graph = () => {
 			wickDownColor: '#838ca1',
 			wickUpColor: '#838ca1',
 		});
+		setCandleSeries(candleSeries);
 
-		candleSeries.setData(priceData);
+		candleSeries.setData(pairData[pair?.id] ?? []);
 
 		// const areaSeries = chart.current.addAreaSeries({
 		//   topColor: 'rgba(38,198,218, 0.56)',
@@ -93,7 +101,7 @@ const Graph = () => {
 			<div
 				ref={chartContainerRef}
 				className="chart-container"
-				// style={{ height: "100%" }}
+				style={{ height: '100%' }}
 			/>
 		</div>
 	);

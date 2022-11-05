@@ -11,69 +11,31 @@ const DataContext = React.createContext<DataValue>({} as DataValue);
 // http://localhost:3010/orders/1a7f0acc09e078a414a7d74d2d00434427ef2c021a09d075996d2441f0d4ab9c
 
 // list of tokens
-const dummyPairs = [
-	{
-		id: '0x0000000000000000000000000000000000000000',
-		token0: {
-			id: 'TL9XwmUbYYDdNFkMpSs3x2DU2XSLa2XDGk',
-			name: 'Ethereum',
-			symbol: 'ETH',
-			decimals: 18,
-		},
-		token1: {
-			id: 'TBS4yTRWgfvxo8WF2DVZpMFdJqaKoKhekn',
-			name: 'USD Coin',
-			symbol: 'USDC',
-			decimals: 6,
-		},
-		price: 1670.1231,
-		tags: ['trending', 'eth', 'usd'],
-	},
-	{
-		id: '0x0000000000000000000000000000000000000001',
-		token0: {
-			id: 'TBaZGjW1JfnfHzQfG711bKD9yix4ya2e79',
-			name: 'Bitcoin',
-			symbol: 'BTC',
-			decimals: 18,
-		},
-		token1: {
-			id: 'TBS4yTRWgfvxo8WF2DVZpMFdJqaKoKhekn',
-			name: 'USD Coin',
-			symbol: 'USDC',
-			decimals: 6,
-		},
-		price: 19870.12,
-		tags: ['trending', 'eth', 'usd'],
-	},
-];
+const coingeckoIds = {
+	'BTC': 'bitcoin',
+	'ETH': 'ethereum',
+	'USDT': 'tether',
+	'USDD': 'usdd',
+	'TRX': 'tron',
+	'BTT': 'bittorrent',
+};
 
-const dummyTokens = [
-	{
-		id: 'TL9XwmUbYYDdNFkMpSs3x2DU2XSLa2XDGk',
-		name: 'Ethereum',
-		symbol: 'ETH',
-		decimals: 18,
-	},
-	{
-		id: 'TBS4yTRWgfvxo8WF2DVZpMFdJqaKoKhekn',
-		name: 'USD Coin',
-		symbol: 'USDC',
-		decimals: 6,
-	},
-	{
-		id: 'TBaZGjW1JfnfHzQfG711bKD9yix4ya2e79',
-		name: 'Bitcoin',
-		symbol: 'BTC',
-		decimals: 18,
-	}
-];
+const dummyPrices = {
+	'BTC': '20000',
+	'ETH': '1400',
+	'USDT': '1',
+	'USDD': '1',
+	'TRX': '0.006',
+	'BTT': '0.0000000008',
+};
+
 
 function DataProvider({ children }: any) {
 	const [isDataReady, setIsDataReady] = React.useState(false);
 	const [isFetchingData, setIsFetchingData] = React.useState(false);
 	const [dataFetchError, setDataFetchError] = React.useState<string | null>(null);
 	const [pairs, setPairs] = React.useState<any[]>([]);
+	const [pairData, setPairData] = React.useState<any>({});
 	const [orders, setOrders] = React.useState<any>({});
 	const [tokens, setTokens] = React.useState<any[]>([]);
 
@@ -98,17 +60,32 @@ function DataProvider({ children }: any) {
 			multicall.balanceOf(_tokens.map(token => token.id), address).call(), 
 			multicall.allowance(_tokens.map(token => token.id), address, getAddress('Vault')).call(),
 			multicall.tradingBalanceOf(getAddress('Vault'), _tokens.map(token => token.id), address).call(),
-		]).then((res) => {
+		]).then(async (res) => {
 			// set balance in token
-			let newTokens = _tokens.map((token, index) => {
+			let newTokens = []
+			for(let index in _tokens) {
+				let token = _tokens[index];
 				token.balance = res[0].balance[index].toString();
 				token.allowance = res[1].balance[index].toString();
 				token.tradingBalance = res[2].balance[index].toString();
-				return token;
-			})
+				token.price = await getPrice(token.symbol)
+				newTokens.push(token);
+			}
 			setTokens(newTokens);
 		})
 	};
+
+	const getPrice = (token: string) => {
+		return new Promise((resolve, reject) => {
+			axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds[token]}&vs_currencies=usd`)
+			.then((res) => {
+				resolve(res.data[coingeckoIds[token]].usd);
+			})
+			.catch((e) => {
+				resolve(dummyPrices[token]);
+			})
+		})
+	}
 
 	const fetchData = async (tronWeb: any, address: string) => {
 		setIsFetchingData(true);
@@ -118,6 +95,7 @@ function DataProvider({ children }: any) {
 			Promise.all([axios.get('https://api.zexe.io/allpairs'), axios.get('https://api.zexe.io/alltokens')]).then((res) => {
 				setPairs(res[0].data.data);
 				console.log('pairs', res[0].data.data);
+				fetchPairData(res[0].data.data);
 				setTokens(res[1].data.data);
 				console.log('tokens', res[1].data.data);
 				getWalletBalances(address, res[1].data.data);
@@ -141,9 +119,20 @@ function DataProvider({ children }: any) {
 		setIsFetchingData(false);
 	};
 
+	const fetchPairData = async (pairIds: any[]) => {
+		// api.zexe.io/pair/pricetrend/{pair}?interval=300000
+		let pairData = {};
+		for(let i in pairIds) {
+			let pair = pairIds[i].id;
+			pairData[pair] = (await axios.get(`https://api.zexe.io/pair/pricetrend/${pair}?interval=300000`)).data.data;
+		}
+		setPairData(pairData);
+	}
+
 	const value: DataValue = {
 		isDataReady,
 		pairs,
+		pairData,
 		tokens,
 		dataFetchError,
 		dollarFormatter,
@@ -161,6 +150,7 @@ function DataProvider({ children }: any) {
 interface DataValue {
 	isDataReady: boolean;
 	pairs: any[];
+	pairData: any[];
 	tokens: any[];
 	dataFetchError: string | null;
 	dollarFormatter: any;

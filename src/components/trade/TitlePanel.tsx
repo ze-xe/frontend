@@ -1,8 +1,12 @@
 import { Box, Text, Flex, Divider } from '@chakra-ui/react';
 import Image from 'next/image';
-import React from 'react';
+import React, { useContext } from 'react';
+import { DataContext } from '../../context/DataProvider';
 
 export default function TitlePanel({ pair }) {
+	
+	const {tokenFormatter} = useContext(DataContext);
+
 	return (
 		<Box bgColor={'gray.1100'} px="4" pb={2} pt={3}>
 			<Flex justify={'space-between'}>
@@ -31,7 +35,7 @@ export default function TitlePanel({ pair }) {
 			</Flex>
 			<Box textAlign={'right'} color={pair?.priceDiff < 0 ? 'red' : 'green'}>
 				{/* <Text fontSize={'xs'} textTransform='uppercase'>Price</Text> */}
-				<Text fontSize={'3xl'} fontWeight='bold'>{pair?.exchangeRate / (10**pair?.exchangeRateDecimals)} </Text>
+				<Text fontSize={'3xl'} fontWeight='bold'>{tokenFormatter.format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))} </Text>
 				<Text fontSize={'sm'}>{2.33
 				// (pair?.priceDiff)/(10**pair?.exchangeRateDecimals)
 				}%</Text>
