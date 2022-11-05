@@ -146,8 +146,8 @@ export default function SellModal({
 	};
 
 	const amountExceedsBalance = () => {
-		if (amount == '0' || amount == '') return false;
-		if (Number(amount))
+		if (amount == '0' || amount == '' || !token0.tradingBalance) return false;
+		if (Number(amount) )
 			return Big(amount).gt(
 				Big(token0.tradingBalance).div(10 ** token1.decimals)
 			);

@@ -4,6 +4,8 @@ import {
 	Box,
 	Button,
 	Flex,
+	IconButton,
+	Input,
 	Text,
 	useDisclosure,
 } from '@chakra-ui/react';
@@ -28,42 +30,52 @@ import { DataContext } from '../../../context/DataProvider';
 import Link from 'next/link';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
+import { MdCancel, MdEdit } from 'react-icons/md';
+import { useEffect } from 'react';
 
 export default function CancelOrder({
 	pair,
 	token1,
 	token0,
 	price,
+    order
 }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [loading, setLoading] = React.useState(false);
 	const [response, setResponse] = React.useState(null);
 	const [hash, setHash] = React.useState(null);
-    const [amount, setAmount] = React.useState(null);
-    const [token0Amount, setToken0Amount] = React.useState(null);
+    const [token0Amount, setToken0Amount] = React.useState('0');
+    const [maxAmount, setMaxAmount] = React.useState('0');
 	const [confirmed, setConfirmed] = React.useState(false);
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 
 	const { tokenFormatter, placedOrders } = useContext(DataContext);
-    console.log(placedOrders);
+    
+    useEffect(() => {
+        if(order.orderType == '0'){
+            setMaxAmount((token0.tradingBalance/(10**token0.decimals)).toString())
+        } else {
+            setMaxAmount((token1.tradingBalance/(10**token1.decimals)).toString())
+        }
+    })
 
-	// const amountExceedsBalance = () => {
-	// 	if (amount == '0' || amount == '' || !token1.tradingBalance) return false;
-	// 	if (Number(amount))
-	// 		return Big(amount).gt(
-	// 			Big(token1.tradingBalance).div(10 ** token1.decimals)
-	// 		);
-	// };
+	const amountExceedsBalance = () => {
+		if (token0Amount == '0' || token0Amount == '' || !token1.tradingBalance) return false;
+		if (Number(token0Amount))
+			return Big(token0Amount).gt(
+				Big(maxAmount).div(10 ** token1.decimals)
+			);
+	};
 
-	// const amountExceedsMin = () => {
-	// 	if (token0Amount == '0' || token0Amount == '') return false;
-	// 	if (Number(token0Amount))
-	// 		return Big(token0Amount).lt(
-	// 			Big(MIN_T0_ORDER).div(10 ** token0.decimals)
-	// 		);
-	// };
+	const amountExceedsMin = () => {
+		if (token0Amount == '0' || token0Amount == '') return false;
+		if (Number(token0Amount))
+			return Big(token0Amount).lt(
+				Big(MIN_T0_ORDER).div(10 ** token0.decimals)
+			);
+	};
 
 	// const buy = () => {
 	// 	setLoading(true);
@@ -118,193 +130,113 @@ export default function CancelOrder({
 	// 		});
 	// };
 
-	// const _onOpen = () => {
-	// 	onOpen();
-	// 	let _amount = Big(token0Amount)
-	// 		.times(10 ** token0.decimals)
-	// 		.toFixed(0);
+	const _onOpen = () => {
+		onOpen();
+	};
 
-	// 	axios
-	// 		.get('https://api.zexe.io/matchedorders/' + pair.id, {
-	// 			params: {
-	// 				amount: _amount,
-	// 				exchange_rate: Big(price).times(
-	// 					10 ** pair.exchangeRateDecimals
-	// 				),
-	// 				order_type: 1,
-	// 			},
-	// 		})
-	// 		.then((resp) => {
-	// 			let orders = resp.data.data;
-	// 			let ordersToExecute = [];
-	// 			let _orderToPlace = token0Amount * 10 ** token0.decimals;
-	// 			let _expectedOutput = Big(0);
-	// 			for (let i in orders) {
-	// 				ordersToExecute.push(orders[i]);
-	// 				let execAmount = Math.min(_orderToPlace, orders[i].amount);
-	// 				_orderToPlace = Big(_orderToPlace)
-	// 					.minus(execAmount)
-	// 					.toFixed(0);
-	// 				_expectedOutput = _expectedOutput.plus(
-	// 					Big(execAmount)
-	// 						.times(orders[i].exchangeRate)
-	// 						.div(10 ** pair.exchangeRateDecimals)
-	// 				);
-	// 			}
-	// 			_expectedOutput = _expectedOutput.plus(
-	// 				Big(_orderToPlace).times(price)
-	// 			);
-	// 			setOrderToPlace(_orderToPlace);
-	// 			setOrders(ordersToExecute);
-	// 			setExpectedOutput(_expectedOutput.toFixed(0));
-	// 		});
-	// };
-
-	// const _onClose = () => {
-	// 	setOrderToPlace(0);
-	// 	setLoading(false);
-	// 	setResponse(null);
-	// 	setOrders([]);
-	// 	onClose();
-	// };
+	const _onClose = () => {
+		setOrderToPlace(0);
+		setLoading(false);
+		setResponse(null);
+		setOrders([]);
+		onClose();
+	};
 
 	return (
-        <></>
-		// <>
-		// 	<Button
-		// 		width={'100%'}
-		// 		mt="2"
-		// 		bgColor={'green'}
-		// 		onClick={_onOpen}
-		// 		disabled={
-		// 			loading ||
-		// 			Number(amount) <= 0 ||
-		// 			amountExceedsBalance() ||
-		// 			amountExceedsMin() ||
-		// 			price == '' ||
-		// 			Number(price) <= 0
-		// 		}>
-		// 		{amountExceedsMin()
-		// 			? 'Amount is too less'
-		// 			: amountExceedsBalance()
-		// 			? 'Insufficient Trading Balance'
-		// 			: 'Limit Buy'}
-		// 	</Button>
-		// 	<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
-		// 		<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
-		// 		<ModalOverlay />
-		// 		<ModalContent bgColor={'gray.1000'}>
-		// 			<ModalHeader>Review</ModalHeader>
-		// 			<ModalCloseButton />
-		// 			<ModalBody>
-		// 				<Text>Executing Orders</Text>
-		// 				{orders.map((o) => (
-		// 					<Box py={2} my={2} bgColor="gray.900" px={2}>
-		// 						<Text fontSize={'xs'}>ID: {o.id}</Text>
+		<>
+			<IconButton
+                size={'xs'}
+                variant='ghost'
+                p={0}
+                icon={<MdEdit/>}
+                onClick={_onOpen}
+                aria-label={''}>
+			</IconButton>
+            
+			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
+				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
+				<ModalOverlay />
+				<ModalContent bgColor={'gray.1000'}>
+					<ModalHeader>Review {order.orderType == '0'? 'SELL' : 'BUY'}</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody>
+                        <Text fontSize={'sm'} mb={1} color='gray'>Previous Amount</Text>
+						<Input disabled value={(order.amount/(10**token0.decimals)) + ' ' + token0.symbol} />
+                        <Text fontSize={'sm'} my={1} color='gray'>New Amount</Text>
+						<Input placeholder='Enter Amount' onChange={(e) => setToken0Amount(e.target.value)}/>
 
-		// 						<Text>
-		// 							{tokenFormatter.format(
-		// 								o.amount / 10 ** pair.tokens[0].decimals
-		// 							)}{' '}
-		// 							{pair.tokens[0].symbol} @{' '}
-		// 							{tokenFormatter.format(
-		// 								o.exchangeRate /
-		// 									10 ** pair.exchangeRateDecimals
-		// 							)}{' '}
-		// 							{pair.tokens[1].symbol}
-		// 						</Text>
-		// 					</Box>
-		// 				))}
-		// 				{orders.length == 0 && (
-		// 					<Text mb={2} color="gray" fontSize={'sm'}>
-		// 						No orders to execute
-		// 					</Text>
-		// 				)}
-		// 				<Text>Placing Orders</Text>
-		// 				{orderToPlace > 0 ? (
-		// 					<Box py={2} my={2} bgColor="gray.900" px={2}>
-		// 						<Text fontSize={'xs'}>OrderType: BUY</Text>
-		// 						<Text>
-		// 							{orderToPlace / 10 ** token0?.decimals}{' '}
-		// 							{token0?.symbol} @ {price} {token1?.symbol}
-		// 						</Text>
-		// 					</Box>
-		// 				) : (
-		// 					<Text mb={2} color="gray" fontSize={'sm'}>
-		// 						No limit order to place
-		// 					</Text>
-		// 				)}
+						<Text mt={4}>
+							Estimated Output: {token0Amount} {token0?.symbol}
+						</Text>
+						<Text>
+							Total Amount:{' '}
+							{expectedOutput / 10 ** token1?.decimals}{' '}
+							{token1?.symbol}
+						</Text>
+					</ModalBody>
 
-		// 				<Text>
-		// 					Estimated Output: {token0Amount} {token0?.symbol}
-		// 				</Text>
-		// 				<Text>
-		// 					Total Amount:{' '}
-		// 					{expectedOutput / 10 ** token1?.decimals}{' '}
-		// 					{token1?.symbol}
-		// 				</Text>
-		// 			</ModalBody>
-
-		// 			<ModalFooter>
-		// 				<Flex flexDir={'column'} width={'100%'}>
-		// 					{response ? (
-		// 						<Box mb={2}>
-		// 							<Box width={'100%'} mb={2}>
-		// 								<Alert
-		// 									status={
-		// 										response.includes('confirm')
-		// 											? 'info'
-		// 											: confirmed &&
-		// 											  response.includes(
-		// 													'Success'
-		// 											  )
-		// 											? 'success'
-		// 											: 'error'
-		// 									}
-		// 									variant="subtle">
-		// 									<AlertIcon />
-		// 									<Box>
-		// 										<Text fontSize="md" mb={0}>
-		// 											{response}
-		// 										</Text>
-		// 										<Link
-		// 											href={
-		// 												'https://nile.tronscan.org/#/transaction/' +
-		// 												hash
-		// 											}
-		// 											target="_blank">
-		// 											{' '}
-		// 											<Text fontSize={'sm'}>
-		// 												View on TronScan
-		// 											</Text>
-		// 										</Link>
-		// 									</Box>
-		// 								</Alert>
-		// 							</Box>
-		// 							<Button onClick={_onClose} width="100%">
-		// 								Close
-		// 							</Button>
-		// 						</Box>
-		// 					) : (
-		// 						<>
-		// 							<Button
-		// 								bgColor="green"
-		// 								mr={3}
-		// 								width="100%"
-		// 								onClick={buy}
-		// 								loadingText="Sign the transaction in your wallet"
-		// 								isLoading={loading}>
-		// 								Confirm Buy
-		// 							</Button>
-		// 							<Button onClick={onClose} mt={2}>
-		// 								Cancel
-		// 							</Button>{' '}
-		// 						</>
-		// 					)}
-		// 				</Flex>
-		// 			</ModalFooter>
-		// 		</ModalContent>
-		// 	</Modal>
-		// </>
+					<ModalFooter>
+						<Flex flexDir={'column'} width={'100%'}>
+							{response ? (
+								<Box mb={2}>
+									<Box width={'100%'} mb={2}>
+										<Alert
+											status={
+												response.includes('confirm')
+													? 'info'
+													: confirmed &&
+													  response.includes(
+															'Success'
+													  )
+													? 'success'
+													: 'error'
+											}
+											variant="subtle">
+											<AlertIcon />
+											<Box>
+												<Text fontSize="md" mb={0}>
+													{response}
+												</Text>
+												<Link
+													href={
+														'https://nile.tronscan.org/#/transaction/' +
+														hash
+													}
+													target="_blank">
+													{' '}
+													<Text fontSize={'sm'}>
+														View on TronScan
+													</Text>
+												</Link>
+											</Box>
+										</Alert>
+									</Box>
+									<Button onClick={_onClose} width="100%">
+										Close
+									</Button>
+								</Box>
+							) : (
+								<>
+									<Button
+										bgColor="orange"
+										mr={3}
+										width="100%"
+										// onClick={update}
+										loadingText="Sign the transaction in your wallet"
+										isLoading={loading}
+                                        disabled={amountExceedsBalance() || !Number(token0Amount) || token0Amount == '0' || amountExceedsMin()}>
+                                        
+										Confirm Update
+									</Button>
+									<Button onClick={onClose} mt={2}>
+										Cancel
+									</Button>{' '}
+								</>
+							)}
+						</Flex>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+		</>
 	);
 }
