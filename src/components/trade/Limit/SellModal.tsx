@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
+import { Alert, AlertIcon, Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 const Big = require('big.js');
 
@@ -238,29 +238,38 @@ export default function SellModal({
 						<Flex flexDir={'column'} width={'100%'}>
 							{response ? (
 								<Box mb={2}>
-									<Flex gap={4} align="center" mb={6}>
-										{confirmed ? (
-											<CheckIcon />
-										) : (
-											<AiOutlineLoading />
-										)}
-										<Box>
-											<Text fontSize="md" mb={0}>
-												{response}
-											</Text>
-											<Link
-												href={
-													'https://nile.tronscan.org/#/transaction/' +
-													hash
-												}
-												target="_blank">
-												{' '}
-												<Text fontSize={'sm'}>
-													View on TronScan
+									<Box width={'100%'} mb={2}>
+										<Alert
+											status={
+												response.includes('confirm')
+													? 'info'
+													: confirmed &&
+													  response.includes(
+															'Success'
+													  )
+													? 'success'
+													: 'error'
+											}
+											variant="subtle">
+											<AlertIcon />
+											<Box>
+												<Text fontSize="md" mb={0}>
+													{response}
 												</Text>
-											</Link>
-										</Box>
-									</Flex>
+												<Link
+													href={
+														'https://nile.tronscan.org/#/transaction/' +
+														hash
+													}
+													target="_blank">
+													{' '}
+													<Text fontSize={'sm'}>
+														View on TronScan
+													</Text>
+												</Link>
+											</Box>
+										</Alert>
+									</Box>
 									<Button onClick={_onClose} width="100%">
 										Close
 									</Button>

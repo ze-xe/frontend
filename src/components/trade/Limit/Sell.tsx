@@ -43,6 +43,10 @@ export default function BuyModule({ pair }) {
 
 
 	useEffect(() => {
+		const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
+		const _token1 = tokens.find((t) => t.id === pair?.tokens[1].id);
+		setToken0(_token0);
+		setToken1(_token1);
 		// if there is change in pair
 		if(pair && pairNow !== pair?.id) {
 			const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);

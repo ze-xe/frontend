@@ -36,9 +36,10 @@ export default function TitlePanel({ pair }) {
 			<Box textAlign={'right'} color={pair?.priceDiff < 0 ? 'red' : 'green'}>
 				{/* <Text fontSize={'xs'} textTransform='uppercase'>Price</Text> */}
 				<Text fontSize={'3xl'} fontWeight='bold'>{tokenFormatter.format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))} </Text>
-				<Text fontSize={'sm'}>{2.33
+				<Text fontSize={'sm'} mt={-1}>{2.33
 				// (pair?.priceDiff)/(10**pair?.exchangeRateDecimals)
 				}%</Text>
+				
 
 			</Box>
 			</Flex>

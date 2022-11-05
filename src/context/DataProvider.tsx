@@ -68,7 +68,6 @@ function DataProvider({ children }: any) {
 				token.balance = res[0].balance[index].toString();
 				token.allowance = res[1].balance[index].toString();
 				token.tradingBalance = res[2].balance[index].toString();
-				token.price = await getPrice(token.symbol)
 				newTokens.push(token);
 			}
 			setTokens(newTokens);
@@ -87,19 +86,25 @@ function DataProvider({ children }: any) {
 		})
 	}
 
-	const fetchData = async (tronWeb: any, address: string) => {
-		setIsFetchingData(true);
+	const fetchData = async (tronWeb: any, address: string, firstTime = true) => {
+		setIsFetchingData(firstTime);
 		setDataFetchError(null);
 		try {
 			// fetch data
-			Promise.all([axios.get('https://api.zexe.io/allpairs'), axios.get('https://api.zexe.io/alltokens')]).then((res) => {
-				setPairs(res[0].data.data);
-				console.log('pairs', res[0].data.data);
-				fetchPairData(res[0].data.data);
-				setTokens(res[1].data.data);
-				console.log('tokens', res[1].data.data);
-				getWalletBalances(address, res[1].data.data);
-				let orderRequests = res[0].data.data.map((pair) => {
+			Promise.all([axios.get('https://api.zexe.io/allpairs'), axios.get('https://api.zexe.io/alltokens')]).then(async (res) => {
+				let pairs = res[0].data.data;
+				console.log('pairs', pairs);
+				setPairs(pairs);
+				fetchPairData(pairs);
+				let tokens = res[1].data.data;
+				console.log('tokens', tokens);
+				setTokens(tokens);
+				for(let i in tokens){
+					let token = tokens[i];
+					token.price = await getPrice(token.symbol)
+				}
+				getWalletBalances(address, tokens);
+				let orderRequests = pairs.map((pair) => {
 					return axios.get(`https://api.zexe.io/orders/${pair.id}`);
 				})
 				Promise.all(orderRequests).then((res) => {
@@ -107,10 +112,10 @@ function DataProvider({ children }: any) {
 					res.forEach((order, index) => {
 						return newOrders[order.data.data.pair] = order.data.data;
 					})
-					console.log(newOrders);
 					setOrders(newOrders);
 					setIsFetchingData(false);
 					setIsDataReady(true);
+					setTimeout(() => keepListening(address, pairs, tokens), 10000);
 				})
 			})
 		} catch (error) {
@@ -118,6 +123,30 @@ function DataProvider({ children }: any) {
 		}
 		setIsFetchingData(false);
 	};
+
+	const keepListening = async (address: string, pairs: any[], tokens: string[]) => {
+		axios.get('https://api.zexe.io/allpairs')
+		.then(res => {
+			setPairs(res.data.data)
+		})
+
+		let orderRequests = pairs.map((pair) => {
+			return axios.get(`https://api.zexe.io/orders/${pair.id}`);
+		})
+		Promise.all(orderRequests).then((res) => {
+			let newOrders = {};
+			res.forEach((order, index) => {
+				return newOrders[order.data.data.pair] = order.data.data;
+			})
+			setOrders(newOrders);
+			setIsFetchingData(false);
+			setIsDataReady(true);
+			
+			setTimeout(() => keepListening(address, pairs, tokens), 5000);
+		})
+		fetchPairData(pairs);
+		getWalletBalances(address, tokens);
+	}
 
 	const fetchPairData = async (pairIds: any[]) => {
 		// api.zexe.io/pair/pricetrend/{pair}?interval=300000

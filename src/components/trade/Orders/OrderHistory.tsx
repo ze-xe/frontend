@@ -149,10 +149,10 @@ const Order = ({ order, index }) => {
 
 export default function OrderHistory() {
 	return (
-		<Flex flexDir={'column'} justify="flex-end" align={'end'}>
+		<Box>
 			{orders.map((order: any, index: number) => {
 				return <Order order={order} index={index} key={index} />;
 			})}
-		</Flex>
+		</Box>
 	);
 }

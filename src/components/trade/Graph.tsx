@@ -14,7 +14,7 @@ const Graph = ({ pair }) => {
 
 	const [_candleSeries, setCandleSeries] = React.useState<any>();
 
-	if (chart.current) {
+	if (chart.current && pair) {
 		_candleSeries.setData(pairData[pair?.id] ?? []);
 	}
 	useEffect(() => {

@@ -4,12 +4,13 @@ import GraphPanel from '../../components/trade/GraphPanel';
 import TokensPanel from '../../components/trade/TokensPanel/TokensPanel';
 import OrdersPanel from '../../components/trade/Orders/OrdersPanel';
 import TitlePanel from '../../components/trade/TitlePanel';
-import Swap from '../../components/trade/Limit/LimitOrder';
+import Swap from '../../components/trade/Limit';
 import { useContext } from 'react';
 import { DataContext } from '../../context/DataProvider';
 import { useRouter } from 'next/router';
 import PlacedOrders from '../../components/trade/UserOrders';
 import {useEffect, useState} from 'react';
+import Exchange from '../../components/trade/Exchange';
 
 const Trade = () => {
 	const {pairs} = useContext(DataContext);
@@ -30,24 +31,23 @@ const Trade = () => {
 	return (
 		<>
 			<Box>
-				<Flex justify={'stretch'} gap={2} mt={2}>
-					<Box bgColor={'gray.1100'} width="20%">
+				<Flex flexDir={{'sm': 'column', md: 'row'}} justifyItems={'stretch'} gap={2} mt={2}>
+					<Box order={{sm: 1, md: 0}} bgColor={'gray.1100'} width={{sm: '100%', md: "20%", lg: '20%', xl: '15%'}} mb={{sm: '2', md: 2, lg:0}}>
 						<TokensPanel />
 					</Box>
-					<Box width="60%">
+					<Box order={{sm: 0, md: 1}} width={{sm: '100%', md: "60%", lg: '60%', xl: '55%'}} mb={{sm: '2', md: 2, lg:0}}>
 						<TitlePanel pair={pair} />
 						<GraphPanel pair={pair} />
-						<Swap pair={pair}/>
+						<Exchange pair={pair}/>
 					</Box>
-					<Flex
+					<Flex order={{sm: 1, md: 2}}
 						flexDir={'column'}
-						width={'20%'}
-						bgColor={'gray.1100'}
+						width={{sm: '100%', md: "20%", lg: '20%', xl: '30%'}}
 						>
 						<OrdersPanel pair={pair} />
 					</Flex>
 				</Flex>
-				<Box bgColor={'gray.1100'} my={2}>
+				<Box bgColor={'gray.1100'} my={2} width='100%'>
 					<PlacedOrders/>
 				</Box>
 			</Box>

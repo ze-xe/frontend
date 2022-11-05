@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
+import {
+	Alert,
+	AlertIcon,
+	Box,
+	Button,
+	Flex,
+	Text,
+	useDisclosure,
+} from '@chakra-ui/react';
 import React, { useContext } from 'react';
 const Big = require('big.js');
 
@@ -41,7 +49,7 @@ export default function BuyModal({
 	const { tokenFormatter } = useContext(DataContext);
 
 	const amountExceedsBalance = () => {
-		if (amount == '0' || amount == '') return false;
+		if (amount == '0' || amount == '' || !token1.tradingBalance) return false;
 		if (Number(amount))
 			return Big(amount).gt(
 				Big(token1.tradingBalance).div(10 ** token1.decimals)
@@ -76,7 +84,7 @@ export default function BuyModal({
 				orders.map((o) => '0x' + o.id)
 			)
 			.send({
-				feeLimit: 1000000000
+				feeLimit: 1000000000,
 			})
 			.then((res: any) => {
 				setHash(res);
@@ -128,7 +136,7 @@ export default function BuyModal({
 			.then((resp) => {
 				let orders = resp.data.data;
 				let ordersToExecute = [];
-				let _orderToPlace = token0Amount*(10**token0.decimals);
+				let _orderToPlace = token0Amount * 10 ** token0.decimals;
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
 					ordersToExecute.push(orders[i]);
@@ -216,8 +224,8 @@ export default function BuyModal({
 							<Box py={2} my={2} bgColor="gray.900" px={2}>
 								<Text fontSize={'xs'}>OrderType: BUY</Text>
 								<Text>
-									{orderToPlace/(10**token0?.decimals)} {token0?.symbol} @ {price}{' '}
-									{token1?.symbol}
+									{orderToPlace / 10 ** token0?.decimals}{' '}
+									{token0?.symbol} @ {price} {token1?.symbol}
 								</Text>
 							</Box>
 						) : (
@@ -230,7 +238,9 @@ export default function BuyModal({
 							Estimated Output: {token0Amount} {token0?.symbol}
 						</Text>
 						<Text>
-							Total Amount: {expectedOutput/(10**token1?.decimals)} {token1?.symbol}
+							Total Amount:{' '}
+							{expectedOutput / 10 ** token1?.decimals}{' '}
+							{token1?.symbol}
 						</Text>
 					</ModalBody>
 
@@ -238,29 +248,38 @@ export default function BuyModal({
 						<Flex flexDir={'column'} width={'100%'}>
 							{response ? (
 								<Box mb={2}>
-									<Flex gap={4} align="center" mb={6}>
-										{confirmed ? (
-											<CheckIcon />
-										) : (
-											<AiOutlineLoading />
-										)}
-										<Box>
-											<Text fontSize="md" mb={0}>
-												{response}
-											</Text>
-											<Link
-												href={
-													'https://nile.tronscan.org/#/transaction/' +
-													hash
-												}
-												target="_blank">
-												{' '}
-												<Text fontSize={'sm'}>
-													View on TronScan
+									<Box width={'100%'} mb={2}>
+										<Alert
+											status={
+												response.includes('confirm')
+													? 'info'
+													: confirmed &&
+													  response.includes(
+															'Success'
+													  )
+													? 'success'
+													: 'error'
+											}
+											variant="subtle">
+											<AlertIcon />
+											<Box>
+												<Text fontSize="md" mb={0}>
+													{response}
 												</Text>
-											</Link>
-										</Box>
-									</Flex>
+												<Link
+													href={
+														'https://nile.tronscan.org/#/transaction/' +
+														hash
+													}
+													target="_blank">
+													{' '}
+													<Text fontSize={'sm'}>
+														View on TronScan
+													</Text>
+												</Link>
+											</Box>
+										</Alert>
+									</Box>
 									<Button onClick={_onClose} width="100%">
 										Close
 									</Button>

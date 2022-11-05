@@ -17,6 +17,14 @@ import {
 } from '@chakra-ui/react';
 import { DataContext } from '../context/DataProvider';
 import Link from 'next/link';
+import {
+	Stat,
+	StatLabel,
+	StatNumber,
+	StatHelpText,
+	StatArrow,
+	StatGroup,
+  } from '@chakra-ui/react'
 
 const dummyPrices = {
 	'BTC': '20000',
@@ -61,7 +69,7 @@ export default function wallet() {
 	return (
 		<Flex justify={'center'}>
 			<Box mt={2} width="100%" maxW="1400px">
-				<Flex bgColor={'gray.1000'} align="start" p={4} py={10} justify='space-between'>
+				<Flex bgColor={'gray.1000'} align="start" p={4} pt={10} pb={8} justify='space-between'>
 					<Flex>
 					<Avatar
 						bgGradient={'linear(to-r, #E11860, #CB1DC3)'}></Avatar>
@@ -74,10 +82,19 @@ export default function wallet() {
 						</Text>
 					</Box>
 					</Flex>
-					<Box textAlign={'right'}>
-						<Text ml={4} fontSize="sm" color={'gray.400'}>Trading Balance</Text>
-						<Text ml={4} fontSize="xl" fontWeight={'bold'} >{dollarFormatter.format(totalTradingBalanceUSD)}</Text>
+					<Box>
+
+					<Stat textAlign={'right'}>
+					<StatLabel>Trading Balance</StatLabel>
+					<StatNumber>{dollarFormatter.format(totalTradingBalanceUSD)}</StatNumber>
+					<StatHelpText></StatHelpText>
+					</Stat>
 					</Box>
+					{/* <Box textAlign={'right'}>
+						<Text ml={4} fontSize="sm" color={'gray.400'}></Text>
+						<Text ml={4} fontSize="xl" fontWeight={'bold'} ></Text>
+					</Box> */}
+
 				</Flex>
 
 				<Box bgColor={'gray.1000'} mt={2}>

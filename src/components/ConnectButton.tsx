@@ -61,7 +61,7 @@ const ConnectButton = ({}) => {
 	}
 
 	return (
-		<Box>
+		<Box >
 			{isTronConnected ? (
 				<Box>
 					<Button 

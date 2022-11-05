@@ -55,14 +55,15 @@ export default function OrderBook({ pair }) {
 			setTotalSell(orders[pair.id].totalSell);
 		}
 	})
+
 	return (
 		<Flex flexDir={'column'}>
-			<Flex justify={'space-between'} px={4} color='gray.400' py={1} mb={1} mt={-2} bgColor='gray.900'>
+			<Flex justify={'space-between'} px={4} color='gray.400' py={1} mb={1} mt={0} bgColor='gray.900'>
 				<Text fontSize={'xs'}>Amount {pair?.tokens[0].symbol} </Text>
 				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
-			{sellOrders.reverse().map((order: any, index: number) => {
+			{[...sellOrders].reverse().map((order: any, index: number) => {
 				return (
 					<Order
 						order={order}
@@ -79,7 +80,7 @@ export default function OrderBook({ pair }) {
 				<Flex textAlign={'right'} mb={1.5} mr={-1}>
 				
 				{pair?.priceDiff < 0 ? <ArrowDownIcon width={3}/> : <ArrowUpIcon width={3}/>}
-				<Text fontSize={'xs'}>{pair?.priceDiff/ (10**pair?.exchangeRateDecimals)}</Text>
+				<Text fontSize={'xs'} mt={-0.5}>{pair?.priceDiff/ (10**pair?.exchangeRateDecimals)}</Text>
 
 				</Flex>
 				<Text
