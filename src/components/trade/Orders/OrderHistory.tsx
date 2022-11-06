@@ -1,5 +1,7 @@
 import { Box, Flex, Spacer, Text } from '@chakra-ui/react';
 import React from 'react';
+import { useContext } from 'react';
+import { DataContext } from '../../../context/DataProvider';
 
 const orders = [
 	{
@@ -124,34 +126,40 @@ const orders = [
 	},
 ];
 
-const Order = ({ order, index }) => {
+const Order = ({ order, pair, index }) => {
+	const {tokenFormatter} = useContext(DataContext);
+
 	return (
 		<Flex justify={'space-between'} width="100%"
-            color={order.type == 'BUY' ? 'green' : 'red'}
+            color={order.orderType == '1' ? 'green' : 'red'}
             bgColor="gray.1100"
             my={0.5}
         >
-			<Text fontSize={'sm'}>
-				{order.amount} T0
+			<Text fontSize={'xs'}>
+				{tokenFormatter.format(order.fillAmount/(10**pair?.tokens[0].decimals))} 
 			</Text>
-			<Box
-				key={index}
-				my={0.5}
-				textAlign="right"
-				>
-				<Text fontSize="sm" fontWeight={"bold"}>
-					{order.exchangeRate?.toFixed(4)} T1
-				</Text>
-			</Box>
+			<Text fontSize={'xs'}>
+				{tokenFormatter.format(order.fillAmount*(order.exchangeRate/(10**pair.exchangeRateDecimals))/(10**pair?.tokens[0].decimals))} 
+			</Text>
+			<Text fontSize="xs">
+				{tokenFormatter.format(order.exchangeRate/(10**pair.exchangeRateDecimals))}
+			</Text>
 		</Flex>
 	);
 };
 
-export default function OrderHistory() {
+export default function OrderHistory({pair}) {
+	const {pairExecutedData} = useContext(DataContext);
+
 	return (
-		<Box>
-			{orders.map((order: any, index: number) => {
-				return <Order order={order} index={index} key={index} />;
+		<Box px={2}>
+			<Flex justify={'space-between'} py={1} mb={1} mt={0} mx={-4} px={4}  bgColor='gray.900' gap={2}>
+				<Text fontSize="xs" fontWeight={"bold"}>Amount {pair?.tokens[0].symbol}</Text>
+				<Text fontSize="xs" fontWeight={"bold"}>Amount {pair?.tokens[1].symbol}</Text>
+				<Text fontSize="xs" fontWeight={"bold"}>Price {pair?.tokens[1].symbol}</Text>
+			</Flex>
+			{(pairExecutedData[pair?.id]) && pairExecutedData[pair?.id].slice(0,53).map((order: any, index: number) => {
+				return <Order order={order} pair={pair} index={index} key={index} />;
 			})}
 		</Box>
 	);

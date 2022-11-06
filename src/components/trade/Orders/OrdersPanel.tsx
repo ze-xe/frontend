@@ -24,7 +24,7 @@ export default function OrdersPanel({ pair }) {
 						<OrderBook pair={pair} />
 					</TabPanel>
 					<TabPanel>
-						<OrderHistory />
+						<OrderHistory pair={pair} />
 					</TabPanel>
 				</TabPanels>
 			</Tabs>
@@ -37,9 +37,9 @@ export default function OrdersPanel({ pair }) {
 
 			</Box>
 			<Box width={'50%'} px={2} bgColor={'gray.1100'}>
-				<Text fontSize={'xs'} py={1} bgColor={'gray.900'} mx={-2} px={2} color={'gray.400'}>Order History</Text>
+				{/* <Text fontSize={'xs'} py={1} bgColor={'gray.900'} mx={-2} px={2} color={'gray.400'}>Order History</Text> */}
 
-			<OrderHistory />
+			<OrderHistory pair={pair} />
 			</Box>
 		</Box>	
 					</>

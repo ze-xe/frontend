@@ -61,11 +61,13 @@ export default function UpdateOrder({
     const [sliderValue, setSliderValue] = React.useState(0);
 
     useEffect(() => {
-        if(order.orderType == '0'){
-            setMaxAmount((token0.tradingBalance/(10**token0.decimals)).toString())
-        } else {
-            setMaxAmount(((token1.tradingBalance/(order.exchangeRate/(10**pair.exchangeRateDecimals)))/(10**token1.decimals)).toString())
-        }
+		if(token0?.tradingBalance){
+			if(order.orderType == '0'){
+				setMaxAmount((token0.tradingBalance/(10**token0.decimals)).toString())
+			} else {
+				setMaxAmount(((token1.tradingBalance/(order.exchangeRate/(10**pair.exchangeRateDecimals)))/(10**token1.decimals)).toString())
+			}
+		}
     })
 
 	const amountExceedsBalance = () => {

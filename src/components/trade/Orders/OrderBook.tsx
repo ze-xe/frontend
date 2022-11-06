@@ -58,10 +58,10 @@ export default function OrderBook({ pair }) {
 
 	return (
 		<Flex flexDir={'column'}>
-			<Flex justify={'space-between'} px={4} color='gray.400' py={1} mb={1} mt={0} bgColor='gray.900' gap={2}>
-				<Text fontSize={'xs'}>Amount {pair?.tokens[0].symbol} </Text>
-				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
-				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>
+			<Flex justify={'space-between'} px={4} py={1} mb={1} mt={0} bgColor='gray.900' gap={2}>
+				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[0].symbol} </Text>
+				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[1].symbol}</Text>
+				<Text fontSize={'xs'} fontWeight='bold'>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
 			{[...sellOrders].reverse().map((order: any, index: number) => {
 				return (

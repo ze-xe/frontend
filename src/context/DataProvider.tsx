@@ -36,8 +36,12 @@ function DataProvider({ children }: any) {
 	const [dataFetchError, setDataFetchError] = React.useState<string | null>(null);
 	const [pairs, setPairs] = React.useState<any[]>([]);
 	const [pairData, setPairData] = React.useState<any>({});
+	const [pairExecutedData, setPairExecutedData] = React.useState<any>({});
+
 	const [orders, setOrders] = React.useState<any>({});
 	const [placedOrders, setPlacedOrders] = React.useState<any>({});
+	const [orderHistory, setOrderHistory] = React.useState<any>({});
+	const [cancelledOrders, setCancelledOrders] = React.useState<any>({});
 
 	const [tokens, setTokens] = React.useState<any[]>([]);
 
@@ -51,9 +55,7 @@ function DataProvider({ children }: any) {
 		new Intl.NumberFormat('en-US')
 	);
 
-	React.useEffect(() => {
-	  getWalletBalances(DUMMY_ADDRESS);
-	}, [])
+	React.useEffect(() => {}, [])
 	
 
 	const getWalletBalances = async (address: string, _tokens = tokens) => {
@@ -63,6 +65,7 @@ function DataProvider({ children }: any) {
 			multicall.allowance(_tokens.map(token => token.id), address, getAddress('Vault')).call(),
 			multicall.tradingBalanceOf(getAddress('Vault'), _tokens.map(token => token.id), address).call(),
 		]).then(async (res) => {
+			console.log('balances', res)
 			// set balance in token
 			let newTokens = []
 			for(let index in _tokens) {
@@ -88,29 +91,36 @@ function DataProvider({ children }: any) {
 		})
 	}
 
-	const fetchData = async (tronWeb: any, address: string, firstTime = true) => {
+	const fetchData = async (tronWeb: any, address: string, firstTime = true, _tokens=tokens, _pairs=pairs) => {
 		setIsFetchingData(firstTime);
 		setDataFetchError(null);
 		try {
 			// fetch data
-			Promise.all([axios.get('https://api.zexe.io/allpairs'), axios.get('https://api.zexe.io/alltokens')]).then(async (res) => {
-				let pairs = res[0].data.data;
-				setPairs(pairs);
-				fetchPairData(pairs);
-				let tokens = res[1].data.data;
-				setTokens(tokens);
+			const requests = [axios.get('https://api.zexe.io/allpairs')]
+			if(firstTime) requests.push(axios.get('https://api.zexe.io/alltokens'))
+			Promise.all(requests).then(async (res) => {
+				_pairs = res[0].data.data;
+				setPairs(_pairs);
+				fetchPairData(_pairs);
 
-				console.log('pairs', pairs);
-				console.log('tokens', tokens);
-				
-				for(let i in tokens){
-					let token = tokens[i];
-					token.price = await getPrice(token.symbol)
+				if(firstTime) {
+					_tokens = res[1].data.data;
+					for(let i in _tokens){
+						let token = _tokens[i];
+						token.price = await getPrice(token.symbol)
+					}
+					setTokens(_tokens);
+					console.log('pairs', _pairs);
+					console.log('tokens', _tokens);
 				}
 
-				getWalletBalances(address, tokens);
-				fetchOrders(pairs)
-				fetchPlacedOrders(address, pairs)
+				getWalletBalances(address, _tokens);
+				fetchOrders(_pairs)
+				fetchExecutedPairData(_pairs);
+				fetchPlacedOrders(address, _pairs)
+				fetchCancelledOrders(address, _pairs)
+				fetchExecutedOrders(address, _pairs)
+				setTimeout(() => fetchData(tronWeb, address, false, _tokens, _pairs), 8000);
 			})
 		} catch (error) {
 			setDataFetchError(error.message);
@@ -118,17 +128,6 @@ function DataProvider({ children }: any) {
 		setIsFetchingData(false);
 	};
 
-	const keepListening = async (address: string, pairs: any[], tokens: string[]) => {
-		axios.get('https://api.zexe.io/allpairs')
-		.then(res => {
-			setPairs(res.data.data)
-		})
-
-		fetchOrders(pairs)
-		fetchPlacedOrders(address, pairs)
-		fetchPairData(pairs);
-		getWalletBalances(address, tokens);
-	}
 
 	const fetchOrders = (pairs: any[]) => {
 		let orderRequests = pairs.map((pair) => {
@@ -156,15 +155,61 @@ function DataProvider({ children }: any) {
 			setPlacedOrders(newOrders);
 		})
 	}
+	
+	// api.zexe.io/pair/pricetrend/{pair}?interval=300000
+	const fetchPairData = (pairs: any[]) => {
+		let pairRequests = pairs.map((pair) => {
+			return axios.get(`https://api.zexe.io/pair/pricetrend/${pair.id}?interval=300000`);
+		})
+		Promise.all(pairRequests).then((res) => {
+			let newPairs = {};
+			res.forEach((pair, index) => {
+				return newPairs[pairs[index].id] = pair.data.data;
+			})
+			setPairData(newPairs);
+		})
+	}
+	
+	// /pair/orders/history/:id
+	const fetchExecutedPairData = async (pairs: any[]) => {
+		let pairRequests = pairs.map((pair) => {
+			return axios.get(`https://api.zexe.io/pair/orders/history/${pair.id}`);
+		})
+		Promise.all(pairRequests).then((res) => {
+			let newPairs = {};
+			res.forEach((pair, index) => {
+				return newPairs[pairs[index].id] = pair.data.data;
+			})
+			setPairExecutedData(newPairs);
+		})
+	}
 
-	const fetchPairData = async (pairIds: any[]) => {
-		// api.zexe.io/pair/pricetrend/{pair}?interval=300000
-		let pairData = {};
-		for(let i in pairIds) {
-			let pair = pairIds[i].id;
-			pairData[pair] = (await axios.get(`https://api.zexe.io/pair/pricetrend/${pair}?interval=300000`)).data.data;
-		}
-		setPairData(pairData);
+	// /orders_history/:taker/:pairId
+	const fetchExecutedOrders = async (address: string, pairs: any[]) => {
+		let pairRequests = pairs.map((pair) => {
+			return axios.get(`https://api.zexe.io/orders_history/${address}/${pair.id}`);
+		})
+		Promise.all(pairRequests).then((res) => {
+			let newPairs = {};
+			res.forEach((pair, index) => {
+				return newPairs[pairs[index].id] = pair.data.data;
+			})
+			setOrderHistory(newPairs);
+		})
+	}
+
+	// /user/order/cancelled/:maker/:pairId
+	const fetchCancelledOrders = async (address: string, pairs: any[]) => {
+		let pairRequests = pairs.map((pair) => {
+			return axios.get(`https://api.zexe.io/user/order/cancelled/${address}/${pair.id}`);
+		})
+		Promise.all(pairRequests).then((res) => {
+			let newPairs = {};
+			res.forEach((pair, index) => {
+				return newPairs[pairs[index].id] = pair.data.data;
+			})
+			setCancelledOrders(newPairs);
+		})
 	}
 
 	const value: DataValue = {
@@ -178,7 +223,10 @@ function DataProvider({ children }: any) {
 		isFetchingData,
 		fetchData,
 		orders,
-		placedOrders
+		placedOrders,
+		pairExecutedData,
+		cancelledOrders,
+		orderHistory,
 	};
 
 	return (
@@ -197,7 +245,10 @@ interface DataValue {
 	isFetchingData: boolean;
 	orders: any;
 	fetchData: (_:any, __:string) => void;
-	placedOrders: any
+	placedOrders: any,
+	pairExecutedData: any,
+	cancelledOrders: any,
+	orderHistory: any,
 }
 
 export { DataProvider, DataContext };

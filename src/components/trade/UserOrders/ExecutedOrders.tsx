@@ -19,7 +19,7 @@ import { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 import UpdateOrder from './UpdateOrder';
 
-export default function PlacedOrders({ pair }) {
+export default function ExecutedOrders({ pair }) {
 	const { tokens } = useContext(DataContext);
 	const [token0, setToken0] = React.useState(null);
 	const [token1, setToken1] = React.useState(null);
@@ -35,7 +35,7 @@ export default function PlacedOrders({ pair }) {
 		}
 	});
 
-	const { tokenFormatter, placedOrders } = useContext(DataContext);
+	const { tokenFormatter, orderHistory } = useContext(DataContext);
 	
 	return (
 		<Box bgColor="gray.1100">
@@ -46,11 +46,10 @@ export default function PlacedOrders({ pair }) {
 							<Th>Order</Th>
 							<Th>Amount</Th>
 							<Th>Exchange Rate</Th>
-							<Th isNumeric></Th>
 						</Tr>
 					</Thead>
 					<Tbody>
-						{placedOrders[pair?.id]?.map(
+						{orderHistory[pair?.id]?.map(
 							(order: any, index: number) => {
 								return (
 									<Tr>
@@ -66,7 +65,7 @@ export default function PlacedOrders({ pair }) {
 										</Td>
 										<Td>
 											{tokenFormatter.format(
-												order.amount /
+												order.fillAmount /
 													10 ** token0?.decimals
 											)}{' '}
 											{token0?.symbol}
@@ -79,24 +78,7 @@ export default function PlacedOrders({ pair }) {
 											)}{' '}
 											{token1?.symbol}/{token0?.symbol}
 										</Td>
-										<Td isNumeric>
-											<Flex justify={'end'}>
-												<UpdateOrder
-													pair={pair}
-													token0={token0}
-													token1={token1}
-													price={0}
-													order={order}
-												/>
-												<CancelOrder
-													pair={pair}
-													token0={token0}
-													token1={token1}
-													price={0}
-													order={order}
-												/>
-											</Flex>
-										</Td>
+										
 									</Tr>
 								);
 							}
