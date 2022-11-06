@@ -66,7 +66,7 @@ const Graph = ({ pair }) => {
 			wickUpColor: '#838ca1',
 		});
 		setCandleSeries(candleSeries);
-		candleSeries.setData(pairData[pair?.id] ?? []);
+		candleSeries.setData(pairData[pair?.id]?.exchangeRate ?? []);
 
 		// const areaSeries = chart.current.addAreaSeries({
 		//   topColor: 'rgba(38,198,218, 0.56)',
@@ -90,7 +90,7 @@ const Graph = ({ pair }) => {
 			},
 		});
 		setVolumeSeries(volumeSeries);
-		volumeSeries.setData(volumeData);
+		volumeSeries.setData(pairData[pair?.id]?.volume ?? []);
 	}, []);
 
 	// Resize chart on container resizes.
