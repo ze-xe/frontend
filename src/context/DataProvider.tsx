@@ -37,6 +37,7 @@ function DataProvider({ children }: any) {
 	const [pairs, setPairs] = React.useState<any[]>([]);
 	const [pairData, setPairData] = React.useState<any>({});
 	const [pairExecutedData, setPairExecutedData] = React.useState<any>({});
+	const [pairStats, setPairStats] = React.useState<any>({});
 
 	const [orders, setOrders] = React.useState<any>({});
 	const [placedOrders, setPlacedOrders] = React.useState<any>({});
@@ -91,7 +92,7 @@ function DataProvider({ children }: any) {
 		})
 	}
 
-	const fetchData = async (tronWeb: any, address: string, firstTime = true, _tokens=tokens, _pairs=pairs) => {
+	const fetchData = async (tronWeb: any, address: string|null, firstTime = true, _tokens=tokens, _pairs=pairs) => {
 		setIsFetchingData(firstTime);
 		setDataFetchError(null);
 		try {
@@ -102,6 +103,7 @@ function DataProvider({ children }: any) {
 				_pairs = res[0].data.data;
 				setPairs(_pairs);
 				fetchPairData(_pairs);
+				fetchPairStatus(_pairs);
 
 				if(firstTime) {
 					_tokens = res[1].data.data;
@@ -114,12 +116,14 @@ function DataProvider({ children }: any) {
 					console.log('tokens', _tokens);
 				}
 
-				getWalletBalances(address, _tokens);
+				if(address) {
+					getWalletBalances(address, _tokens);
+					fetchPlacedOrders(address, _pairs)
+					fetchCancelledOrders(address, _pairs)
+					fetchExecutedOrders(address, _pairs)
+				}
 				fetchOrders(_pairs)
 				fetchExecutedPairData(_pairs);
-				fetchPlacedOrders(address, _pairs)
-				fetchCancelledOrders(address, _pairs)
-				fetchExecutedOrders(address, _pairs)
 				setTimeout(() => fetchData(tronWeb, address, false, _tokens, _pairs), 8000);
 			})
 		} catch (error) {
@@ -212,6 +216,21 @@ function DataProvider({ children }: any) {
 		})
 	}
 
+	// /pair/trading/status/:pairId
+	const fetchPairStatus = async (pairs: any[]) => {
+		let pairRequests = pairs.map((pair) => {
+			return axios.get(`https://api.zexe.io/pair/trading/status/${pair.id}`);
+		})
+		Promise.all(pairRequests).then((res) => {
+			let newPairs = {};
+			res.forEach((pair, index) => {
+				return newPairs[pairs[index].id] = pair.data.data;
+			})
+			console.log(newPairs)
+			setPairStats(newPairs);
+		})
+	}
+
 	const value: DataValue = {
 		isDataReady,
 		pairs,
@@ -227,6 +246,7 @@ function DataProvider({ children }: any) {
 		pairExecutedData,
 		cancelledOrders,
 		orderHistory,
+		pairStats
 	};
 
 	return (
@@ -249,6 +269,7 @@ interface DataValue {
 	pairExecutedData: any,
 	cancelledOrders: any,
 	orderHistory: any,
+	pairStats: any
 }
 
 export { DataProvider, DataContext };

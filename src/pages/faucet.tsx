@@ -30,6 +30,7 @@ import { Input, InputGroup } from '@chakra-ui/react';
 
 function RadioCard(props) {
 	const { getInputProps, getCheckboxProps } = useRadio(props);
+	const {address, isConnected} = useContext(WalletContext);
 
 	const input = getInputProps();
 	const checkbox = getCheckboxProps();
@@ -62,7 +63,7 @@ function RadioCard(props) {
 
 export default function faucets() {
 	const { tokens } = useContext(DataContext);
-	const { address } = useContext(WalletContext);
+	const { address, isConnected } = useContext(WalletContext);
 
 	const [selectedToken, setSelectedToken] = React.useState(0);
 	const [loading, setLoading] = React.useState(false);
@@ -226,8 +227,10 @@ export default function faucets() {
 							loadingText="Confirm in your wallet"
 							bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
 							size='lg'
-							isLoading={loading}>
-							Mint
+							isLoading={loading}
+							disabled={!isConnected}
+							>
+							{isConnected ? 'Mint' : 'Connect Wallet'}
 						</Button>
 						{success && (
 							<Text fontSize={'sm'} mt={2}>

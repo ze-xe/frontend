@@ -20,7 +20,7 @@ const Big = require('big.js');
 const ethers = require('ethers');
 
 export default function Deposit() {
-	const { address } = useContext(WalletContext);
+	const { address, isConnected } = useContext(WalletContext);
 	const { tokens } = useContext(DataContext);
 	const [selectedToken, setSelectedToken] = React.useState(0);
 	const [amount, setAmount] = React.useState('0');
@@ -207,13 +207,13 @@ export default function Deposit() {
 							height={3}
 							width={3}
 							borderRadius={10}
-							bgColor="green"></Box>
-						<Box>
+							bgColor={isConnected ? "green" : 'red'}></Box>
+						{isConnected ?<Box>
 							<Text fontSize={'sm'}>From Wallet</Text>
 							<Text fontSize={'md'}>{address}</Text>
-						</Box>
+						</Box> : <Text>Wallet not connected</Text>}
 					</Flex>
-					<Button size={'sm'} variant="ghost" h="1.75rem">
+					<Button size={'sm'} variant="ghost" h="1.75rem" disabled>
 						Change Wallet
 					</Button>
 				</Flex>
@@ -232,13 +232,13 @@ export default function Deposit() {
 					<Button
 						width={'100%'}
 						mt={2}
-						disabled={Number(amount) == 0 || amountExceedsBalance()}
+						disabled={Number(amount) == 0 || amountExceedsBalance() || !isConnected}
 						onClick={deposit}
 						isLoading={loading}
 						loadingText="Confirm in your wallet"
 						bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
 						size="lg">
-						{Number(amount) == 0
+						{isConnected ? 'Connect wallet' : Number(amount) == 0
 							? 'Enter Amount'
 							: amountExceedsBalance()
 							? 'Insufficient Balance'

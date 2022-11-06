@@ -20,7 +20,7 @@ const Big = require('big.js');
 const ethers = require('ethers');
 
 export default function Deposit() {
-	const { address } = useContext(WalletContext);
+	const { address, isConnected } = useContext(WalletContext);
 	const { tokens } = useContext(DataContext);
 	const [selectedToken, setSelectedToken] = React.useState(0);
 	const [amount, setAmount] = React.useState('0');
@@ -144,13 +144,13 @@ export default function Deposit() {
 				<Button
 					width={'100%'}
 					mt={2}
-					disabled={Number(amount) == 0 || amountExceedsBalance()}
+					disabled={Number(amount) == 0 || amountExceedsBalance() || !isConnected}
 					onClick={withdraw}
 					isLoading={loading}
 					loadingText="Confirm in your wallet"
 					bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
 					size="lg">
-					{Number(amount) == 0
+					{!isConnected ? 'Connect Wallet' : Number(amount) == 0
 						? 'Enter Amount'
 						: amountExceedsBalance()
 						? 'Insufficient Balance'

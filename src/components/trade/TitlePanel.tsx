@@ -5,7 +5,7 @@ import { DataContext } from '../../context/DataProvider';
 
 export default function TitlePanel({ pair }) {
 	
-	const {tokenFormatter} = useContext(DataContext);
+	const {tokenFormatter, dollarFormatter, pairStats} = useContext(DataContext);
 
 	return (
 		<Box bgColor={'gray.1100'} px="4" pb={2} pt={3}>
@@ -36,11 +36,7 @@ export default function TitlePanel({ pair }) {
 			<Box textAlign={'right'} color={pair?.priceDiff < 0 ? 'red' : 'green'}>
 				{/* <Text fontSize={'xs'} textTransform='uppercase'>Price</Text> */}
 				<Text fontSize={'3xl'} fontWeight='bold'>{tokenFormatter.format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))} </Text>
-				<Text fontSize={'sm'} mt={-1}>{2.33
-				// (pair?.priceDiff)/(10**pair?.exchangeRateDecimals)
-				}%</Text>
-				
-
+				<Text fontSize={'sm'} mt={-1}>{tokenFormatter.format(pairStats[pair?.id][1].changeInER)}%</Text>
 			</Box>
 			</Flex>
 			<Divider mt={2} mb={4} />
@@ -54,7 +50,7 @@ export default function TitlePanel({ pair }) {
 						Trading Volume
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						$10,293,144
+					{dollarFormatter.format(pairStats[pair?.id][0].volume24Hr * pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
 					</Text>
 				</Box>
 				<Box>
@@ -66,7 +62,7 @@ export default function TitlePanel({ pair }) {
 						24h Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						+2.33%
+						{tokenFormatter.format(pairStats[pair?.id][1].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -78,7 +74,7 @@ export default function TitlePanel({ pair }) {
 						7d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						-12.1%
+					{tokenFormatter.format(pairStats[pair?.id][2].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -90,7 +86,7 @@ export default function TitlePanel({ pair }) {
 						30d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						-12.1%
+					{tokenFormatter.format(pairStats[pair?.id][3].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -102,7 +98,7 @@ export default function TitlePanel({ pair }) {
 						90d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						-12.1%
+					{tokenFormatter.format(pairStats[pair?.id][4].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -114,7 +110,7 @@ export default function TitlePanel({ pair }) {
 						1y Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						-12.1%
+					{tokenFormatter.format(pairStats[pair?.id][5].changeInER)} %
 					</Text>
 				</Box>
 			</Flex>

@@ -68,7 +68,7 @@ export default function wallet() {
 
 	return (
 		<Flex justify={'center'}>
-			<Box mt={2} width="100%" maxW="1400px">
+			{isConnected ? <Box mt={2} width="100%" maxW="1400px">
 				<Flex bgColor={'gray.1000'} align="start" p={4} pt={10} pb={8} justify='space-between'>
 					<Flex>
 					<Avatar
@@ -193,7 +193,10 @@ export default function wallet() {
 						</Table>
 					</TableContainer>
 				</Box>
-			</Box>
+			</Box>: 
+			<Box bgColor={'gray.900'} width='100%' p={5} textAlign='center' mt={2}>
+				<Text my={5}>Please connect your wallet</Text>
+			</Box>}
 		</Flex>
 	);
 }

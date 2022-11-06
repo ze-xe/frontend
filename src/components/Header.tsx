@@ -8,7 +8,7 @@ import {
 	Tooltip,
 } from '@chakra-ui/react';
 import Link from 'next/link';
-import { useEffect, useContext } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 import { DarkModeSwitch } from './DarkModeSwitch';
 import {
@@ -47,22 +47,24 @@ export const Header = ({ title }: { title: string }) => {
 	const { connectionError, connect, isConnected, isConnecting, tronWeb } =
 		useContext(WalletContext);
 	const { isFetchingData, isDataReady, fetchData } = useContext(DataContext);
+	const [init, setInit] = useState(false);
 
 	useEffect(() => {
 		if (localStorage.getItem('chakra-ui-color-mode') === 'light') {
 			localStorage.setItem('chakra-ui-color-mode', 'dark');
 		}
 		if (typeof window !== 'undefined') {
-			if (
-				localStorage.getItem('address') &&
-				!isConnected &&
-				!isConnecting
-			) {
-				connect((_address: string | null, _err: string) => {
-					if (!isDataReady && !isFetchingData && _address) {
-						fetchData(tronWeb, _address);
-					}
-				});
+			if (!isConnected && !isConnecting) {
+				if(localStorage.getItem('address')){
+					connect((_address: string | null, _err: string) => {
+						if (!isDataReady && !isFetchingData && _address) {
+							fetchData(tronWeb, _address);
+						}
+					});
+				} else if(!init) {
+					fetchData((window as any).tronWeb, null);
+					setInit(true)
+				}
 			}
 		}
 	});
