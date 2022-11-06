@@ -15,12 +15,21 @@ const Graph = ({ pair }) => {
 	const [_candleSeries, setCandleSeries] = React.useState<any>();
 	const [_volumeSeries, setVolumeSeries] = React.useState<any>();
 
-
 	if (chart.current && pair) {
-		_candleSeries.setData(pairData[pair?.id]?.exchangeRate ?? []);
-		_volumeSeries.setData(pairData[pair?.id]?.volume ?? []);
-
+		let exchangeData = pairData[pair?.id]?.exchangeRate ?? [];
+		if(!Array.isArray(exchangeData)) {
+			exchangeData = []
+		}
+		console.log(exchangeData);
+		_candleSeries.setData(exchangeData);
+		let volumeData = pairData[pair?.id]?.volume ?? [];
+		if(!Array.isArray(volumeData)) {
+			volumeData = []
+		}
+		console.log(volumeData);
+		_volumeSeries.setData(volumeData);
 	}
+
 	useEffect(() => {
 		chart.current = createChart(chartContainerRef.current, {
 			width: chartContainerRef.current.clientWidth,
