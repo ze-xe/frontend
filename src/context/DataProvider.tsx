@@ -137,6 +137,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/orders/${pair.id}`);
 		})
 		Promise.all(orderRequests).then((res) => {
+			console.log(res);
 			let newOrders = {};
 			res.forEach((order, index) => {
 				return newOrders[order.data.data.pair] = order.data.data;
@@ -150,6 +151,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/orders_placed/${address}/${pair.id}`);
 		})
 		Promise.all(orderRequests).then((res) => {
+			console.log(res)
 			let newOrders = {};
 			res.forEach((order, index) => {
 				return newOrders[pairs[index].id] = order.data.data;
@@ -164,6 +166,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/pair/pricetrend/${pair.id}?interval=300000`);
 		})
 		Promise.all(pairRequests).then((res) => {
+			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -178,6 +181,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/pair/orders/history/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
+			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -192,6 +196,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/orders_history/${address}/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
+			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -206,6 +211,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/user/order/cancelled/${address}/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
+			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -220,6 +226,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/pair/trading/status/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
+			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
