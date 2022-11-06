@@ -49,7 +49,7 @@ export default function ExecutedOrders({ pair }) {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{orderHistory[pair?.id]?.map(
+						{orderHistory[pair?.id]?.slice(0, 10).map(
 							(order: any, index: number) => {
 								return (
 									<Tr>

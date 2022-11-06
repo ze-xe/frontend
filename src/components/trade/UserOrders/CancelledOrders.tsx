@@ -49,7 +49,7 @@ export default function CancelledOrders({ pair }) {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{cancelledOrders[pair?.id]?.map(
+						{cancelledOrders[pair?.id]?.slice(0, 10).map(
 							(order: any, index: number) => {
 								return (
 									<Tr>

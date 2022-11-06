@@ -53,7 +53,7 @@ export default function SellModal({
 				pair.tokens[0].id,
 				pair.tokens[1].id,
 				_amount,
-				(Number(price) * 10 ** pair.exchangeRateDecimals).toFixed(0),
+				'0',
 				0,
 				orders.map((order) => '0x' + order.id)
 			)
@@ -102,7 +102,7 @@ export default function SellModal({
 			.toFixed(0);
 
 		axios
-			.get('https://api.zexe.io/matchedorders/' + pair.id, {
+			.get('https://api.zexe.io/market/matched/orders/' + pair.id, {
 				params: {
 					amount: _amount,
 					exchange_rate: Big(price).times(
@@ -117,21 +117,23 @@ export default function SellModal({
 				let _orderToPlace = amount*(10**token0.decimals);
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
-					ordersToExecute.push(orders[i]);
 					let execAmount = Math.min(_orderToPlace, orders[i].amount);
+					orders[i].amount = execAmount;
+					ordersToExecute.push(orders[i]);
 					_orderToPlace = Big(_orderToPlace)
 						.minus(execAmount)
 						.toFixed(0);
 					_expectedOutput = _expectedOutput.plus(
 						Big(execAmount)
-							.div(orders[i].exchangeRate)
-							.times(10 ** pair.exchangeRateDecimals)
+							.times(orders[i].exchangeRate)
+							.div(10 ** pair.exchangeRateDecimals)
 					);
 				}
 				_expectedOutput = _expectedOutput.plus(
-					Big(_orderToPlace).div(price)
+					Big(_orderToPlace).times(price)
 				);
-				setOrderToPlace(_orderToPlace);
+
+				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
 			});

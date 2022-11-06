@@ -77,7 +77,7 @@ export default function BuyModule({ pair }) {
 					.div(10 ** token1.decimals);
 				setAmount(token0Amount.toNumber().toFixed(pair.exchangeRateDecimals));
 				settoken1Amount(
-					token0Amount.div(_price).toNumber().toFixed(pair.exchangeRateDecimals)
+					token0Amount.times(_price).toNumber().toFixed(pair.exchangeRateDecimals)
 				);
 			}
 		}

@@ -10,7 +10,6 @@ import {
 import React, { useContext } from 'react';
 const Big = require('big.js');
 
-const MIN_T0_ORDER = '10000000000000000';
 import axios from 'axios';
 import { getABI, getAddress } from '../../../utils/contract';
 
@@ -60,7 +59,7 @@ export default function BuyModal({
 		if (token0Amount == '0' || token0Amount == '') return false;
 		if (Number(token0Amount))
 			return Big(token0Amount).lt(
-				Big(MIN_T0_ORDER).div(10 ** token0.decimals)
+				Big(pair?.minToken0Order).div(10 ** token0.decimals)
 			);
 	};
 
@@ -139,8 +138,9 @@ export default function BuyModal({
 				let _orderToPlace = token0Amount * 10 ** token0.decimals;
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
-					ordersToExecute.push(orders[i]);
 					let execAmount = Math.min(_orderToPlace, orders[i].amount);
+					orders[i].amount = execAmount;
+					ordersToExecute.push(orders[i]);
 					_orderToPlace = Big(_orderToPlace)
 						.minus(execAmount)
 						.toFixed(0);
@@ -153,7 +153,7 @@ export default function BuyModal({
 				_expectedOutput = _expectedOutput.plus(
 					Big(_orderToPlace).times(price)
 				);
-				setOrderToPlace(_orderToPlace);
+				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
 			});

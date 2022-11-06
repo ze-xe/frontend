@@ -26,7 +26,7 @@ const Big = require('big.js');
 
 const MIN_T0_ORDER = '10000000000000000';
 
-export default function SellModule({ pair }) {
+export default function BuyModule({ pair }) {
 	const [pairNow, setPairNow] = React.useState(null);
 	const [amount, setAmount] = React.useState('0');
 	const [token1Amount, settoken1Amount] = React.useState('0');
@@ -43,6 +43,10 @@ export default function SellModule({ pair }) {
 
 
 	useEffect(() => {
+		const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
+		const _token1 = tokens.find((t) => t.id === pair?.tokens[1].id);
+		setToken0(_token0);
+		setToken1(_token1);
 		// if there is change in pair
 		if(pair && pairNow !== pair?.id) {
 			const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
@@ -73,7 +77,7 @@ export default function SellModule({ pair }) {
 					.div(10 ** token1.decimals);
 				setAmount(token0Amount.toNumber().toFixed(pair.exchangeRateDecimals));
 				settoken1Amount(
-					token0Amount.div(_price).toNumber().toFixed(pair.exchangeRateDecimals)
+					token0Amount.times(_price).toNumber().toFixed(pair.exchangeRateDecimals)
 				);
 			}
 		}
@@ -156,7 +160,7 @@ export default function SellModule({ pair }) {
 			<Flex flexDir={'column'} gap={1}>
 				<Text fontSize={'sm'}>Price ({pair?.tokens[1].symbol})</Text>
 				<NumberInput
-				isDisabled
+					isDisabled
 					min={0}
 					precision={pair?.exchangeRateDecimals}
 					value={price}
