@@ -11,9 +11,12 @@ import { useRouter } from 'next/router';
 import PlacedOrders from '../../components/trade/UserOrders';
 import {useEffect, useState} from 'react';
 import Exchange from '../../components/trade/Exchange';
+import { WalletContext } from '../../context/Wallet';
 
 const Trade = () => {
 	const {pairs} = useContext(DataContext);
+	const {isConnected} = useContext(WalletContext);
+
 	const router = useRouter()
 	const { pairId } = router.query
 	const [pair, setPair] = useState(null)
@@ -47,9 +50,9 @@ const Trade = () => {
 						<OrdersPanel pair={pair} />
 					</Flex>
 				</Flex>
-				<Box bgColor={'gray.1100'} my={2} width='100%'>
+				{isConnected && <Box bgColor={'gray.1100'} my={2} width='100%'>
 					<PlacedOrders pair={pair}/> 
-				</Box>
+				</Box>}
 			</Box>
 		</>
 	);

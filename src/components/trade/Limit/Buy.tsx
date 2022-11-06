@@ -96,10 +96,11 @@ export default function BuyModule({ pair }) {
 
 	const setSlider = (e) => {
 		setSliderValue(e);
+		if(!token1 || !price) return;
 		const token1Amount = Big(e)
-			.times(token1?.tradingBalance ?? 0)
+			.times(token1.tradingBalance ?? 0)
 			.div(100)
-			.div(10 ** token1?.decimals);
+			.div(10 ** token1.decimals);
 		setAmount(token1Amount.toString());
 		if (price != '0' && price != '' && Number(price))
 			if (Number(price) > 0)

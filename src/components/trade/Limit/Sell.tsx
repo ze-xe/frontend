@@ -24,7 +24,6 @@ import { getABI, getAddress } from '../../../utils/contract';
 import SellModal from './SellModal';
 const Big = require('big.js');
 
-const MIN_T0_ORDER = '10000000000000000';
 
 export default function BuyModule({ pair }) {
 	const [pairNow, setPairNow] = React.useState(null);
@@ -104,6 +103,7 @@ export default function BuyModule({ pair }) {
 
 	const setSlider = (e) => {
 		setSliderValue(e);
+		if(!token0 || !price) return;
 		const token0Amount = Big(e)
 			.times(token0?.tradingBalance ?? 0)
 			.div(100)
@@ -143,7 +143,7 @@ export default function BuyModule({ pair }) {
 	const onPriceChange = (e) => {
 		setPrice(e);
 		if (amount != '0' && amount != '' && e != '0' && e != '' && Number(e))
-			settoken1Amount(Big(amount).div(e).toString());
+			settoken1Amount(Big(amount).times(e).toString());
 	};
 
 	

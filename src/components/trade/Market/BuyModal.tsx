@@ -48,16 +48,16 @@ export default function BuyModal({
 	const { tokenFormatter } = useContext(DataContext);
 
 	const amountExceedsBalance = () => {
-		if (amount == '0' || amount == '' || !token1.tradingBalance) return false;
-		if (Number(amount))
+		if (amount == '0' || amount == '' || !token1?.tradingBalance ) return false;
+		if (Number(amount) && token1?.tradingBalance)
 			return Big(amount).gt(
-				Big(token1.tradingBalance).div(10 ** token1.decimals)
+				Big(token1?.tradingBalance).div(10 ** token1?.decimals)
 			);
 	};
 
 	const amountExceedsMin = () => {
-		if (token0Amount == '0' || token0Amount == '') return false;
-		if (Number(token0Amount))
+		if (token0Amount == '0' || token0Amount == '' || !token0 || !pair) return false;
+		if (Number(token0Amount) && pair?.minToken0Order && token0.decimals)
 			return Big(token0Amount).lt(
 				Big(pair?.minToken0Order).div(10 ** token0.decimals)
 			);

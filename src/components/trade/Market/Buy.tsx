@@ -94,8 +94,9 @@ export default function BuyModule({ pair }) {
 		}
 	});
 
-	const setSlider = (e) => {
+	const setSlider = (e: any) => {
 		setSliderValue(e);
+		if(!token0 || !price) return;
 		const token1Amount = Big(e)
 			.times(token1?.tradingBalance ?? 0)
 			.div(100)

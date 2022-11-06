@@ -46,7 +46,6 @@ export default function SellModal({
 			.times(10 ** token0.decimals)
 			.toFixed(0);
 
-		console.log(orders.map((order) => order.amount), _amount);
 		(window as any).tronWeb
 			.contract(getABI('Exchange'), getAddress('Exchange'))
 			.methods.executeAndPlaceOrder(
@@ -68,7 +67,6 @@ export default function SellModal({
 			})
 			.catch((err: any) => {
 				setLoading(false);
-				console.log(err);
 			});
 	};
 
@@ -146,17 +144,17 @@ export default function SellModal({
 	};
 
 	const amountExceedsBalance = () => {
-		if (amount == '0' || amount == '' || !token0.tradingBalance) return false;
-		if (Number(amount) )
+		if (amount == '0' || amount == '' || !token0 || !token1) return false;
+		if (Number(amount) && token0.tradingBalance && token1.decimals)
 			return Big(amount).gt(
 				Big(token0.tradingBalance).div(10 ** token1.decimals)
 			);
 	};
 
 	const amountExceedsMin = () => {
-		if (amount == '0' || amount == '') return false;
-		if (Number(amount))
-			return Big(amount).lt(Big(MIN_T0_ORDER).div(10 ** token0.decimals));
+		if (amount == '0' || amount == '' || !pair || !token0) return false;
+		if (Number(amount) && pair?.minToken0Order && token0.decimals)
+			return Big(amount).lt(Big(pair?.minToken0Order).div(10 ** token0.decimals));
 	};
 
 	return (

@@ -45,7 +45,6 @@ const ConnectButton = ({}) => {
 				fetchData((window as any).tronWeb, _address);
 			}
 		});
-		console.log("should close")
 		onConnectClose();
 	}
 

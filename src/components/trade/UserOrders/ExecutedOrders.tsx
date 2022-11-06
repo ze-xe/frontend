@@ -39,7 +39,7 @@ export default function ExecutedOrders({ pair }) {
 	
 	return (
 		<Box bgColor="gray.1100">
-			<TableContainer>
+			{orderHistory[pair?.id]?.length ? <TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>
 						<Tr>
@@ -86,6 +86,11 @@ export default function ExecutedOrders({ pair }) {
 					</Tbody>
 				</Table>
 			</TableContainer>
+			:
+			<Box>
+				<Text color={'gray'}>No executed orders</Text>
+			</Box>
+			}
 		</Box>
 	);
 }

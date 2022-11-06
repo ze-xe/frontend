@@ -39,7 +39,7 @@ export default function CancelledOrders({ pair }) {
 	
 	return (
 		<Box bgColor="gray.1100">
-			<TableContainer>
+			{cancelledOrders[pair?.id]?.length > 0 ? <TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>
 						<Tr>
@@ -85,7 +85,12 @@ export default function CancelledOrders({ pair }) {
 						)}
 					</Tbody>
 				</Table>
-			</TableContainer>
+			</TableContainer>:
+			
+			<Box>
+				<Text color={'gray'}>No cancelled orders</Text>
+			</Box>
+			}
 		</Box>
 	);
 }

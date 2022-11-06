@@ -6,6 +6,8 @@ import {
 	Flex,
 	Link,
 	InputLeftElement,
+	Alert,
+	AlertIcon,
 } from '@chakra-ui/react';
 import React from 'react';
 import { useContext } from 'react';
@@ -16,6 +18,7 @@ import { DataContext } from '../../context/DataProvider';
 import Image from 'next/image';
 import { getABI, getAddress } from '../../utils/contract';
 import { PhoneIcon } from '@chakra-ui/icons';
+import axios from 'axios';
 const Big = require('big.js');
 const ethers = require('ethers');
 
@@ -27,9 +30,9 @@ export default function Deposit() {
 
 	// loading
 	const [loading, setLoading] = React.useState(false);
-	const [error, setError] = React.useState('');
-	const [success, setSuccess] = React.useState(false);
-	const [hash, setHash] = React.useState('');
+	const [response, setResponse] = React.useState(null);
+	const [hash, setHash] = React.useState(null);
+	const [confirmed, setConfirmed] = React.useState(false);
 
 	const handleMax = () => {
 		// set amount as token balance
@@ -40,9 +43,9 @@ export default function Deposit() {
 
 	const withdraw = () => {
 		setLoading(true);
-		setError('');
-		setSuccess(false);
-		setHash('');
+		setResponse(null);
+		setConfirmed(false);
+		setHash(null);
 		// deposit amount of selected token
 		let token = tokens[selectedToken];
 		let _amount = Big(amount)
@@ -53,9 +56,32 @@ export default function Deposit() {
 			.methods.withdraw(token.id, _amount)
 			.send({})
 			.then((res: any) => {
-				setLoading(false);
-				setSuccess(true);
 				setHash(res);
+				setLoading(false);
+				checkResponse(res);
+				setResponse('Transaction sent! Waiting for confirmation...');
+			});
+	};
+
+	const checkResponse = (tx_id: string) => {
+		axios
+			.get(
+				'https://nile.trongrid.io/wallet/gettransactionbyid?value=' +
+					tx_id
+			)
+			.then((res) => {
+				if (!res.data.ret) {
+					setTimeout(() => {
+						checkResponse(tx_id);
+					}, 2000);
+				} else {
+					setConfirmed(true);
+					if (res.data.ret[0].contractRet == 'SUCCESS') {
+						setResponse('Transaction Successful!');
+					} else {
+						setResponse('Transaction Failed. Please try again.');
+					}
+				}
 			});
 	};
 
@@ -144,35 +170,57 @@ export default function Deposit() {
 				<Button
 					width={'100%'}
 					mt={2}
-					disabled={Number(amount) == 0 || amountExceedsBalance() || !isConnected}
+					disabled={
+						loading ||
+						Number(amount) == 0 ||
+						amountExceedsBalance() ||
+						!isConnected
+					}
 					onClick={withdraw}
 					isLoading={loading}
 					loadingText="Confirm in your wallet"
 					bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
 					size="lg">
-					{!isConnected ? 'Connect Wallet' : Number(amount) == 0
+					{!isConnected
+						? 'Connect Wallet'
+						: Number(amount) == 0
 						? 'Enter Amount'
 						: amountExceedsBalance()
 						? 'Insufficient Balance'
 						: 'Withdraw'}
 				</Button>
 
-				<Box>
-					{error && <Text color={'red'}>{error}</Text>}
-					{success && (
-						<Box>
-							<Text>Transaction Submitted!</Text>
-							<Link
-								target={'_blank'}
-								href={
-									'https://nile.tronscan.org/#/transaction/' +
-									hash
-								}>
-								View on TronScan
-							</Link>
-						</Box>
-					)}
-				</Box>
+				{(hash && response) && (
+					<Box width={'100%'} my={2}>
+						<Alert
+							status={
+								response.includes('confirm')
+									? 'info'
+									: confirmed && response.includes('Success')
+									? 'success'
+									: 'error'
+							}
+							variant="subtle">
+							<AlertIcon />
+							<Box>
+								<Text fontSize="md" mb={0}>
+									{response}
+								</Text>
+								<Link
+									href={
+										'https://nile.tronscan.org/#/transaction/' +
+										hash
+									}
+									target="_blank">
+									{' '}
+									<Text fontSize={'sm'}>
+										View on TronScan
+									</Text>
+								</Link>
+							</Box>
+						</Alert>
+					</Box>
+				)}
 			</Box>
 		</Flex>
 	);

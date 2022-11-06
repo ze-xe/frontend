@@ -39,7 +39,7 @@ export default function PlacedOrders({ pair }) {
 	
 	return (
 		<Box bgColor="gray.1100">
-			<TableContainer>
+			{placedOrders[pair?.id]?.length > 0 ? <TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>
 						<Tr>
@@ -103,7 +103,11 @@ export default function PlacedOrders({ pair }) {
 						)}
 					</Tbody>
 				</Table>
-			</TableContainer>
+			</TableContainer>:
+			<Box>
+				<Text color={'gray'}>No orders placed</Text>
+			</Box>
+			}
 		</Box>
 	);
 }

@@ -1,4 +1,6 @@
 import {
+	Alert,
+	AlertIcon,
 	Box,
 	Button,
 	Flex,
@@ -27,10 +29,12 @@ const mintAmount = {
 
 const Big = require('big.js');
 import { Input, InputGroup } from '@chakra-ui/react';
+import axios from 'axios';
+import Link from 'next/link';
 
 function RadioCard(props) {
 	const { getInputProps, getCheckboxProps } = useRadio(props);
-	const {address, isConnected} = useContext(WalletContext);
+	const { address, isConnected } = useContext(WalletContext);
 
 	const input = getInputProps();
 	const checkbox = getCheckboxProps();
@@ -66,10 +70,12 @@ export default function faucets() {
 	const { address, isConnected } = useContext(WalletContext);
 
 	const [selectedToken, setSelectedToken] = React.useState(0);
+
+	// loading
 	const [loading, setLoading] = React.useState(false);
-	const [error, setError] = React.useState('');
-	const [success, setSuccess] = React.useState(false);
-	const [hash, setHash] = React.useState('');
+	const [response, setResponse] = React.useState(null);
+	const [hash, setHash] = React.useState(null);
+	const [confirmed, setConfirmed] = React.useState(false);
 
 	const { getRootProps, getRadioProps } = useRadioGroup({
 		// name: tokens[selectedToken].name,
@@ -83,8 +89,9 @@ export default function faucets() {
 
 	const mint = async () => {
 		setLoading(true);
-		setSuccess(false);
-		setHash('');
+		setResponse(null);
+		setConfirmed(false);
+		setHash(null);
 
 		const token = tokens[selectedToken];
 		// mint tokens
@@ -96,12 +103,35 @@ export default function faucets() {
 			.mint(address, Big(mintAmount[token.symbol]).times(1e18).toFixed(0))
 			.send({})
 			.then((res: any) => {
-				setLoading(false);
-				setSuccess(true);
 				setHash(res);
-				console.log(res);
+				setLoading(false);
+				checkResponse(res);
+				setResponse('Transaction sent! Waiting for confirmation...');
 			});
 	};
+
+	const checkResponse = (tx_id: string) => {
+		axios
+			.get(
+				'https://nile.trongrid.io/wallet/gettransactionbyid?value=' +
+					tx_id
+			)
+			.then((res) => {
+				if (!res.data.ret) {
+					setTimeout(() => {
+						checkResponse(tx_id);
+					}, 2000);
+				} else {
+					setConfirmed(true);
+					if (res.data.ret[0].contractRet == 'SUCCESS') {
+						setResponse('Transaction Successful!');
+					} else {
+						setResponse('Transaction Failed. Please try again.');
+					}
+				}
+			});
+	};
+
 	return (
 		<Flex justify={'center'}>
 			<Box
@@ -111,7 +141,7 @@ export default function faucets() {
 				bgColor="gray.1000"
 				// width={'70%'}
 				// maxW="1400px"
-				>
+			>
 				<Text fontSize={'3xl'} fontWeight="bold">
 					Faucet
 				</Text>
@@ -119,7 +149,7 @@ export default function faucets() {
 					It's raining free money! 💰
 				</Text>
 
-				<Text fontSize={'lg'} fontWeight='bold' mb={2}>
+				<Text fontSize={'lg'} fontWeight="bold" mb={2}>
 					Choose an asset
 				</Text>
 				<HStack {...group}>
@@ -131,7 +161,10 @@ export default function faucets() {
 								{...radio}
 								minW="150px"
 								isChecked={selectedToken == index}>
-								<Box key={token.id} minW={'150px'} minH={'160px'}> 
+								<Box
+									key={token.id}
+									minW={'150px'}
+									minH={'160px'}>
 									<Image
 										src={
 											`/assets/crypto_logos/` +
@@ -145,7 +178,9 @@ export default function faucets() {
 											maxHeight: 40,
 											borderRadius: '50%',
 										}}></Image>
-									<Text fontSize={'xl'} mt={2}>{token.name}</Text>
+									<Text fontSize={'xl'} mt={2}>
+										{token.name}
+									</Text>
 									<Text>{token.symbol}</Text>
 
 									<Text fontSize={'sm'} my={2} mt={4}>
@@ -226,16 +261,42 @@ export default function faucets() {
 							onClick={() => mint()}
 							loadingText="Confirm in your wallet"
 							bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
-							size='lg'
+							size="lg"
 							isLoading={loading}
-							disabled={!isConnected}
-							>
+							disabled={!isConnected}>
 							{isConnected ? 'Mint' : 'Connect Wallet'}
 						</Button>
-						{success && (
-							<Text fontSize={'sm'} mt={2}>
-								Transaction Successful!
-							</Text>
+						{hash && response && (
+							<Box width={'100%'} my={2}>
+								<Alert
+									status={
+										response.includes('confirm')
+											? 'info'
+											: confirmed &&
+											  response.includes('Success')
+											? 'success'
+											: 'error'
+									}
+									variant="subtle">
+									<AlertIcon />
+									<Box>
+										<Text fontSize="md" mb={0}>
+											{response}
+										</Text>
+										<Link
+											href={
+												'https://nile.tronscan.org/#/transaction/' +
+												hash
+											}
+											target="_blank">
+											{' '}
+											<Text fontSize={'sm'}>
+												View on TronScan
+											</Text>
+										</Link>
+									</Box>
+								</Alert>
+							</Box>
 						)}
 					</Box>
 				</Box>

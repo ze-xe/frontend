@@ -66,7 +66,6 @@ function DataProvider({ children }: any) {
 			multicall.allowance(_tokens.map(token => token.id), address, getAddress('Vault')).call(),
 			multicall.tradingBalanceOf(getAddress('Vault'), _tokens.map(token => token.id), address).call(),
 		]).then(async (res) => {
-			console.log('balances', res)
 			// set balance in token
 			let newTokens = []
 			for(let index in _tokens) {
@@ -140,7 +139,6 @@ function DataProvider({ children }: any) {
 		Promise.all(orderRequests).then((res) => {
 			let newOrders = {};
 			res.forEach((order, index) => {
-				
 				return newOrders[order.data.data.pair] = order.data.data;
 			})
 			setOrders(newOrders);
@@ -226,7 +224,6 @@ function DataProvider({ children }: any) {
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
 			})
-			console.log(newPairs)
 			setPairStats(newPairs);
 		})
 	}

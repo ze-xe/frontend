@@ -50,10 +50,8 @@ export default function wallet() {
 	const _setTradingBalanceUSD = () => {
 		let _tradingBalancesUSD = [];
 		let _totalTradingBalanceUSD = 0;
-		console.log(tokens);
 		for(let i in tokens){
 			let _amount = tokens[i].tradingBalance * tokens[i].price/10**tokens[i].decimals;
-			console.log(_amount, tokens[i].tradingBalance, tokens[i].price);
 			if(isNaN(_amount)) _amount = 0;
 			_tradingBalancesUSD.push(_amount);
 			_totalTradingBalanceUSD += _amount;
