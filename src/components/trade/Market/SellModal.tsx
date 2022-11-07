@@ -177,7 +177,7 @@ export default function SellModal({
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'
-					: 'Limit Sell'}
+					: 'Market Sell'}
 			</Button>
 			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />

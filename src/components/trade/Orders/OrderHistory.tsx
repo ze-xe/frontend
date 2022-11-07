@@ -132,7 +132,7 @@ const Order = ({ order, pair, index }) => {
 
 	return (
 		<Flex justify={'space-between'} width="100%"
-            color={order.orderType == '1' ? 'green' : 'red'}
+            color={order.orderType == '1' ? 'red' : 'green'}
             bgColor="gray.1100"
             my={0.5}
         >

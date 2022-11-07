@@ -186,7 +186,7 @@ export default function BuyModal({
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'
-					: 'Limit Buy'}
+					: 'Market Buy'}
 			</Button>
 			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
