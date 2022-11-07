@@ -12,28 +12,31 @@ import {
 import { CheckCircleIcon, LinkIcon } from '@chakra-ui/icons'
 
 
-export const Footer = (props: FlexProps) => (
-  <Flex gap={5} position={"absolute"} bottom="0" mb={10}>
-
-
+export const Footer = () => (
+  <Box position={'fixed'} bottom='0' width={'100%'} >
+  <Flex gap={5} justify='center' bgColor={'#F60DC9'} minH={8} align='center'>
           <ChakraLink
             isExternal
             href="https://github.com/ze-xe"
-            flexGrow={1}
-            mr={2}
+            fontWeight='bold'
           >
-            Github <LinkIcon />
+            Github 
           </ChakraLink>
 
-          <ChakraLink isExternal href="https://twitter.com/zexeio" flexGrow={1} mr={2}>
-            Twitter <LinkIcon />
+          <ChakraLink isExternal href="https://twitter.com/zexeio"
+            fontWeight='bold'
+            >
+            Twitter 
           </ChakraLink>
 
           <ChakraLink
           //  isExternal
-            href="#" flexGrow={1} mr={2}>
-            Discord <LinkIcon />
+          fontWeight='bold'
+
+            href="#">
+            Discord 
           </ChakraLink>
 
   </Flex>
+  </Box>
 )

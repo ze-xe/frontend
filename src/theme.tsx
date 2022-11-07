@@ -12,25 +12,25 @@ const breakpoints = createBreakpoints({
 
 const config: ThemeConfig = {
   useSystemColorMode: false,
-	initialColorMode: 'light',
+	initialColorMode: 'dark',
 };
 
 const theme = extendTheme({
   config: config,
   semanticTokens: {
     colors: {
-      text: {
-        default: '#16161D',
-        _dark: '#ade3b8',
-      },
-      heroGradientStart: {
-        default: '#7928CA',
-        _dark: '#e3a7f9',
-      },
-      heroGradientEnd: {
-        default: '#FF0080',
-        _dark: '#fbec8f',
-      },
+      // text: {
+      //   default: '#16161D',
+      //   _dark: '#ade3b8',
+      // },
+      // heroGradientStart: {
+      //   default: '#7928CA',
+      //   _dark: '#e3a7f9',
+      // },
+      // heroGradientEnd: {
+      //   default: '#FF0080',
+      //   _dark: '#fbec8f',
+      // },
     },
     radii: {
       button: '12px',
@@ -52,8 +52,10 @@ const theme = extendTheme({
       1000: '#161616',
       1100: '#161616'
     },
-    // green: '#0CAD4B',
-    // red: '#C53027'
+    // green: '#228B22',
+    // red: '#D82626',
+     green: '#18B05F',
+    red: '#C83232'
   },
   fonts,
   breakpoints,
