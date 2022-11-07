@@ -53,11 +53,12 @@ function DataProvider({ children }: any) {
 		})
 	);
 	const [tokenFormatter, setTokenFormatter] = React.useState<null | {}>(
-		new Intl.NumberFormat('en-US')
+		new Intl.NumberFormat('en-US', {
+			minimumFractionDigits: 2,
+		})
 	);
 
-	React.useEffect(() => {}, [])
-	
+	React.useEffect(() => {}, [])	
 
 	const getWalletBalances = async (address: string, _tokens = tokens) => {
 		let multicall = await tronWeb.contract(getABI('Helper'), getAddress('Helper'));

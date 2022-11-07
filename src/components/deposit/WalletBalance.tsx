@@ -15,11 +15,11 @@ import {
 } from '@chakra-ui/react';
 import { DataContext } from '../../context/DataProvider';
 import Image from 'next/image';
+import { tokenFormatter } from '../../utils/formatters';
 const Big = require('big.js');
 
 export default function WalletBalance() {
 	const { tokens } = useContext(DataContext);
-	const { tokenFormatter } = useContext(DataContext);
 
 	return (
 		<>
@@ -56,7 +56,7 @@ export default function WalletBalance() {
 											</Flex>
 									</Td>
 									<Td isNumeric>
-										{tokenFormatter.format(
+										{tokenFormatter(null).format(
 											Big(token.balance ?? 0)
 												.div(
 													10 ** (token.decimals ?? 18)

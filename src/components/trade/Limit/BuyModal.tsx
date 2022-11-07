@@ -27,6 +27,7 @@ import { DataContext } from '../../../context/DataProvider';
 import Link from 'next/link';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
+import { tokenFormatter } from '../../../utils/formatters';
 
 export default function BuyModal({
 	pair,
@@ -37,15 +38,15 @@ export default function BuyModal({
 	price,
 }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	
 	const [loading, setLoading] = React.useState(false);
 	const [response, setResponse] = React.useState(null);
 	const [hash, setHash] = React.useState(null);
 	const [confirmed, setConfirmed] = React.useState(false);
+
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
-
-	const { tokenFormatter } = useContext(DataContext);
 
 	const amountExceedsBalance = () => {
 		if (amount == '0' || amount == '' || !token1?.tradingBalance ) return false;
@@ -202,11 +203,11 @@ export default function BuyModal({
 								<Text fontSize={'xs'}>ID: {o.id}</Text>
 
 								<Text>
-									{tokenFormatter.format(
+									{tokenFormatter(null).format(
 										o.amount / 10 ** pair.tokens[0].decimals
 									)}{' '}
 									{pair.tokens[0].symbol} @{' '}
-									{tokenFormatter.format(
+									{tokenFormatter(null).format(
 										o.exchangeRate /
 											10 ** pair.exchangeRateDecimals
 									)}{' '}

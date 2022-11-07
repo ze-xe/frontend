@@ -25,6 +25,7 @@ import {
 	StatArrow,
 	StatGroup,
   } from '@chakra-ui/react'
+import { dollarFormatter, tokenFormatter } from '../utils/formatters';
 
 const dummyPrices = {
 	'BTC': '20000',
@@ -37,7 +38,7 @@ const dummyPrices = {
 
 export default function wallet() {
 	const { address, isConnected } = useContext(WalletContext);
-	const { tokens, tokenFormatter, dollarFormatter } = useContext(DataContext);
+	const { tokens } = useContext(DataContext);
 	const [balance, setBalance] = React.useState(0);
 	const [tradingBalancesUSD, setTradingBalancesUSD] = React.useState([]);
 	const [totalTradingBalanceUSD, setTotalTradingBalanceUSD] = React.useState(0);
@@ -76,7 +77,7 @@ export default function wallet() {
 							{address}
 						</Text>
 						<Text ml={4} fontSize="sm" color={'gray.400'}>
-							{tokenFormatter.format(balance / 1e6)} TRX
+							{tokenFormatter(null).format(balance / 1e6)} TRX
 						</Text>
 					</Box>
 					</Flex>
@@ -84,7 +85,7 @@ export default function wallet() {
 
 					<Stat textAlign={'right'}>
 					<StatLabel>Trading Balance</StatLabel>
-					<StatNumber>{dollarFormatter.format(totalTradingBalanceUSD)}</StatNumber>
+					<StatNumber>{dollarFormatter(null).format(totalTradingBalanceUSD)}</StatNumber>
 					<StatHelpText></StatHelpText>
 					</Stat>
 					</Box>
@@ -137,24 +138,24 @@ export default function wallet() {
 												</div>
 											</Td>
 											<Td><Box>
-												<Text>{tokenFormatter.format(
+												<Text>{tokenFormatter(null).format(
 													token.tradingBalance /
 														10 ** token.decimals
 												)}{' '}
 												{token.symbol}</Text>
-												<Text fontSize={'sm'} color='gray'>{dollarFormatter.format(
+												<Text fontSize={'sm'} color='gray'>{dollarFormatter(null).format(
 													tradingBalancesUSD[index])}</Text>
 											</Box>
 											</Td>
 											<Td>
 												
 												<Box>
-												<Text>{tokenFormatter.format(
+												<Text>{tokenFormatter(null).format(
 													token.balance /
 														10 ** token.decimals
 												)}{' '}
 												{token.symbol}</Text>
-												<Text fontSize={'sm'} color='gray'>{dollarFormatter.format(
+												<Text fontSize={'sm'} color='gray'>{dollarFormatter(null).format(
 													token.balance*token.price /
 													10 ** token.decimals)}</Text>
 											</Box>

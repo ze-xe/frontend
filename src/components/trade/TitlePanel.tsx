@@ -2,10 +2,12 @@ import { Box, Text, Flex, Divider } from '@chakra-ui/react';
 import Image from 'next/image';
 import React, { useContext } from 'react';
 import { DataContext } from '../../context/DataProvider';
+import { dollarFormatter, tokenFormatter } from '../../utils/formatters';
+import { decimalPoints } from '../../utils/const';
 
 export default function TitlePanel({ pair }) {
 	
-	const {tokenFormatter, dollarFormatter, pairStats} = useContext(DataContext);
+	const {pairStats} = useContext(DataContext);
 
 	return (
 		<Box bgColor={'gray.1100'} px="4" pb={2} pt={3}>
@@ -35,8 +37,8 @@ export default function TitlePanel({ pair }) {
 			</Flex>
 			<Box textAlign={'right'} color={pair?.priceDiff < 0 ? 'red' : 'green'}>
 				{/* <Text fontSize={'xs'} textTransform='uppercase'>Price</Text> */}
-				<Text fontSize={'3xl'} fontWeight='bold'>{tokenFormatter.format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))} </Text>
-				<Text fontSize={'sm'} mt={-1}>{tokenFormatter.format(pairStats[pair?.id]?.[1].changeInER)}%</Text>
+				<Text fontSize={'3xl'} fontWeight='bold'>{tokenFormatter(decimalPoints[pair?.tokens[0].symbol]).format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))} </Text>
+				<Text fontSize={'sm'} mt={-1}>{tokenFormatter(null).format(pairStats[pair?.id]?.[1].changeInER)}%</Text>
 			</Box>
 			</Flex>
 			<Divider mt={2} mb={4} />
@@ -50,7 +52,7 @@ export default function TitlePanel({ pair }) {
 						Trading Volume
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{dollarFormatter.format(pairStats[pair?.id]?.[0].volume24Hr * pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
+					{dollarFormatter(null).format(pairStats[pair?.id]?.[0].volume24Hr * pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
 					</Text>
 				</Box>
 				<Box>
@@ -62,7 +64,7 @@ export default function TitlePanel({ pair }) {
 						24h Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						{tokenFormatter.format(pairStats[pair?.id]?.[1].changeInER)} %
+						{tokenFormatter(null).format(pairStats[pair?.id]?.[1].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -74,7 +76,7 @@ export default function TitlePanel({ pair }) {
 						7d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter.format(pairStats[pair?.id]?.[2].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[2].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -86,7 +88,7 @@ export default function TitlePanel({ pair }) {
 						30d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter.format(pairStats[pair?.id]?.[3].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[3].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -98,7 +100,7 @@ export default function TitlePanel({ pair }) {
 						90d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter.format(pairStats[pair?.id]?.[4].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[4].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -110,7 +112,7 @@ export default function TitlePanel({ pair }) {
 						1y Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter.format(pairStats[pair?.id]?.[5].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[5].changeInER)} %
 					</Text>
 				</Box>
 			</Flex>

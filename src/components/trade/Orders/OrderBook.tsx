@@ -4,10 +4,10 @@ import React from 'react';
 import { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 import {useEffect, useState} from 'react';
+import { tokenFormatter } from '../../../utils/formatters';
+import { decimalPoints } from '../../../utils/const';
 
 const Order = ({ order, index, total, pair, orderType }) => {
-
-	const {tokenFormatter} = useContext(DataContext);
 
 	return (
 		<Flex
@@ -23,14 +23,14 @@ const Order = ({ order, index, total, pair, orderType }) => {
 			textAlign="right"
 			px={4}
 			_hover={{ bgColor: 'gray.800' }}>
-			<Text fontSize={'xs'} color={'gray.300'}>
-				{tokenFormatter.format(order.amount/(10**pair.tokens[0].decimals))}
+			<Text fontSize={'xs'}>
+				{tokenFormatter(null).format(order.amount/(10**pair.tokens[0].decimals))}
 			</Text>
-			<Text fontSize={'xs'} color={'gray.300'}>
-				{tokenFormatter.format((order.amount/(10**(pair.tokens[0].decimals)))*(order.exchangeRate/(10**pair.exchangeRateDecimals)))}
+			<Text fontSize={'xs'}>
+				{tokenFormatter(null).format((order.amount/(10**(pair.tokens[0].decimals)))*(order.exchangeRate/(10**pair.exchangeRateDecimals)))}
 			</Text>
 			<Text fontSize="xs" fontWeight={'bold'}>
-				{tokenFormatter.format(order.exchangeRate/(10**pair.exchangeRateDecimals))} 
+				{tokenFormatter(decimalPoints[pair.tokens[0].symbol]).format(order.exchangeRate/(10**pair.exchangeRateDecimals))} 
 			</Text>
 		</Flex>
 	);
@@ -42,7 +42,6 @@ export default function OrderBook({ pair }) {
 	const [sellOrders, setSellOrders] = useState([]);
 	const [totalBuy, setTotalBuy] = useState(0);
 	const [totalSell, setTotalSell] = useState(0);
-	const {tokenFormatter} = useContext(DataContext);
 
 	// const totalSell = orders.sellOrders.reduce((acc, order) => acc + order.amount, 0);
 	// const totalBuy = orders.buyOrders.reduce((acc, order) => acc + order.amount, 0);
@@ -84,11 +83,11 @@ export default function OrderBook({ pair }) {
 
 				</Flex>
 				<Text
-					fontSize={'3xl'}
+					fontSize={'2xl'}
 					fontWeight="bold"
 					textAlign={'right'}
 					mr={4}>
-					{tokenFormatter.format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
+					{tokenFormatter(decimalPoints[pair?.tokens[0].symbol]).format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
 				</Text>
 			</Flex>
 			<Divider mb={2} bgColor="transparent" />

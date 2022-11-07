@@ -22,6 +22,7 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import { getABI, getAddress } from '../../../utils/contract';
 import BuyModal from './BuyModal';
+import { tokenFormatter } from '../../../utils/formatters';
 const Big = require('big.js');
 
 export default function BuyModule({ pair }) {
@@ -35,7 +36,7 @@ export default function BuyModule({ pair }) {
 	const [token0, setToken0] = React.useState(null);
 	const [token1, setToken1] = React.useState(null);
 
-	const { tokens, tokenFormatter } = useContext(DataContext);
+	const { tokens } = useContext(DataContext);
 
 	useEffect(() => {
 		const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
@@ -192,7 +193,7 @@ export default function BuyModule({ pair }) {
 					<Text fontSize={'sm'}>Total ({token1?.symbol})</Text>
 					<Text fontSize={'xs'}>
 						Balance{' '}
-						{tokenFormatter.format(
+						{tokenFormatter(null).format(
 							(token1?.tradingBalance ?? 0) /
 								10 ** token1?.decimals
 						)}

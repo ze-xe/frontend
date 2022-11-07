@@ -16,10 +16,10 @@ import {
 import { DataContext } from '../../context/DataProvider';
 const Big = require('big.js');
 import Image from 'next/image';
+import { tokenFormatter } from '../../utils/formatters';
 
 export default function WalletBalance() {
 	const { tokens } = useContext(DataContext);
-	const { tokenFormatter } = useContext(DataContext);
 
 	return (
 		<>
@@ -57,7 +57,7 @@ export default function WalletBalance() {
 											</Flex>
 									</Td>
 									<Td isNumeric>
-										{tokenFormatter.format(
+										{tokenFormatter(null).format(
 											Big(token.tradingBalance ?? 0)
 												.div(
 													10 ** (token.decimals ?? 18)

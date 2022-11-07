@@ -2,6 +2,8 @@ import { Box, Flex, Spacer, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
+import { tokenFormatter } from '../../../utils/formatters';
+import { decimalPoints } from '../../../utils/const';
 
 const orders = [
 	{
@@ -127,7 +129,6 @@ const orders = [
 ];
 
 const Order = ({ order, pair, index }) => {
-	const {tokenFormatter} = useContext(DataContext);
 
 	return (
 		<Flex justify={'space-between'} width="100%"
@@ -136,13 +137,13 @@ const Order = ({ order, pair, index }) => {
             my={0.5}
         >
 			<Text fontSize={'xs'}>
-				{tokenFormatter.format(order.fillAmount/(10**pair?.tokens[0].decimals))} 
+				{tokenFormatter(null).format(order.fillAmount/(10**pair?.tokens[0].decimals))} 
 			</Text>
 			<Text fontSize={'xs'}>
-				{tokenFormatter.format(order.fillAmount*(order.exchangeRate/(10**pair.exchangeRateDecimals))/(10**pair?.tokens[0].decimals))} 
+				{tokenFormatter(null).format(order.fillAmount*(order.exchangeRate/(10**pair.exchangeRateDecimals))/(10**pair?.tokens[0].decimals))} 
 			</Text>
 			<Text fontSize="xs">
-				{tokenFormatter.format(order.exchangeRate/(10**pair.exchangeRateDecimals))}
+				{tokenFormatter(decimalPoints[pair.tokens[0].symbol]).format(order.exchangeRate/(10**pair.exchangeRateDecimals))}
 			</Text>
 		</Flex>
 	);

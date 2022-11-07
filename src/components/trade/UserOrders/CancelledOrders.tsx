@@ -18,6 +18,7 @@ import { useEffect } from 'react';
 import { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 import UpdateOrder from './UpdateOrder';
+import { tokenFormatter } from '../../../utils/formatters';
 
 export default function CancelledOrders({ pair }) {
 	const { tokens } = useContext(DataContext);
@@ -35,7 +36,7 @@ export default function CancelledOrders({ pair }) {
 		}
 	});
 
-	const { tokenFormatter, cancelledOrders } = useContext(DataContext);
+	const { cancelledOrders } = useContext(DataContext);
 	
 	return (
 		<Box bgColor="gray.1100">
@@ -64,14 +65,14 @@ export default function CancelledOrders({ pair }) {
 												: 'BUY'}
 										</Td>
 										<Td>
-											{tokenFormatter.format(
+											{tokenFormatter(null).format(
 												order.amount /
 													10 ** token0?.decimals
 											)}{' '}
 											{token0?.symbol}
 										</Td>
 										<Td>
-											{tokenFormatter.format(
+											{tokenFormatter(pair?.exchangeRateDecimals).format(
 												order.exchangeRate /
 													10 **
 														pair?.exchangeRateDecimals

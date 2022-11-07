@@ -20,13 +20,11 @@ const Graph = ({ pair }) => {
 		if(!Array.isArray(exchangeData)) {
 			exchangeData = []
 		}
-		console.log(exchangeData);
 		_candleSeries.setData(exchangeData);
 		let volumeData = pairData[pair?.id]?.volume ?? [];
 		if(!Array.isArray(volumeData)) {
 			volumeData = []
 		}
-		console.log(volumeData);
 		_volumeSeries.setData(volumeData);
 	}
 

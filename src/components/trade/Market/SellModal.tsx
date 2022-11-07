@@ -20,6 +20,7 @@ import { DataContext } from '../../../context/DataProvider';
 import Link from 'next/link';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
+import { tokenFormatter } from '../../../utils/formatters';
 
 export default function SellModal({
 	pair,
@@ -37,8 +38,6 @@ export default function SellModal({
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
-
-	const { tokenFormatter } = useContext(DataContext);
 
 	const sell = () => {
 		setLoading(true);
@@ -194,11 +193,11 @@ export default function SellModal({
 								<Text fontSize={'xs'}>ID: {o.id}</Text>
 
 								<Text>
-									{tokenFormatter.format(
+									{tokenFormatter(null).format(
 										o.amount / 10 ** pair.tokens[0].decimals
 									)}{' '}
 									{pair.tokens[0].symbol} @{' '}
-									{tokenFormatter.format(
+									{tokenFormatter(null).format(
 										o.exchangeRate /
 											10 ** pair.exchangeRateDecimals
 									)}{' '}
