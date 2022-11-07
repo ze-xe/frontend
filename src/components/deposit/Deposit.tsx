@@ -24,7 +24,7 @@ const ethers = require('ethers');
 
 export default function Deposit() {
 	const { address, isConnected } = useContext(WalletContext);
-	const { tokens } = useContext(DataContext);
+	const { tokens, userDepositWithdraws } = useContext(DataContext);
 	const [selectedToken, setSelectedToken] = React.useState(0);
 	const [amount, setAmount] = React.useState('0');
 
@@ -131,9 +131,9 @@ export default function Deposit() {
 						Choose an asset to deposit
 					</Text>
 					<Link href="/faucet">
-						<Button variant={'ghost'}>
+						<Button >
 							<Text mr={'2'} fontSize="sm">
-								Get Test Tokens
+							💰 Faucet (Testnet)
 							</Text>
 							<MdOpenInNew />
 						</Button>

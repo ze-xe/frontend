@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
 import { tokenFormatter } from '../../../utils/formatters';
+import { WalletContext } from '../../../context/Wallet';
 
 export default function SellModal({
 	pair,
@@ -39,6 +40,8 @@ export default function SellModal({
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 
+	const {isConnected} = useContext(WalletContext);
+	
 	const sell = () => {
 		setLoading(true);
 		let _amount = Big(amount)
@@ -166,6 +169,7 @@ export default function SellModal({
 				bgColor={'red'}
 				onClick={_onOpen}
 				disabled={
+					!isConnected ||
 					loading ||
 					Number(amount) <= 0 ||
 					amountExceedsBalance() ||
@@ -173,7 +177,7 @@ export default function SellModal({
 					price == '' ||
 					Number(price) <= 0
 				}>
-				{amountExceedsMin()
+				{!isConnected ? 'Connect Wallet' : amountExceedsMin()
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'

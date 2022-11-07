@@ -28,6 +28,7 @@ import Link from 'next/link';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
 import { tokenFormatter } from '../../../utils/formatters';
+import { WalletContext } from '../../../context/Wallet';
 
 export default function BuyModal({
 	pair,
@@ -45,6 +46,8 @@ export default function BuyModal({
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
+
+	const {isConnected} = useContext(WalletContext);
 
 	const amountExceedsBalance = () => {
 		if (amount == '0' || amount == '' || !token1?.tradingBalance ) return false;
@@ -175,6 +178,7 @@ export default function BuyModal({
 				bgColor={'green'}
 				onClick={_onOpen}
 				disabled={
+					!isConnected ||
 					loading ||
 					Number(amount) <= 0 ||
 					amountExceedsBalance() ||
@@ -182,7 +186,7 @@ export default function BuyModal({
 					price == '' ||
 					Number(price) <= 0
 				}>
-				{amountExceedsMin()
+				{!isConnected ? 'Connect Wallet' :amountExceedsMin()
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'

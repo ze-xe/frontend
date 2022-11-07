@@ -1,7 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
 import React from 'react';
 import Withdraw from '../components/deposit/Withdraw';
-import Recent from '../components/deposit/Recent';
+import Recent from '../components/deposit/RecentDeposits';
 import TradingBalance from '../components/deposit/TradingBalance';
 
 export default function deposit() {
@@ -15,7 +15,7 @@ export default function deposit() {
 					<Withdraw />
 				</Box>
 				<Box bgColor="gray.1000" width={'20%'} p={4}>
-					<Recent />
+					<Recent type={'withdraws'} />
 				</Box>
 			</Flex>
 		</Flex>

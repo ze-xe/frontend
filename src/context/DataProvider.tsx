@@ -45,6 +45,7 @@ function DataProvider({ children }: any) {
 	const [cancelledOrders, setCancelledOrders] = React.useState<any>({});
 
 	const [tokens, setTokens] = React.useState<any[]>([]);
+	const [userDepositWithdraws, setUserDepositWithdraws] = React.useState<any>([]);
 
 	const [dollarFormatter, setDollarFormatter] = React.useState<null | {}>(
 		new Intl.NumberFormat('en-US', {
@@ -121,6 +122,7 @@ function DataProvider({ children }: any) {
 					fetchPlacedOrders(address, _pairs)
 					fetchCancelledOrders(address, _pairs)
 					fetchExecutedOrders(address, _pairs)
+					fetchUserDepositsWithdraws(address)
 				}
 				fetchOrders(_pairs)
 				fetchExecutedPairData(_pairs);
@@ -138,7 +140,6 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/orders/${pair.id}`);
 		})
 		Promise.all(orderRequests).then((res) => {
-			console.log(res);
 			let newOrders = {};
 			res.forEach((order, index) => {
 				return newOrders[order.data.data.pair] = order.data.data;
@@ -152,7 +153,6 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/orders_placed/${address}/${pair.id}`);
 		})
 		Promise.all(orderRequests).then((res) => {
-			console.log(res)
 			let newOrders = {};
 			res.forEach((order, index) => {
 				return newOrders[pairs[index].id] = order.data.data;
@@ -167,7 +167,6 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/pair/pricetrend/${pair.id}?interval=300000`);
 		})
 		Promise.all(pairRequests).then((res) => {
-			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -182,7 +181,6 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/pair/orders/history/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
-			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -197,7 +195,6 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/orders_history/${address}/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
-			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -212,7 +209,6 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/user/order/cancelled/${address}/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
-			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -227,12 +223,18 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/pair/trading/status/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
-			console.log(res)
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
 			})
 			setPairStats(newPairs);
+		})
+	}
+
+	// /user/deposits/withdraws/:id
+	const fetchUserDepositsWithdraws = async (address: string) => {
+		axios.get('https://api.zexe.io/user/deposits/withdraws/' + address).then((res) => {
+			setUserDepositWithdraws(res.data.data);
 		})
 	}
 
@@ -251,7 +253,8 @@ function DataProvider({ children }: any) {
 		pairExecutedData,
 		cancelledOrders,
 		orderHistory,
-		pairStats
+		pairStats,
+		userDepositWithdraws
 	};
 
 	return (
@@ -274,7 +277,8 @@ interface DataValue {
 	pairExecutedData: any,
 	cancelledOrders: any,
 	orderHistory: any,
-	pairStats: any
+	pairStats: any,
+	userDepositWithdraws: any
 }
 
 export { DataProvider, DataContext };

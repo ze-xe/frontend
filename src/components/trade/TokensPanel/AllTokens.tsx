@@ -50,11 +50,11 @@ export default function AllTokens({search}) {
 							</Box>
 						</Flex>
 						<Box textAlign={'right'} color={Number(pairStats[pair.id]?.[1].changeInER) >= 0 ? 'green' : 'red'}>
-							<Text fontWeight={'bold'}>
+							<Text fontWeight={'bold'} color='gray.200'>
 								{tokenFormatter(decimalPoints[pair.tokens[0].symbol]).format(pair.exchangeRate /
 									10 ** pair.exchangeRateDecimals)}
 							</Text>
-							<Text fontSize={'xs'}>{tokenFormatter(null).format(pairStats[pair.id]?.[1].changeInER ?? 0)} %</Text>
+							<Text fontSize={'xs'} fontWeight='bold'>{tokenFormatter(2).format(pairStats[pair.id]?.[1].changeInER ?? 0)}%</Text>
 						</Box>
 					</Flex>
 				</Link>

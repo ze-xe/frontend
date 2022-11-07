@@ -115,7 +115,7 @@ export default function Deposit() {
 						{tokens.map((token, index) => {
 							return (
 								<option key={index} value={index}>
-									{token.symbol}
+									{token.name} ({token.symbol})
 								</option>
 							);
 						})}

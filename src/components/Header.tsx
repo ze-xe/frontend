@@ -135,15 +135,29 @@ export const Header = ({ title }: { title: string }) => {
 					<Flex
 						display={{ sm: 'none', md: 'flex' }}
 						align="center"
-						gap={2}>
-						<WalletMenu />
+						gap={4}>
+						{/* <WalletMenu /> */}
 						<Box>
-							<Link href={'/faucet'}>
-								<Button variant={'ghost'} fontSize="sm">
-									Faucet 💰
+							<Link href={'/deposit'}>
+								<Button variant={'unstyled'} fontSize="sm">
+									Deposit
 								</Button>
 							</Link>
 						</Box>
+						<Box>
+							<Link href={'/withdraw'}>
+								<Button variant={'unstyled'} fontSize="sm">
+									Withdraw
+								</Button>
+							</Link>
+						</Box>
+						{/* <Box>
+							<Link href={'/portfolio'}>
+								<Button variant={'unstyled'} fontSize="sm" whiteSpace={'nowrap'}>
+									My Wallet
+								</Button>
+							</Link>
+						</Box> */}
 						<ConnectButton />
 					</Flex>
 				</Stack>
