@@ -117,8 +117,9 @@ export default function SellModal({
 				let _orderToPlace = amount*(10**token0.decimals);
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
-					ordersToExecute.push(orders[i]);
 					let execAmount = Math.min(_orderToPlace, orders[i].amount);
+					orders[i].amount = execAmount;
+					ordersToExecute.push(orders[i]);
 					_orderToPlace = Big(_orderToPlace)
 						.minus(execAmount)
 						.toFixed(0);
@@ -131,7 +132,7 @@ export default function SellModal({
 				_expectedOutput = _expectedOutput.plus(
 					Big(_orderToPlace).div(price)
 				);
-				setOrderToPlace(_orderToPlace);
+				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
 			});

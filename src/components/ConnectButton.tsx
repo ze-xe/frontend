@@ -10,7 +10,6 @@ import {
 	InputRightElement,
 	InputGroup,
 	Spinner,
-	Link,
 	Image,
 	Menu,
 	MenuButton,
@@ -38,6 +37,7 @@ import { Avatar } from '@chakra-ui/react';
 import { BiLogOut } from 'react-icons/bi';
 import { MdCopyAll, MdLogout } from 'react-icons/md';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import Link from 'next/link';
 
 const ConnectButton = ({}) => {
 	const {
@@ -118,16 +118,8 @@ const ConnectButton = ({}) => {
 											textAlign={'center'}
 											width="100%"
 											mb={2}>
-											<Link href="/portfolio">
-												<div>
-													<div>Portfolio</div>
-													<div
-														style={{
-															fontSize: '10px',
-														}}>
-														View your asset holdings
-													</div>
-												</div>
+											<Link href="/portfolio" as='/portfolio'>
+												<Button fontSize={'sm'}>View your Portfolio</Button>
 											</Link>
 										</Box>
 									</Box>

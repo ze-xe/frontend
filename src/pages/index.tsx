@@ -26,10 +26,8 @@ const Index = () => {
 	const { colorMode, toggleColorMode } = useColorMode();
 
 	return (
-		<Flex flexDir='column' justify='space-between'>
+		<Flex flexDir='column' justify='space-between' bgColor={'gray.1000'} height='100vh'>
       <Box>
-        
-      
 			<Hero title="zexe" />
 			<Flex flexDir={'column'}>
 				<Flex justify="center" gap={1} mt={5}>

@@ -4,7 +4,6 @@ import {
 	Box,
 	Text,
 	Flex,
-	Link,
 	InputLeftElement,
 	Alert,
 	AlertIcon,
@@ -19,6 +18,7 @@ import Image from 'next/image';
 import { getABI, getAddress } from '../../utils/contract';
 import { MdOpenInNew } from 'react-icons/md';
 import axios from 'axios';
+import Link from 'next/link';
 const Big = require('big.js');
 const ethers = require('ethers');
 

@@ -139,7 +139,7 @@ export default function BuyModal({
 			.then((resp) => {
 				let orders = resp.data.data;
 				let ordersToExecute = [];
-				let _orderToPlace = token0Amount * 10 ** token0.decimals;
+				let _orderToPlace = token0Amount * (10 ** token0.decimals);
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
 					let execAmount = Math.min(_orderToPlace, orders[i].amount);

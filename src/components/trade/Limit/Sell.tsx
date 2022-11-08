@@ -244,7 +244,7 @@ export default function BuyModule({ pair }) {
 						{isNaN(sliderValue) ? 0 : sliderValue}%
 					</SliderMark>
 					<SliderTrack>
-						<SliderFilledTrack bgColor="red.300" />
+						<SliderFilledTrack bgColor="red" />
 					</SliderTrack>
 					<SliderThumb />
 				</Slider>

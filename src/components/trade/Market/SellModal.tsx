@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
+import { Alert, AlertIcon, Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 const Big = require('big.js');
 
@@ -125,14 +125,13 @@ export default function SellModal({
 						.toFixed(0);
 					_expectedOutput = _expectedOutput.plus(
 						Big(execAmount)
-							.times(orders[i].exchangeRate)
-							.div(10 ** pair.exchangeRateDecimals)
+							.div(orders[i].exchangeRate)
+							.times(10 ** pair.exchangeRateDecimals)
 					);
 				}
 				_expectedOutput = _expectedOutput.plus(
-					Big(_orderToPlace).times(price)
+					Big(_orderToPlace).div(price)
 				);
-
 				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
@@ -241,12 +240,20 @@ export default function SellModal({
 						<Flex flexDir={'column'} width={'100%'}>
 							{response ? (
 								<Box mb={2}>
-									<Flex gap={4} align="center" mb={6}>
-										{confirmed ? (
-											<CheckIcon />
-										) : (
-											<AiOutlineLoading />
-										)}
+								<Box width={'100%'} mb={2}>
+									<Alert
+										status={
+											response.includes('confirm')
+												? 'info'
+												: confirmed &&
+												  response.includes(
+														'Success'
+												  )
+												? 'success'
+												: 'error'
+										}
+										variant="subtle">
+										<AlertIcon />
 										<Box>
 											<Text fontSize="md" mb={0}>
 												{response}
@@ -263,11 +270,12 @@ export default function SellModal({
 												</Text>
 											</Link>
 										</Box>
-									</Flex>
-									<Button onClick={_onClose} width="100%">
-										Close
-									</Button>
+									</Alert>
 								</Box>
+								<Button onClick={_onClose} width="100%">
+									Close
+								</Button>
+							</Box>
 							) : (
 								<>
 									<Button
