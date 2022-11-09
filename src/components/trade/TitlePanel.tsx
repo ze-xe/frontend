@@ -52,7 +52,7 @@ export default function TitlePanel({ pair }) {
 						Trading Volume
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{dollarFormatter(null).format(pairStats[pair?.id]?.[0].volume24Hr * pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
+					{dollarFormatter(null).format(pairStats[pair?.id]?.[0].volume * pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
 					</Text>
 				</Box>
 				<Box>
@@ -64,7 +64,7 @@ export default function TitlePanel({ pair }) {
 						24h Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-						{tokenFormatter(null).format(pairStats[pair?.id]?.[1].changeInER)} %
+						{tokenFormatter(null).format(pairStats[pair?.id]?.[0].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -76,7 +76,7 @@ export default function TitlePanel({ pair }) {
 						7d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter(null).format(pairStats[pair?.id]?.[2].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[1].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -88,7 +88,7 @@ export default function TitlePanel({ pair }) {
 						30d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter(null).format(pairStats[pair?.id]?.[3].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[2].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -100,7 +100,7 @@ export default function TitlePanel({ pair }) {
 						90d Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter(null).format(pairStats[pair?.id]?.[4].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[3].changeInER)} %
 					</Text>
 				</Box>
 				<Box>
@@ -112,7 +112,7 @@ export default function TitlePanel({ pair }) {
 						1y Change
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{tokenFormatter(null).format(pairStats[pair?.id]?.[5].changeInER)} %
+					{tokenFormatter(null).format(pairStats[pair?.id]?.[4].changeInER)} %
 					</Text>
 				</Box>
 			</Flex>

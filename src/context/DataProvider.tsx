@@ -223,6 +223,7 @@ function DataProvider({ children }: any) {
 			return axios.get(`https://api.zexe.io/pair/trading/status/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
+			console.log(res);
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
