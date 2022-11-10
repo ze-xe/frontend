@@ -23,7 +23,7 @@ const mintAmount = {
 	USDD: 100000,
 	BTC: 100,
 	ETH: 1000,
-	TRX: 10000000,
+	WTRX: 10000000,
 	BTT: 100000000000,
 };
 

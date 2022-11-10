@@ -57,8 +57,8 @@ export default function CancelledOrders({ pair }) {
 										<Td
 											color={
 												order.orderType == '0'
-													? 'red'
-													: 'green'
+													? 'red2'
+													: 'green2'
 											}>
 											{order.orderType == '0'
 												? 'SELL'

@@ -3,7 +3,6 @@ import React from 'react';
 import { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 import { tokenFormatter } from '../../../utils/formatters';
-import { decimalPoints } from '../../../utils/const';
 
 const orders = [
 	{
@@ -132,7 +131,7 @@ const Order = ({ order, pair, index }) => {
 
 	return (
 		<Flex justify={'space-between'} width="100%"
-            color={order.orderType == '1' ? 'red' : 'green'}
+            color={order.orderType == '1' ? 'red2' : 'green2'}
             bgColor="gray.1100"
             my={0.5}
         >
@@ -143,7 +142,7 @@ const Order = ({ order, pair, index }) => {
 				{tokenFormatter(null).format(order.fillAmount*(order.exchangeRate/(10**pair.exchangeRateDecimals))/(10**pair?.tokens[0].decimals))} 
 			</Text>
 			<Text fontSize="xs">
-				{tokenFormatter(decimalPoints[pair.tokens[0].symbol]).format(order.exchangeRate/(10**pair.exchangeRateDecimals))}
+				{tokenFormatter(pair.exchangeRateDecimals).format(order.exchangeRate/(10**pair.exchangeRateDecimals))}
 			</Text>
 		</Flex>
 	);

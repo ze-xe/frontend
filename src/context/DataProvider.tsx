@@ -16,17 +16,17 @@ const coingeckoIds = {
 	'ETH': 'ethereum',
 	'USDT': 'tether',
 	'USDD': 'usdd',
-	'TRX': 'tron',
+	'WTRX': 'tron',
 	'BTT': 'bittorrent',
 };
 
 const dummyPrices = {
-	'BTC': '20000',
-	'ETH': '1400',
+	'BTC': '18000',
+	'ETH': '1200',
 	'USDT': '1',
 	'USDD': '1',
-	'TRX': '0.006',
-	'BTT': '0.0000000008',
+	'WTRX': '0.006',
+	'BTT': '0.0000008',
 };
 
 

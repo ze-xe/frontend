@@ -24,16 +24,19 @@ export default function PlacedOrders({ pair }) {
 	const { tokens } = useContext(DataContext);
 	const [token0, setToken0] = React.useState(null);
 	const [token1, setToken1] = React.useState(null);
+	const [pairNow, setPairNow] = React.useState(null);
 
 	useEffect(() => {
-		if (pair && !token0) {
+		if(pair){
+		if (pairNow !== pair.id || (!token0)) {
 			setToken0(
 				tokens.find((token) => token.symbol === pair.tokens[0].symbol)
 			);
 			setToken1(
 				tokens.find((token) => token.symbol === pair.tokens[1].symbol)
 			);
-		}
+			setPairNow(pair.id)
+		}}
 	});
 
 	const { placedOrders } = useContext(DataContext);
@@ -58,8 +61,8 @@ export default function PlacedOrders({ pair }) {
 										<Td
 											color={
 												order.orderType == '0'
-													? 'red'
-													: 'green'
+													? 'red2'
+													: 'green2'
 											}>
 											{order.orderType == '0'
 												? 'SELL'

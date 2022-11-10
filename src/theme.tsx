@@ -54,8 +54,8 @@ const theme = extendTheme({
     },
     // green: '#228B22',
     // red: '#D82626',
-     green: '#18B05F',
-    red: '#C83232'
+    green2: '#18B05F',
+    red2: '#C83232'
   },
   fonts,
   breakpoints,

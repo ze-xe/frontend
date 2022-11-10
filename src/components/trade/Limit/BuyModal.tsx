@@ -176,7 +176,7 @@ export default function BuyModal({
 			<Button
 				width={'100%'}
 				mt="2"
-				bgColor={'green'}
+				bgColor={'green2'}
 				onClick={_onOpen}
 				disabled={
 					!isConnected ||
@@ -193,7 +193,7 @@ export default function BuyModal({
 					? 'Insufficient Trading Balance'
 					: 'Limit Buy'}
 			</Button>
-			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
+			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'} scrollBehavior='inside'>
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>
@@ -265,7 +265,8 @@ export default function BuyModal({
 													? 'success'
 													: 'error'
 											}
-											variant="subtle">
+											variant='subtle'
+											>
 											<AlertIcon />
 											<Box>
 												<Text fontSize="md" mb={0}>
@@ -292,7 +293,7 @@ export default function BuyModal({
 							) : (
 								<>
 									<Button
-										bgColor="green"
+										bgColor="green2"
 										mr={3}
 										width="100%"
 										onClick={buy}

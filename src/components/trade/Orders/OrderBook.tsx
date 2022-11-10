@@ -5,7 +5,6 @@ import { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 import {useEffect, useState} from 'react';
 import { tokenFormatter } from '../../../utils/formatters';
-import { decimalPoints } from '../../../utils/const';
 
 const Order = ({ order, index, total, pair, orderType }) => {
 
@@ -13,7 +12,7 @@ const Order = ({ order, index, total, pair, orderType }) => {
 		<Flex
 			key={index}
 			justify="space-between"
-			color={orderType == 'BUY' ? 'green' : 'red'}
+			color={orderType == 'BUY' ? 'green2' : 'red2'}
 			// bgSize={(order.amount / total) * 100 + '% auto'}
 			bgColor="gray.1100"
 			width="100%"
@@ -30,7 +29,7 @@ const Order = ({ order, index, total, pair, orderType }) => {
 				{tokenFormatter(null).format((order.amount/(10**(pair.tokens[0].decimals)))*(order.exchangeRate/(10**pair.exchangeRateDecimals)))}
 			</Text>
 			<Text fontSize="xs" fontWeight={'bold'}>
-				{tokenFormatter(decimalPoints[pair.tokens[0].symbol]).format(order.exchangeRate/(10**pair.exchangeRateDecimals))} 
+				{tokenFormatter(pair.exchangeRateDecimals).format(order.exchangeRate/(10**pair.exchangeRateDecimals))} 
 			</Text>
 		</Flex>
 	);
@@ -75,7 +74,7 @@ export default function OrderBook({ pair }) {
 				);
 			})}
 			<Divider mt={2} bgColor="transparent" />
-			<Flex py={2} align="end" gap={2} color={pair?.priceDiff < 0 ? 'red' : 'green'} justify="end">
+			<Flex py={2} align="end" gap={2} color={pair?.priceDiff < 0 ? 'red2' : 'green2'} justify="end">
 				<Flex textAlign={'right'} mb={1.5} mr={-1}>
 				
 				{pair?.priceDiff < 0 ? <ArrowDownIcon width={3}/> : <ArrowUpIcon width={3}/>}
@@ -87,7 +86,7 @@ export default function OrderBook({ pair }) {
 					fontWeight="bold"
 					textAlign={'right'}
 					mr={4}>
-					{tokenFormatter(decimalPoints[pair?.tokens[0].symbol]).format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
+					{tokenFormatter(pair?.exchangeRateDecimals).format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
 				</Text>
 			</Flex>
 			<Divider mb={2} bgColor="transparent" />

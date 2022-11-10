@@ -10,12 +10,3 @@ export const ADDRESSES = {
     'Exchange': EXCHANGE,
     'Vault': VAULT,
 }
-
-export const decimalPoints = {
-	'BTC': 2,
-	'ETH': 2,
-	'USDD': 4,
-	'USDT': 4,
-	'TRX': 6,
-	'BTT': 8,
-}

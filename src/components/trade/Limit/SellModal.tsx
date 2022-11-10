@@ -182,7 +182,7 @@ export default function SellModal({
 					? 'Insufficient Trading Balance'
 					: 'Limit Sell'}
 			</Button>
-			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
+			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'} scrollBehavior='inside'>
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>

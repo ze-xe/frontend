@@ -4,7 +4,6 @@ import Link from 'next/link';
 import React, { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 import { tokenFormatter } from '../../../utils/formatters';
-import { decimalPoints } from '../../../utils/const';
 
 export default function AllTokens({search}) {
 	const { pairs, pairStats } = useContext(DataContext);
@@ -49,9 +48,9 @@ export default function AllTokens({search}) {
 								</Text>
 							</Box>
 						</Flex>
-						<Box textAlign={'right'} color={Number(pairStats[pair.id]?.[1].changeInER) >= 0 ? 'green' : 'red'}>
+						<Box textAlign={'right'} color={Number(pairStats[pair.id]?.[1].changeInER) >= 0 ? 'green2' : 'red2'}>
 							<Text fontWeight={'bold'} color='gray.200'>
-								{tokenFormatter(decimalPoints[pair.tokens[0].symbol]).format(pair.exchangeRate /
+								{tokenFormatter(pair.exchangeRateDecimals).format(pair.exchangeRate /
 									10 ** pair.exchangeRateDecimals)}
 							</Text>
 							<Text fontSize={'xs'} fontWeight='bold'>{tokenFormatter(2).format(pairStats[pair.id]?.[1].changeInER ?? 0)}%</Text>

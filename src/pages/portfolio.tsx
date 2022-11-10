@@ -27,15 +27,6 @@ import {
   } from '@chakra-ui/react'
 import { dollarFormatter, tokenFormatter } from '../utils/formatters';
 
-const dummyPrices = {
-	'BTC': '20000',
-	'ETH': '1400',
-	'USDT': '1',
-	'USDD': '1',
-	'TRX': '0.006',
-	'BTT': '0.0000000008',
-};
-
 export default function wallet() {
 	const { address, isConnected } = useContext(WalletContext);
 	const { tokens } = useContext(DataContext);

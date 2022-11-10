@@ -21,20 +21,6 @@ import UpdateOrder from './UpdateOrder';
 import { tokenFormatter } from '../../../utils/formatters';
 
 export default function ExecutedOrders({ pair }) {
-	const { tokens } = useContext(DataContext);
-	const [token0, setToken0] = React.useState(null);
-	const [token1, setToken1] = React.useState(null);
-
-	useEffect(() => {
-		if (pair && !token0) {
-			setToken0(
-				tokens.find((token) => token.symbol === pair.tokens[0].symbol)
-			);
-			setToken1(
-				tokens.find((token) => token.symbol === pair.tokens[1].symbol)
-			);
-		}
-	});
 
 	const { orderHistory } = useContext(DataContext);
 	
@@ -57,8 +43,8 @@ export default function ExecutedOrders({ pair }) {
 										<Td
 											color={
 												order.orderType == '0'
-													? 'red'
-													: 'green'
+													? 'red2'
+													: 'green2'
 											}>
 											{order.orderType == '0'
 												? 'SELL'
@@ -67,9 +53,9 @@ export default function ExecutedOrders({ pair }) {
 										<Td>
 											{tokenFormatter(null).format(
 												order.fillAmount /
-													10 ** token0?.decimals
+													10 ** pair.tokens[0]?.decimals
 											)}{' '}
-											{token0?.symbol}
+											{pair.tokens[0]?.symbol}
 										</Td>
 										<Td>
 											{tokenFormatter(null).format(
@@ -77,7 +63,7 @@ export default function ExecutedOrders({ pair }) {
 													10 **
 														pair?.exchangeRateDecimals
 											)}{' '}
-											{token1?.symbol}/{token0?.symbol}
+											{pair.tokens[1]?.symbol}/{pair.tokens[0]?.symbol}
 										</Td>
 										
 									</Tr>

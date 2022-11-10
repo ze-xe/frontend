@@ -182,7 +182,7 @@ export default function SellModal({
 					? 'Insufficient Trading Balance'
 					: 'Market Sell'}
 			</Button>
-			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
+			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'} scrollBehavior='inside'>
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>
@@ -190,6 +190,7 @@ export default function SellModal({
 					<ModalCloseButton />
 					<ModalBody>
 						<Text>Executing Orders</Text>
+						<Box >
 						{orders.map((o) => (
 							<Box py={2} my={2} bgColor="gray.900" px={2}>
 								{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
@@ -198,16 +199,17 @@ export default function SellModal({
 								<Text>
 									{tokenFormatter(null).format(
 										o.amount / 10 ** pair.tokens[0].decimals
-									)}{' '}
+										)}{' '}
 									{pair.tokens[0].symbol} @{' '}
 									{tokenFormatter(null).format(
 										o.exchangeRate /
-											10 ** pair.exchangeRateDecimals
-									)}{' '}
+										10 ** pair.exchangeRateDecimals
+										)}{' '}
 									{pair.tokens[1].symbol}
 								</Text>
 							</Box>
 						))}
+						</Box>
 						{orders.length == 0 && (
 							<Text mb={2} color="gray" fontSize={'sm'}>
 								No orders to execute
