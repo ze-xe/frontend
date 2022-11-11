@@ -48,6 +48,7 @@ export default function BuyModal({
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
+	const [offsetAmount, setOffsetAmount] = React.useState(0);
 
 	const {isConnected} = useContext(WalletContext);
 
@@ -94,6 +95,9 @@ export default function BuyModal({
 				setLoading(false);
 				checkResponse(res);
 				setResponse('Transaction sent! Waiting for confirmation...');
+			})
+			.catch((err: any) => {
+				setLoading(false);
 			});
 	};
 
@@ -157,6 +161,9 @@ export default function BuyModal({
 				_expectedOutput = _expectedOutput.plus(
 					Big(_orderToPlace).times(price)
 				);
+				if(Number(_orderToPlace) < Number(pair?.minToken0Order)){
+					setOffsetAmount(Number(_orderToPlace))
+				}
 				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
@@ -168,6 +175,7 @@ export default function BuyModal({
 		setLoading(false);
 		setResponse(null);
 		setOrders([]);
+		setOffsetAmount(0);
 		onClose();
 	};
 

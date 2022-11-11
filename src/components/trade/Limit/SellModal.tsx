@@ -39,14 +39,16 @@ export default function SellModal({
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
+	const [offsetAmount, setOffsetAmount] = React.useState(0);
 
 	const {isConnected} = useContext(WalletContext);
 
 	const sell = () => {
 		setLoading(true);
 		let _amount = Big(amount)
-			.times(10 ** token0.decimals)
-			.toFixed(0);
+		.times(10 ** token0.decimals)
+		.minus(offsetAmount)
+		.toFixed(0);
 
 		(window as any).tronWeb
 			.contract(getABI('Exchange'), getAddress('Exchange'))
@@ -132,6 +134,9 @@ export default function SellModal({
 				_expectedOutput = _expectedOutput.plus(
 					Big(_orderToPlace).div(price)
 				);
+				if(Number(_orderToPlace) < Number(pair?.minToken0Order)){
+					setOffsetAmount(Number(_orderToPlace))
+				}
 				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
@@ -143,6 +148,7 @@ export default function SellModal({
 		setLoading(false);
 		setResponse(null);
 		setOrders([]);
+		setOffsetAmount(0);
 		onClose();
 	};
 

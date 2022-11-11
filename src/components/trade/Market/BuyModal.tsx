@@ -115,6 +115,9 @@ export default function BuyModal({
 						setResponse('Transaction Failed. Please try again.');
 					}
 				}
+			})
+			.catch((err: any) => {
+				setLoading(false);
 			});
 	};
 
