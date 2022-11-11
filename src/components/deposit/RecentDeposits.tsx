@@ -29,7 +29,7 @@ export default function Recent({ type }) {
 								<Image
 									src={
 										'/assets/crypto_logos/' +
-										token.symbol +
+										token.symbol.toLowerCase() +
 										'.png'
 									}
 									height={100}
