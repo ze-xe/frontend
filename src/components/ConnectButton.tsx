@@ -34,7 +34,7 @@ import { AiOutlineDisconnect, AiOutlineInfoCircle } from 'react-icons/ai';
 import { WalletContext } from '../context/Wallet';
 import { DataContext } from '../context/DataProvider';
 import { Avatar } from '@chakra-ui/react';
-import { BiLogOut } from 'react-icons/bi';
+import { BiLogOut, BiMoney } from 'react-icons/bi';
 import { MdCopyAll, MdLogout } from 'react-icons/md';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
@@ -86,7 +86,7 @@ const ConnectButton = ({}) => {
 				// </Box>
 				<Menu isOpen={isOpen}>
 					<MenuButton
-						bgGradient="linear(to-r, #E11860, #CB1DC3)"
+						bgColor={'primary'}
 						as={Button}
 						variant="ghost"
 						fontSize={'sm'}
@@ -94,9 +94,16 @@ const ConnectButton = ({}) => {
 						boxSize={'40px 150px'}
 						_hover={{ bgColor: 'none' }}
 						onMouseEnter={onOpen}
-						onMouseLeave={onClose}>
-						My Wallet{' '}
+						onMouseLeave={onClose}
+						>
+							<Flex align={'center'} gap={1}>
+
+						<Avatar bgColor={'primary'} size='xs' mr={1}/> 
+						<Text>
+						My Wallet
+						</Text>
 						{isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+							</Flex>
 					</MenuButton>
 					<Fade in={isOpen}>
 						<MenuList
@@ -105,31 +112,21 @@ const ConnectButton = ({}) => {
 							color={'gray.900'}
 							onMouseEnter={onOpen}
 							onMouseLeave={onClose}>
-							<Box mx={'15px'} my={'15px'}>
-								<Flex flexDir="column" align={'center'} gap={4}>
+							<Box mx={'15px'} my={'15px'} minW='300px'>
+								<Flex flexDir="column" align={'center'} gap={2}>
 									<Avatar size={'lg'} />
 									<Text fontSize={'lg'} fontWeight="bold">
 										{tronAddress?.slice(0, 5) +
 											'....' +
 											tronAddress?.slice(-5)}
 									</Text>
-									<Box>
-										<Box
-											textAlign={'center'}
-											width="100%"
-											mb={2}>
-											<Link href="/portfolio" as='/portfolio'>
-												<Button fontSize={'sm'}>View your Portfolio</Button>
-											</Link>
-										</Box>
-									</Box>
-									<Flex gap={5} width="100%">
 										<Button
+										mt={5}
 											bgColor={'gray.200'}
 											px={6}
 											height={'55px'}
-											width="50%"
-											rounded={10}>
+											width="100%"
+											>
 											{' '}
 											<Flex
 												flexDir={'column'}
@@ -141,13 +138,36 @@ const ConnectButton = ({}) => {
 												</Text>
 											</Flex>{' '}
 										</Button>
+									
+									<Button
+									as={Link}
+									href='/portfolio'
+											bgColor={'gray.200'}
+											px={6}
+											height={'55px'}
+											width="100%"
+											minW={'200px'}
+											rounded={10}>
+											{' '}
+											<Flex
+												flexDir={'column'}
+												alignItems="center">
+												<BiMoney/>
+												<Text fontSize={'sm'}>
+												View your Portfolio
+												</Text>
+											</Flex>{' '}
+										</Button>
+										
 										<Button
 											bgColor={'gray.200'}
 											px={6}
 											height={'55px'}
-											width="50%"
+											width="100%"
 											rounded={10}
-											onClick={_disconnect}>
+											onClick={_disconnect}
+											
+											>
 											{' '}
 											<Flex
 												flexDir={'column'}
@@ -158,7 +178,7 @@ const ConnectButton = ({}) => {
 												</Text>
 											</Flex>{' '}
 										</Button>
-									</Flex>
+									{/* </Flex> */}
 								</Flex>
 							</Box>
 						</MenuList>
@@ -170,38 +190,11 @@ const ConnectButton = ({}) => {
 					onClick={onConnectOpen}
 					isLoading={isConnecting}
 					size="sm"
-					bgGradient="linear(to-r, #E11860, #CB1DC3, #03ACDF)"
+					bgColor={'primary'}
 					_hover={{ bg: 'gray.800' }}>
 					Connect Wallet
 				</Button>
 			)}
-
-			{/* <Modal isCentered isOpen={isOpen} onClose={onClose} >
-				<ModalOverlay bg="blackAlpha.100" backdropFilter="blur(30px)" />
-				<ModalContent width={'23rem'}
-				pt="5"
-				pb={2}
-				rounded={20}
-				>
-					<ModalCloseButton rounded={20} m={2}/>
-					<ModalBody>
-						<Flex flexDir="column" align={"center"} gap={4}>
-							<Avatar size={"lg"}/>
-							<Text fontSize={"lg"} fontWeight="bold">
-							{(tronAddress)?.slice(0, 5)+"...."+(tronAddress)?.slice(-5)}
-							</Text>
-							<Flex gap={5} width="100%">
-							<Button height={"55px"} width="50%" rounded={10} > <Flex flexDir={"column"} alignItems="center" onClick={_copy}><MdCopyAll/>
-								<Text fontSize={"sm"}>Copy Address</Text>
-								</Flex> </Button>
-								<Button height={"55px"} width="50%" rounded={10} onClick={_disconnect}> <Flex flexDir={"column"} alignItems="center"><MdLogout/>
-								<Text fontSize={"sm"}>Disconnect</Text>
-								</Flex> </Button>
-							</Flex>
-						</Flex>
-					</ModalBody>
-				</ModalContent>
-			</Modal> */}
 
 			<Modal isCentered isOpen={isConnectOpen} onClose={onConnectClose}>
 				<ModalOverlay bg="blackAlpha.100" backdropFilter="blur(30px)" />

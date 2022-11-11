@@ -113,11 +113,9 @@ export const Header = ({ title }: { title: string }) => {
 					flex={{ base: 1 }}
 					justify={{ base: 'center', md: 'start' }}>
 					<Link href={'/'}>
-						<Box
-							bgGradient="linear(to-r, #E11860, #CB1DC3)"
-							bgClip={'text'}>
-							<Text fontSize="3xl" fontWeight={'bold'}>
-								{title}
+						<Box>
+							<Text fontSize="3xl" color={'primary'} fontFamily='Zen Dots'>
+								zexe
 							</Text>
 						</Box>
 					</Link>
