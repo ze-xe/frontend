@@ -26,6 +26,7 @@ import {
 	StatGroup,
   } from '@chakra-ui/react'
 import { dollarFormatter, tokenFormatter } from '../utils/formatters';
+import Head from 'next/head';
 
 export default function wallet() {
 	const { address, isConnected } = useContext(WalletContext);
@@ -57,6 +58,13 @@ export default function wallet() {
 	};
 
 	return (
+		<>
+		<Head>
+				<title>
+					Portfolio | ZEXE.io
+				</title>
+				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
+			</Head>
 		<Flex justify={'center'}>
 			{isConnected ? <Box mt={2} width="100%" maxW="1400px">
 				<Flex bgColor={'gray.1000'} align="start" p={4} pt={10} pb={8} justify='space-between'>
@@ -188,5 +196,7 @@ export default function wallet() {
 				<Text my={5}>Please connect your wallet</Text>
 			</Box>}
 		</Flex>
+		</>
+
 	);
 }

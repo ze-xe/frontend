@@ -1,4 +1,5 @@
 import { Box, Flex } from '@chakra-ui/react';
+import Head from 'next/head';
 import React from 'react';
 import Deposit from '../components/deposit/Deposit';
 import Recent from '../components/deposit/RecentDeposits';
@@ -6,6 +7,13 @@ import WalletBalance from '../components/deposit/WalletBalance';
 
 export default function deposit() {
 	return (
+		<>
+		<Head>
+				<title>
+					Deposit | ZEXE.io
+				</title>
+				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
+			</Head>
 		<Flex justify={'center'}>
 			<Flex mt={2} flex="stretch" gap={2} width="100%" maxW="1400px">
 				<Box bgColor="gray.1000" width={'30%'} p={4}>
@@ -19,5 +27,6 @@ export default function deposit() {
 				</Box>
 			</Flex>
 		</Flex>
+		</>
 	);
 }

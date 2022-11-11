@@ -19,12 +19,12 @@ import { WalletContext } from '../context/Wallet';
 import { getABI } from '../utils/contract';
 
 const mintAmount = {
-	USDT: 100000,
-	USDD: 100000,
-	BTC: 100,
-	ETH: 1000,
-	WTRX: 10000000,
-	BTT: 100000000000,
+	USDT: 1000,
+	USDD: 1000,
+	BTC: 1,
+	ETH: 10,
+	WTRX: 10000,
+	BTT: 10000000,
 };
 
 const Big = require('big.js');
@@ -50,9 +50,9 @@ function RadioCard(props) {
 				borderRadius="md"
 				boxShadow="md"
 				_checked={{
-					bg: 'teal.600',
-					color: 'white',
-					borderColor: 'teal.600',
+					bg: 'white',
+					color: 'black',
+					borderColor: 'gray.600',
 				}}
 				_focus={{
 					boxShadow: 'outline',
@@ -145,8 +145,8 @@ export default function faucets() {
 				<Text fontSize={'3xl'} fontWeight="bold">
 					Faucet
 				</Text>
-				<Text fontSize={'sm'} mb={6} color="gray.400">
-					It's raining free money! 💰
+				<Text fontSize={'sm'} mb={4} color="gray.400">
+					Testnet tokens
 				</Text>
 
 				<Text fontSize={'lg'} fontWeight="bold" mb={2}>

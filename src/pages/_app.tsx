@@ -6,6 +6,7 @@ import { DataProvider } from '../context/DataProvider';
 import { AppDataProvider } from '../context/AppData';
 import { Header } from '../components/Header';
 import { WalletProvider } from '../context/Wallet';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

@@ -53,7 +53,7 @@ export default function AllTokens({search}) {
 								{tokenFormatter(pair.exchangeRateDecimals).format(pair.exchangeRate /
 									10 ** pair.exchangeRateDecimals)}
 							</Text>
-							<Text fontSize={'xs'} fontWeight='bold'>{tokenFormatter(2).format(pairStats[pair.id]?.[1].changeInER ?? 0)}%</Text>
+							<Text fontSize={'xs'} fontWeight='bold'>{tokenFormatter(2).format(pairStats[pair.id]?.[0].changeInER ?? 0)}%</Text>
 						</Box>
 					</Flex>
 				</Link>

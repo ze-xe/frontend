@@ -55,14 +55,16 @@ export default function CancelledOrders({ pair }) {
 								return (
 									<Tr>
 										<Td
-											color={
+										color={
 												order.orderType == '0'
 													? 'red2'
 													: 'green2'
 											}>
+											<Text fontSize={'xs'} ml={1} fontWeight='bold'>
 											{order.orderType == '0'
 												? 'SELL'
 												: 'BUY'}
+												</Text>
 										</Td>
 										<Td>
 											{tokenFormatter(null).format(

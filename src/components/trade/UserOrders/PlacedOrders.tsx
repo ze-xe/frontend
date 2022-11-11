@@ -59,14 +59,16 @@ export default function PlacedOrders({ pair }) {
 								return (
 									<Tr>
 										<Td
-											color={
+										color={
 												order.orderType == '0'
 													? 'red2'
 													: 'green2'
 											}>
+											<Text fontSize={'xs'} ml={1} fontWeight='bold'>
 											{order.orderType == '0'
 												? 'SELL'
 												: 'BUY'}
+												</Text>
 										</Td>
 										<Td>
 											{tokenFormatter(null).format(
@@ -76,7 +78,7 @@ export default function PlacedOrders({ pair }) {
 											{token0?.symbol}
 										</Td>
 										<Td>
-											{tokenFormatter(null).format(
+											{tokenFormatter(pair?.exchangeRateDecimals).format(
 												order.exchangeRate /
 													10 **
 														pair?.exchangeRateDecimals
