@@ -44,7 +44,7 @@ const Index = () => {
 		<>
 			<Head>
 				<title>
-					ZEXE: Advanced limit-order trading platform on TRON
+					ZEXE | Buy & Sell Crypto on TRON
 				</title>
 				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
 			</Head>

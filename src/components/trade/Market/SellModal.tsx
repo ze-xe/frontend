@@ -1,4 +1,12 @@
-import { Alert, AlertIcon, Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
+import {
+	Alert,
+	AlertIcon,
+	Box,
+	Button,
+	Flex,
+	Text,
+	useDisclosure,
+} from '@chakra-ui/react';
 import React, { useContext } from 'react';
 const Big = require('big.js');
 
@@ -40,8 +48,8 @@ export default function SellModal({
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 
-	const {isConnected} = useContext(WalletContext);
-	
+	const { isConnected } = useContext(WalletContext);
+
 	const sell = () => {
 		setLoading(true);
 		let _amount = Big(amount)
@@ -59,7 +67,7 @@ export default function SellModal({
 				orders.map((order) => '0x' + order.id)
 			)
 			.send({
-				feeLimit: 1000000000
+				feeLimit: 1000000000,
 			})
 			.then((res: any) => {
 				setHash(res);
@@ -114,7 +122,7 @@ export default function SellModal({
 			.then((resp) => {
 				let orders = resp.data.data;
 				let ordersToExecute = [];
-				let _orderToPlace = amount*(10**token0.decimals);
+				let _orderToPlace = amount * 10 ** token0.decimals;
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
 					let execAmount = Math.min(_orderToPlace, orders[i].amount);
@@ -132,7 +140,11 @@ export default function SellModal({
 				_expectedOutput = _expectedOutput.plus(
 					Big(_orderToPlace).div(price)
 				);
-				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
+				setOrderToPlace(
+					Number(_orderToPlace) > Number(pair?.minToken0Order)
+						? _orderToPlace
+						: 0
+				);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
 			});
@@ -157,7 +169,9 @@ export default function SellModal({
 	const amountExceedsMin = () => {
 		if (amount == '0' || amount == '' || !pair || !token0) return false;
 		if (Number(amount) && pair?.minToken0Order && token0.decimals)
-			return Big(amount).lt(Big(pair?.minToken0Order).div(10 ** token0.decimals));
+			return Big(amount).lt(
+				Big(pair?.minToken0Order).div(10 ** token0.decimals)
+			);
 	};
 
 	return (
@@ -176,13 +190,20 @@ export default function SellModal({
 					price == '' ||
 					Number(price) <= 0
 				}>
-				{!isConnected ? 'Connect Wallet' : amountExceedsMin()
+				{!isConnected
+					? 'Connect Wallet'
+					: amountExceedsMin()
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'
 					: 'Market Sell'}
 			</Button>
-			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'} scrollBehavior='inside'>
+			<Modal
+				isOpen={isOpen}
+				onClose={_onClose}
+				isCentered
+				size={'xl'}
+				scrollBehavior="inside">
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>
@@ -190,25 +211,39 @@ export default function SellModal({
 					<ModalCloseButton />
 					<ModalBody>
 						<Text>Executing Orders</Text>
-						<Box >
-						{orders.map((o) => (
-							<Box py={2} my={2} bgColor="gray.900" px={2}>
-								{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
-								<Text fontSize={'xs'}>ID: {o.id}</Text>
+						<Box>
+							{orders.map((o) => {
+								if (o.amount > 0)
+									return (
+										<Box
+											py={2}
+											my={2}
+											bgColor="gray.900"
+											px={2}>
+											{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
+											<Text fontSize={'xs'}>
+												ID: {o.id}
+											</Text>
 
-								<Text>
-									{tokenFormatter(null).format(
-										o.amount / 10 ** pair.tokens[0].decimals
-										)}{' '}
-									{pair.tokens[0].symbol} @{' '}
-									{tokenFormatter(null).format(
-										o.exchangeRate /
-										10 ** pair.exchangeRateDecimals
-										)}{' '}
-									{pair.tokens[1].symbol}
-								</Text>
-							</Box>
-						))}
+											<Text>
+												{tokenFormatter(null).format(
+													o.amount /
+														10 **
+															pair.tokens[0]
+																.decimals
+												)}{' '}
+												{pair.tokens[0].symbol} @{' '}
+												{tokenFormatter(null).format(
+													o.exchangeRate /
+														10 **
+															pair.exchangeRateDecimals
+												)}{' '}
+												{pair.tokens[1].symbol}
+											</Text>
+										</Box>
+									);
+								else return null;
+							})}
 						</Box>
 						{orders.length == 0 && (
 							<Text mb={2} color="gray" fontSize={'sm'}>
@@ -220,8 +255,8 @@ export default function SellModal({
 							<Box py={2} my={2} bgColor="gray.900" px={2}>
 								<Text fontSize={'xs'}>OrderType: SELL</Text>
 								<Text>
-									{orderToPlace/(10**token0?.decimals)} {token0?.symbol} @ {price}{' '}
-									{token1?.symbol}
+									{orderToPlace / 10 ** token0?.decimals}{' '}
+									{token0?.symbol} @ {price} {token1?.symbol}
 								</Text>
 							</Box>
 						) : (
@@ -242,42 +277,42 @@ export default function SellModal({
 						<Flex flexDir={'column'} width={'100%'}>
 							{response ? (
 								<Box mb={2}>
-								<Box width={'100%'} mb={2}>
-									<Alert
-										status={
-											response.includes('confirm')
-												? 'info'
-												: confirmed &&
-												  response.includes(
-														'Success'
-												  )
-												? 'success'
-												: 'error'
-										}
-										variant="subtle">
-										<AlertIcon />
-										<Box>
-											<Text fontSize="md" mb={0}>
-												{response}
-											</Text>
-											<Link
-												href={
-													'https://nile.tronscan.org/#/transaction/' +
-													hash
-												}
-												target="_blank">
-												{' '}
-												<Text fontSize={'sm'}>
-													View on TronScan
+									<Box width={'100%'} mb={2}>
+										<Alert
+											status={
+												response.includes('confirm')
+													? 'info'
+													: confirmed &&
+													  response.includes(
+															'Success'
+													  )
+													? 'success'
+													: 'error'
+											}
+											variant="subtle">
+											<AlertIcon />
+											<Box>
+												<Text fontSize="md" mb={0}>
+													{response}
 												</Text>
-											</Link>
-										</Box>
-									</Alert>
+												<Link
+													href={
+														'https://nile.tronscan.org/#/transaction/' +
+														hash
+													}
+													target="_blank">
+													{' '}
+													<Text fontSize={'sm'}>
+														View on TronScan
+													</Text>
+												</Link>
+											</Box>
+										</Alert>
+									</Box>
+									<Button onClick={_onClose} width="100%">
+										Close
+									</Button>
 								</Box>
-								<Button onClick={_onClose} width="100%">
-									Close
-								</Button>
-							</Box>
 							) : (
 								<>
 									<Button

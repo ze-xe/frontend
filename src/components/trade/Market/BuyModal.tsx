@@ -203,8 +203,8 @@ export default function BuyModal({
 					<ModalCloseButton />
 					<ModalBody>
 						<Text>Executing Orders</Text>
-						{orders.map((o) => (
-							<Box py={2} my={2} bgColor="gray.900" px={2}>
+						{orders.map((o) => {
+							if (o.amount > 0) return <Box py={2} my={2} bgColor="gray.900" px={2}>
 								{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
 								<Text fontSize={'xs'}>ID: {o.id}</Text>
 
@@ -219,8 +219,9 @@ export default function BuyModal({
 									)}{' '}
 									{pair.tokens[1].symbol}
 								</Text>
-							</Box>
-						))}
+							</Box>;
+							else return null
+									})}
 						{orders.length == 0 && (
 							<Text mb={2} color="gray" fontSize={'sm'}>
 								No orders to execute

@@ -31,6 +31,7 @@ const Big = require('big.js');
 import { Input, InputGroup } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
+import Head from 'next/head';
 
 function RadioCard(props) {
 	const { getInputProps, getCheckboxProps } = useRadio(props);
@@ -40,6 +41,13 @@ function RadioCard(props) {
 	const checkbox = getCheckboxProps();
 
 	return (
+		<>
+		<Head>
+				<title>
+					Testnet Faucet | ZEXE | Buy & Sell Crypto on TRON
+				</title>
+				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
+			</Head>
 		<Box as="label">
 			<input {...input} />
 			<Box
@@ -62,6 +70,7 @@ function RadioCard(props) {
 				{props.children}
 			</Box>
 		</Box>
+		</>
 	);
 }
 

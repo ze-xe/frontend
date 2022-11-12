@@ -43,7 +43,7 @@ const Trade = () => {
 			<Head>
 				<title>
 					{pair?.exchangeRate / 10 ** pair?.exchangeRateDecimals}{' '}
-					{pair?.tokens[1].symbol}/{pair?.tokens[0].symbol} | ZEXE.io
+					{pair?.tokens[1].symbol}/{pair?.tokens[0].symbol} | ZEXE | Buy & Sell Crypto on TRON
 				</title>
 				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
 			</Head>

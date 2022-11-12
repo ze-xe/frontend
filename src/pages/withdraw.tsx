@@ -10,19 +10,19 @@ export default function deposit() {
 		<>
 		<Head>
 				<title>
-					Withdraw | ZEXE.io
+					Withdraw | ZEXE | Buy & Sell Crypto on TRON
 				</title>
 				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
 			</Head>
 		<Flex justify={'center'}>
 			<Flex mt={2} flex="stretch" gap={2} width="100%" maxW="1400px">
-				<Box bgColor="gray.1000" width={'30%'} p={4}>
+				<Box bgColor="gray.1100" width={'30%'} p={4}>
 					<TradingBalance />
 				</Box>
-				<Box bgColor="gray.1000" width={'50%'} p={4}>
+				<Box bgColor="gray.1100" width={'50%'} p={4}>
 					<Withdraw />
 				</Box>
-				<Box bgColor="gray.1000" width={'20%'} p={4}>
+				<Box bgColor="gray.1100" width={'20%'} p={4}>
 					<Recent type={'withdraws'} />
 				</Box>
 			</Flex>
