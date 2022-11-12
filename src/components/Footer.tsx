@@ -14,7 +14,7 @@ import { BsDiscord, BsGithub, BsTwitter } from 'react-icons/bs'
 
 
 export const Footer = () => (
-  <Box position={'fixed'} bottom='0' width={'100%'} bgColor={'#000'}>
+  <Box position={'fixed'} bottom='0' width={'100%'} bgColor={'blackAlpha.300'}>
   <Flex gap={5} justify='center'  minH={8} align='center'>
     <Text textAlign={'center'} my={1} fontSize='sm' color={'gray.400'}>Join the revolution</Text>
           <ChakraLink

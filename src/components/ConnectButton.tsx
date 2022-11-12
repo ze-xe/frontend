@@ -16,6 +16,7 @@ import {
 	MenuList,
 	MenuItem,
 	Fade,
+	Divider,
 } from '@chakra-ui/react';
 
 import {
@@ -94,16 +95,12 @@ const ConnectButton = ({}) => {
 						boxSize={'40px 150px'}
 						_hover={{ bgColor: 'none' }}
 						onMouseEnter={onOpen}
-						onMouseLeave={onClose}
-						>
-							<Flex align={'center'} gap={1}>
-
-						<Avatar bgColor={'primary'} size='xs' mr={1}/> 
-						<Text>
-						My Wallet
-						</Text>
-						{isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-							</Flex>
+						onMouseLeave={onClose}>
+						<Flex align={'center'} gap={1}>
+							<Avatar bgColor={'primary'} size="xs" mr={1} maxH={'18px'} maxW={'18px'} />
+							<Text>My Wallet</Text>
+							{isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+						</Flex>
 					</MenuButton>
 					<Fade in={isOpen}>
 						<MenuList
@@ -112,72 +109,66 @@ const ConnectButton = ({}) => {
 							color={'gray.900'}
 							onMouseEnter={onOpen}
 							onMouseLeave={onClose}>
-							<Box mx={'15px'} my={'15px'} minW='300px'>
-								<Flex flexDir="column" align={'center'} gap={2}>
-									<Avatar size={'lg'} />
-									<Text fontSize={'lg'} fontWeight="bold">
-										{tronAddress?.slice(0, 5) +
-											'....' +
-											tronAddress?.slice(-5)}
-									</Text>
-										<Button
-										mt={5}
-											bgColor={'gray.200'}
-											px={6}
-											height={'55px'}
-											width="100%"
-											>
-											{' '}
-											<Flex
-												flexDir={'column'}
-												alignItems="center"
-												onClick={_copy}>
-												<MdCopyAll />
-												<Text fontSize={'sm'}>
-													Copy Address
-												</Text>
-											</Flex>{' '}
-										</Button>
-									
+							<Box mx={'15px'} my={'15px'} minW="300px" width={'300px'}>
+								<Flex flexDir="column" align={'center'} gap={2} >
+									<Flex width={'100%'} justify={'start'} align='center' gap={2} px={6}>
+										<Avatar size={'lg'} bgColor={'gray.800'}/>
+										<Text fontSize={'xl'} fontWeight="bold">
+											{tronAddress?.slice(0, 5) +
+												'....' +
+												tronAddress?.slice(-5)}
+										</Text>
+									</Flex>
+
+									<Divider borderColor={'gray.400'} mt={5}/>
 									<Button
-									as={Link}
-									href='/portfolio'
-											bgColor={'gray.200'}
-											px={6}
-											height={'55px'}
-											width="100%"
-											minW={'200px'}
-											rounded={10}>
-											{' '}
-											<Flex
-												flexDir={'column'}
-												alignItems="center">
-												<BiMoney/>
-												<Text fontSize={'sm'}>
-												View your Portfolio
-												</Text>
-											</Flex>{' '}
-										</Button>
-										
-										<Button
-											bgColor={'gray.200'}
-											px={6}
-											height={'55px'}
-											width="100%"
-											rounded={10}
-											onClick={_disconnect}
-											
-											>
-											{' '}
-											<Flex
-												flexDir={'column'}
-												alignItems="center">
-												<MdLogout />
-												<Text fontSize={'sm'}>
-													Disconnect
-												</Text>
-											</Flex>{' '}
-										</Button>
+										as={Link}
+										href="/portfolio"
+										// bgColor={'gray.200'}
+										px={6}
+										height={'55px'}
+										width="100%"
+										minW={'200px'}
+										rounded={10}
+										justifyContent='start'
+										>
+										{' '}
+										<Flex
+										justify={'start'}
+											align="center" gap={2}>
+											<BiMoney size={20} />
+											<Box>
+
+											<Text fontSize={'md'} fontWeight='bold'>
+												Portfolio
+											</Text>
+											</Box>
+										</Flex>
+									</Button>
+
+									<Divider borderColor={'gray.400'} />
+									<Button
+										// bgColor={'gray.200'}
+										px={6}
+										mb={-2}
+										height={'55px'}
+										width="100%"
+										rounded={10}
+										onClick={_disconnect}
+										justifyContent='start'
+										>
+										<Flex
+										justify={'start'}
+											align="center" gap={2}>
+											<MdLogout size={20} />
+											<Box>
+
+											<Text fontSize={'md'} fontWeight='bold'>
+											Disconnect
+											</Text>
+											</Box>
+										</Flex>
+									</Button>
 									{/* </Flex> */}
 								</Flex>
 							</Box>
