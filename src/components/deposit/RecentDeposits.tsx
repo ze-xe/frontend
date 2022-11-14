@@ -29,7 +29,7 @@ export default function Recent({ type }) {
 								<Image
 									src={
 										'/assets/crypto_logos/' +
-										token.symbol.toLowerCase() +
+										token?.symbol.toLowerCase() +
 										'.png'
 									}
 									height={100}
@@ -39,16 +39,16 @@ export default function Recent({ type }) {
 										maxHeight: '30px',
 										borderRadius: '100px',
 									}}
-									alt={token.symbol}
+									alt={token?.symbol}
 								/>
 								<Box>
 									{/* <Text fontSize={'sm'}>{token.name}</Text> */}
 									<Text fontSize={'xs'}>
 										{' '}
 										{tokenFormatter(null).format(
-											item.amount / 10 ** token.decimals
+											item.amount / 10 ** token?.decimals
 										)}{' '}
-										{token.symbol}
+										{token?.symbol}
 									</Text>
 									<Text fontSize={'xs'}>
 										{new Date(

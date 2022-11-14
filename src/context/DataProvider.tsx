@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { DUMMY_ADDRESS, HELPER } from '../utils/const';
+import { DUMMY_ADDRESS, HELPER, Endpoints } from '../utils/const';
 const { Big } = require('big.js');
 import tronWeb from '../utils/tronWeb';
 import axios from 'axios';
-import { getABI, getAddress } from '../utils/contract';
+import { call, getABI, getAddress, getContract } from '../utils/contract';
+import { ChainID, chains, chainMapping } from '../utils/chains';
 
 const DataContext = React.createContext<DataValue>({} as DataValue);
 
@@ -18,6 +19,9 @@ const coingeckoIds = {
 	'USDD': 'usdd',
 	'WTRX': 'tron',
 	'BTT': 'bittorrent',
+	'NEAR': 'near',
+	'AURORA': 'aurora-near',
+	'USDC': 'usd-coin',
 };
 
 const dummyPrices = {
@@ -27,6 +31,9 @@ const dummyPrices = {
 	'USDD': '1',
 	'WTRX': '0.006',
 	'BTT': '0.0000008',
+	'NEAR': '3.2',
+	'AURORA': '0.8',
+	'USDC': '1',
 };
 
 
@@ -46,6 +53,7 @@ function DataProvider({ children }: any) {
 
 	const [tokens, setTokens] = React.useState<any[]>([]);
 	const [userDepositWithdraws, setUserDepositWithdraws] = React.useState<any>([]);
+	const [chain, setChain] = React.useState(null);
 
 	const [dollarFormatter, setDollarFormatter] = React.useState<null | {}>(
 		new Intl.NumberFormat('en-US', {
@@ -61,20 +69,25 @@ function DataProvider({ children }: any) {
 
 	React.useEffect(() => {}, [])	
 
-	const getWalletBalances = async (address: string, _tokens = tokens) => {
-		let multicall = await tronWeb.contract(getABI('Helper'), getAddress('Helper'));
+
+	const explorer = () => {
+		return chain === ChainID.NILE ? 'https://nile.tronscan.org/#/transaction/' : chainMapping[chain]?.blockExplorers.default.url+'tx/';
+	}
+
+	const getWalletBalances = async (address: string, _tokens = tokens, chain: number) => {
+		let multicall = await getContract('Helper', chain);
 		Promise.all([
-			multicall.balanceOf(_tokens.map(token => token.id), address).call(), 
-			multicall.allowance(_tokens.map(token => token.id), address, getAddress('Vault')).call(),
-			multicall.tradingBalanceOf(getAddress('Vault'), _tokens.map(token => token.id), address).call(),
+			call(multicall, 'balanceOf', [_tokens.map(token => token.id), address], chain), 
+			call(multicall, 'allowance', [_tokens.map(token => token.id), address, getAddress('Vault', chain)], chain), 
+			call(multicall, 'tradingBalanceOf', [getAddress('Vault', chain), _tokens.map(token => token.id), address], chain), 
 		]).then(async (res) => {
 			// set balance in token
 			let newTokens = []
 			for(let index in _tokens) {
 				let token = _tokens[index];
-				token.balance = res[0].balance[index].toString();
-				token.allowance = res[1].balance[index].toString();
-				token.tradingBalance = res[2].balance[index].toString();
+				token.balance = res[0][index].toString();
+				token.allowance = res[1][index].toString();
+				token.tradingBalance = res[2][index].toString();
 				newTokens.push(token);
 			}
 			setTokens(newTokens);
@@ -93,18 +106,18 @@ function DataProvider({ children }: any) {
 		})
 	}
 
-	const fetchData = async (tronWeb: any, address: string|null, firstTime = true, _tokens=tokens, _pairs=pairs) => {
+	const fetchData = async (address: string|null, chain: ChainID, firstTime = true, _tokens=tokens, _pairs=pairs) => {
 		setIsFetchingData(firstTime);
 		setDataFetchError(null);
 		try {
 			// fetch data
-			const requests = [axios.get('https://api.zexe.io/allpairs')]
-			if(firstTime) requests.push(axios.get('https://api.zexe.io/alltokens'))
+			const requests = [axios.get(Endpoints[chain]+'allpairs')]
+			if(firstTime) requests.push(axios.get(Endpoints[chain]+'alltokens'))
 			Promise.all(requests).then(async (res) => {
 				_pairs = res[0].data.data;
 				setPairs(_pairs);
-				fetchPairData(_pairs);
-				fetchPairStatus(_pairs);
+				fetchPairData(_pairs, chain);
+				fetchPairStatus(_pairs, chain);
 
 				if(firstTime) {
 					_tokens = res[1].data.data;
@@ -118,15 +131,15 @@ function DataProvider({ children }: any) {
 				}
 
 				if(address) {
-					getWalletBalances(address, _tokens);
-					fetchPlacedOrders(address, _pairs)
-					fetchCancelledOrders(address, _pairs)
-					fetchExecutedOrders(address, _pairs)
-					fetchUserDepositsWithdraws(address)
+					getWalletBalances(address, _tokens, chain);
+					fetchPlacedOrders(address, _pairs, chain)
+					fetchCancelledOrders(address, _pairs, chain)
+					fetchExecutedOrders(address, _pairs, chain)
+					fetchUserDepositsWithdraws(address, chain)
 				}
-				fetchOrders(_pairs)
-				fetchExecutedPairData(_pairs);
-				setTimeout(() => fetchData(tronWeb, address, false, _tokens, _pairs), 8000);
+				fetchOrders(_pairs, chain)
+				fetchExecutedPairData(_pairs, chain);
+				setTimeout(() => fetchData(address, chain, false, _tokens, _pairs), 8000);
 			})
 		} catch (error) {
 			setDataFetchError(error.message);
@@ -134,10 +147,9 @@ function DataProvider({ children }: any) {
 		setIsFetchingData(false);
 	};
 
-
-	const fetchOrders = (pairs: any[]) => {
+	const fetchOrders = (pairs: any[], chain: number) => {
 		let orderRequests = pairs.map((pair) => {
-			return axios.get(`https://api.zexe.io/orders/${pair.id}`);
+			return axios.get(Endpoints[chain]+`orders/${pair.id}`);
 		})
 		Promise.all(orderRequests).then((res) => {
 			let newOrders = {};
@@ -148,9 +160,9 @@ function DataProvider({ children }: any) {
 		})
 	}
 
-	const fetchPlacedOrders = (address: string, pairs: any[]) => {
+	const fetchPlacedOrders = (address: string, pairs: any[], chain: number) => {
 		let orderRequests = pairs.map((pair) => {
-			return axios.get(`https://api.zexe.io/orders_placed/${address}/${pair.id}`);
+			return axios.get(Endpoints[chain]+`orders_placed/${address}/${pair.id}`);
 		})
 		Promise.all(orderRequests).then((res) => {
 			let newOrders = {};
@@ -162,9 +174,9 @@ function DataProvider({ children }: any) {
 	}
 	
 	// api.zexe.io/pair/pricetrend/{pair}?interval=300000
-	const fetchPairData = (pairs: any[]) => {
+	const fetchPairData = (pairs: any[], chain: number) => {
 		let pairRequests = pairs.map((pair) => {
-			return axios.get(`https://api.zexe.io/pair/pricetrend/${pair.id}?interval=300000`);
+			return axios.get(Endpoints[chain]+`pair/pricetrend/${pair.id}?interval=300000`);
 		})
 		Promise.all(pairRequests).then((res) => {
 			let newPairs = {};
@@ -176,9 +188,9 @@ function DataProvider({ children }: any) {
 	}
 	
 	// /pair/orders/history/:id
-	const fetchExecutedPairData = async (pairs: any[]) => {
+	const fetchExecutedPairData = async (pairs: any[], chain: number) => {
 		let pairRequests = pairs.map((pair) => {
-			return axios.get(`https://api.zexe.io/pair/orders/history/${pair.id}`);
+			return axios.get(Endpoints[chain]+`pair/orders/history/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
 			let newPairs = {};
@@ -190,9 +202,9 @@ function DataProvider({ children }: any) {
 	}
 
 	// /orders_history/:taker/:pairId
-	const fetchExecutedOrders = async (address: string, pairs: any[]) => {
+	const fetchExecutedOrders = async (address: string, pairs: any[], chain: number) => {
 		let pairRequests = pairs.map((pair) => {
-			return axios.get(`https://api.zexe.io/orders_history/${address}/${pair.id}`);
+			return axios.get(Endpoints[chain]+`orders_history/${address}/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
 			let newPairs = {};
@@ -204,9 +216,9 @@ function DataProvider({ children }: any) {
 	}
 
 	// /user/order/cancelled/:maker/:pairId
-	const fetchCancelledOrders = async (address: string, pairs: any[]) => {
+	const fetchCancelledOrders = async (address: string, pairs: any[], chain: number) => {
 		let pairRequests = pairs.map((pair) => {
-			return axios.get(`https://api.zexe.io/user/order/cancelled/${address}/${pair.id}`);
+			return axios.get(Endpoints[chain]+`user/order/cancelled/${address}/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
 			let newPairs = {};
@@ -218,12 +230,11 @@ function DataProvider({ children }: any) {
 	}
 
 	// /pair/trading/status/:pairId
-	const fetchPairStatus = async (pairs: any[]) => {
+	const fetchPairStatus = async (pairs: any[], chain: number) => {
 		let pairRequests = pairs.map((pair) => {
-			return axios.get(`https://api.zexe.io/pair/trading/status/${pair.id}`);
+			return axios.get(Endpoints[chain]+`pair/trading/status/${pair.id}`);
 		})
 		Promise.all(pairRequests).then((res) => {
-			console.log(res);
 			let newPairs = {};
 			res.forEach((pair, index) => {
 				return newPairs[pairs[index].id] = pair.data.data;
@@ -233,8 +244,8 @@ function DataProvider({ children }: any) {
 	}
 
 	// /user/deposits/withdraws/:id
-	const fetchUserDepositsWithdraws = async (address: string) => {
-		axios.get('https://api.zexe.io/user/deposits/withdraws/' + address).then((res) => {
+	const fetchUserDepositsWithdraws = async (address: string, chain: number) => {
+		axios.get(Endpoints[chain]+'user/deposits/withdraws/' + address).then((res) => {
 			setUserDepositWithdraws(res.data.data);
 		})
 	}
@@ -255,7 +266,9 @@ function DataProvider({ children }: any) {
 		cancelledOrders,
 		orderHistory,
 		pairStats,
-		userDepositWithdraws
+		userDepositWithdraws,
+		chain, setChain,
+		explorer
 	};
 
 	return (
@@ -273,13 +286,15 @@ interface DataValue {
 	tokenFormatter: any;
 	isFetchingData: boolean;
 	orders: any;
-	fetchData: (_:any, __:string) => void;
+	fetchData: (address :string, chainId: ChainID) => void;
 	placedOrders: any,
 	pairExecutedData: any,
 	cancelledOrders: any,
 	orderHistory: any,
 	pairStats: any,
-	userDepositWithdraws: any
+	userDepositWithdraws: any,
+	chain: number, setChain: (chain: number) => void,
+	explorer: () => string
 }
 
 export { DataProvider, DataContext };

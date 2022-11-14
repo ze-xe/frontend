@@ -7,9 +7,21 @@ import { AppDataProvider } from '../context/AppData';
 import { Header } from '../components/Header';
 import { WalletProvider } from '../context/Wallet';
 import '../styles/globals.css';
+import { configureChains, createClient, defaultChains, WagmiConfig } from 'wagmi';
+import { chains } from '../utils/chains';
+import { publicProvider } from 'wagmi/providers/public'
+
+const { provider, webSocketProvider } = configureChains(chains, [publicProvider()]);
+
+const client = createClient({
+	provider,
+	webSocketProvider,
+});
+
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
+    <WagmiConfig client={client}>
     <ChakraProvider theme={theme}>
       <DataProvider>
         <AppDataProvider>
@@ -20,6 +32,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         </AppDataProvider>
       </DataProvider>
     </ChakraProvider>
+    </WagmiConfig>
   )
 }
 

@@ -39,17 +39,23 @@ import { BiLogOut, BiMoney } from 'react-icons/bi';
 import { MdCopyAll, MdLogout } from 'react-icons/md';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { chains, ChainID } from '../utils/chains';
 
 const ConnectButton = ({}) => {
+	const {address: evmAddress, isConnected: isEvmConnected, isConnecting: isEvmConnecting} = useAccount();
+	const {connectAsync: connectEvm, connectors} = useConnect();
+	const { disconnect: disconnectEvm } = useDisconnect()
+	
 	const {
 		isConnected: isTronConnected,
 		isConnecting,
 		address: tronAddress,
 		connect: connectTron,
-		tronWeb,
 		disconnect,
 	} = useContext(WalletContext);
-	const { isDataReady, isFetchingData, fetchData } = useContext(DataContext);
+
+	const { isDataReady, isFetchingData, fetchData, setChain, chain } = useContext(DataContext);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const {
 		isOpen: isConnectOpen,
@@ -60,7 +66,8 @@ const ConnectButton = ({}) => {
 	const _connectTron = () => {
 		connectTron((_address: string | null, _err: string) => {
 			if (!isDataReady && !isFetchingData && _address) {
-				fetchData((window as any).tronWeb, _address);
+				fetchData(_address, ChainID.NILE);
+				setChain(ChainID.NILE);
 			}
 		});
 		onConnectClose();
@@ -70,16 +77,39 @@ const ConnectButton = ({}) => {
 		navigator.clipboard.writeText(tronAddress as string);
 	};
 
-	const _connectBttc = () => {};
+	const _connectEvm = (chain: number) => {
+		connectEvm({chainId: chains[chain].id, connector: connectors[chain]}).then((res) => {
+			fetchData(res.account, ChainID.AURORA);
+			setChain(ChainID.AURORA);
+			localStorage.setItem("address", res.account)
+			localStorage.setItem("chain", ChainID.AURORA.toString());
+		})
+		onConnectClose();
+	};
 
 	const _disconnect = () => {
-		disconnect();
+		if(chain == ChainID.NILE) {
+			disconnect();
+			// reload
+			window.location.reload();
+		} else {
+			localStorage.removeItem("address");
+			localStorage.removeItem("chain");
+			disconnectEvm();
+			window.location.reload();
+		}
 		onClose();
 	};
 
+	const address = () => {
+		if (isEvmConnected) return evmAddress;
+		if (isTronConnected) return tronAddress;
+		return '';
+	}
+
 	return (
 		<Box>
-			{isTronConnected ? (
+			{isTronConnected || isEvmConnected ? (
 				// <Box>
 				// 	<Button
 				//     bgGradient="linear(to-r, #E11860, #CB1DC3)"
@@ -114,9 +144,9 @@ const ConnectButton = ({}) => {
 									<Flex width={'100%'} justify={'start'} align='center' gap={2} px={6}>
 										<Avatar size={'lg'} bgColor={'gray.800'}/>
 										<Text fontSize={'xl'} fontWeight="bold">
-											{tronAddress?.slice(0, 5) +
+											{address().slice(0, 5) +
 												'....' +
-												tronAddress?.slice(-5)}
+												address().slice(-5)}
 										</Text>
 									</Flex>
 
@@ -189,13 +219,35 @@ const ConnectButton = ({}) => {
 
 			<Modal isCentered isOpen={isConnectOpen} onClose={onConnectClose}>
 				<ModalOverlay bg="blackAlpha.100" backdropFilter="blur(30px)" />
-				<ModalContent maxW={'20rem'} pt={0} pb={2} rounded={20}>
+				<ModalContent maxW={'29rem'} pt={0} pb={2} rounded={20}>
 					{/* <ModalCloseButton rounded={20} bgColor="gray.100" m={2}/> */}
 					<ModalBody>
 						<Text fontSize={'lg'} fontWeight="bold" mb={5} mt={1}>
 							Choose a network
 						</Text>
 						<Flex gap={5}>
+						<Button
+								bgColor={'black'}
+								minW={'125px'}
+								height={'125px'}
+								rounded="20"
+								// disabled
+								_hover={{ bg: 'gray.800' }}
+								onClick={() => _connectEvm(0)}
+								>
+								<Flex
+									flexDir={'column'}
+									align="center"
+									justify={'center'}
+									gap={0}>
+									<Image
+										src="/aurora.png"
+										width={70}
+										height={70}
+										alt="tronlogo"
+									/>
+								</Flex>
+							</Button>
 							<Button
 								display={'flex'}
 								bgColor={'red'}
@@ -210,6 +262,7 @@ const ConnectButton = ({}) => {
 									alt="tronlogo"
 								/>
 							</Button>
+							
 							<Button
 								bgColor={'black'}
 								minW={'125px'}

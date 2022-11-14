@@ -12,7 +12,7 @@ const Big = require('big.js');
 
 const MIN_T0_ORDER = '10000000000000000';
 import axios from 'axios';
-import { getABI, getAddress } from '../../../utils/contract';
+import { getABI, getAddress, getContract, send } from '../../../utils/contract';
 
 import {
 	Modal,
@@ -30,6 +30,9 @@ import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
 import { tokenFormatter } from '../../../utils/formatters';
 import { WalletContext } from '../../../context/Wallet';
+import { ChainID } from '../../../utils/chains';
+import { useAccount } from 'wagmi';
+import { Endpoints } from '../../../utils/const';
 
 export default function SellModal({
 	pair,
@@ -49,35 +52,50 @@ export default function SellModal({
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 
 	const { isConnected } = useContext(WalletContext);
+	const { chain, explorer } = useContext(DataContext);
+	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
 
-	const sell = () => {
+
+	const sell = async () => {
 		setLoading(true);
 		let _amount = Big(amount)
 			.times(10 ** token0.decimals)
 			.toFixed(0);
 
-		(window as any).tronWeb
-			.contract(getABI('Exchange'), getAddress('Exchange'))
-			.methods.executeAndPlaceOrder(
+		let exchange = await getContract('Exchange', chain);
+
+		send(
+			exchange,
+			'executeAndPlaceOrder',
+			[
 				pair.tokens[0].id,
 				pair.tokens[1].id,
 				_amount,
 				'0',
 				0,
-				orders.map((order) => '0x' + order.id)
-			)
-			.send({
-				feeLimit: 1000000000,
-			})
-			.then((res: any) => {
+				orders.map((order) => '0x' + order.id),
+			],
+			chain
+		)
+		.then(async (res: any) => {
+			setLoading(false);
+			setResponse('Transaction sent! Waiting for confirmation...');
+			if (chain == ChainID.NILE) {
 				setHash(res);
-				setLoading(false);
 				checkResponse(res);
-				setResponse('Transaction sent! Waiting for confirmation...');
-			})
-			.catch((err: any) => {
-				setLoading(false);
-			});
+			} else {
+				setHash(res.hash);
+				await res.wait(1);
+				setConfirmed(true);
+				setResponse('Transaction Successful!');
+			}
+		})
+		.catch((err: any) => {
+			console.log(err)
+			setLoading(false);
+			setConfirmed(true);
+			setResponse('Transaction failed. Please try again!');
+		});
 	};
 
 	// check response in intervals
@@ -110,7 +128,7 @@ export default function SellModal({
 			.toFixed(0);
 
 		axios
-			.get('https://api.zexe.io/market/matched/orders/' + pair.id, {
+			.get(Endpoints[chain] + 'market/matched/orders/' + pair.id, {
 				params: {
 					amount: _amount,
 					exchange_rate: Big(price).times(
@@ -182,7 +200,7 @@ export default function SellModal({
 				bgColor={'red'}
 				onClick={_onOpen}
 				disabled={
-					!isConnected ||
+					!(isConnected || isEvmConnected) ||
 					loading ||
 					Number(amount) <= 0 ||
 					amountExceedsBalance() ||
@@ -190,7 +208,7 @@ export default function SellModal({
 					price == '' ||
 					Number(price) <= 0
 				}>
-				{!isConnected
+				{!(isConnected || isEvmConnected)
 					? 'Connect Wallet'
 					: amountExceedsMin()
 					? 'Amount is too less'
@@ -296,12 +314,8 @@ export default function SellModal({
 													{response}
 												</Text>
 												<Link
-													href={
-														'https://nile.tronscan.org/#/transaction/' +
-														hash
-													}
+													href={explorer() + hash}
 													target="_blank">
-													{' '}
 													<Text fontSize={'sm'}>
 														View on TronScan
 													</Text>

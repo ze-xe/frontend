@@ -11,7 +11,7 @@ import React, { useContext } from 'react';
 const Big = require('big.js');
 
 import axios from 'axios';
-import { getABI, getAddress } from '../../../utils/contract';
+import { getABI, getAddress, getContract, send } from '../../../utils/contract';
 
 import {
 	Modal,
@@ -29,6 +29,9 @@ import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
 import { tokenFormatter } from '../../../utils/formatters';
 import { WalletContext } from '../../../context/Wallet';
+import { useAccount } from 'wagmi';
+import { ChainID } from '../../../utils/chains';
+import { Endpoints } from '../../../utils/const';
 
 export default function BuyModal({
 	pair,
@@ -47,10 +50,13 @@ export default function BuyModal({
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 
-	const {isConnected} = useContext(WalletContext);
+	const { isConnected } = useContext(WalletContext);
+	const { isConnected: isEvmConnected } = useAccount();
+	const { chain, explorer } = useContext(DataContext);
 
 	const amountExceedsBalance = () => {
-		if (amount == '0' || amount == '' || !token1?.tradingBalance ) return false;
+		if (amount == '0' || amount == '' || !token1?.tradingBalance)
+			return false;
 		if (Number(amount) && token1?.tradingBalance)
 			return Big(amount).gt(
 				Big(token1?.tradingBalance).div(10 ** token1?.decimals)
@@ -58,14 +64,15 @@ export default function BuyModal({
 	};
 
 	const amountExceedsMin = () => {
-		if (token0Amount == '0' || token0Amount == '' || !token0 || !pair) return false;
+		if (token0Amount == '0' || token0Amount == '' || !token0 || !pair)
+			return false;
 		if (Number(token0Amount) && pair?.minToken0Order && token0.decimals)
 			return Big(token0Amount).lt(
 				Big(pair?.minToken0Order).div(10 ** token0.decimals)
 			);
 	};
 
-	const buy = () => {
+	const buy = async () => {
 		setLoading(true);
 		setConfirmed(false);
 		setHash(null);
@@ -74,24 +81,37 @@ export default function BuyModal({
 			.times(10 ** token0.decimals)
 			.toFixed(0);
 
-		(window as any).tronWeb
-			.contract(getABI('Exchange'), getAddress('Exchange'))
-			.methods.executeAndPlaceOrder(
+		let exchange = await getContract('Exchange', chain);
+		send(
+			exchange,
+			'executeAndPlaceOrder',
+			[
 				pair.tokens[0].id,
 				pair.tokens[1].id,
 				_amount,
 				Number.MAX_SAFE_INTEGER.toString(),
 				1,
-				orders.map((o) => '0x' + o.id)
-			)
-			.send({
-				feeLimit: 1000000000,
-			})
-			.then((res: any) => {
-				setHash(res);
+				orders.map((o) => '0x' + o.id),
+			],
+			chain
+		)
+			.then(async (res: any) => {
 				setLoading(false);
-				checkResponse(res);
 				setResponse('Transaction sent! Waiting for confirmation...');
+				if (chain == ChainID.NILE) {
+					setHash(res);
+					checkResponse(res);
+				} else {
+					setHash(res.hash);
+					await res.wait(1);
+					setConfirmed(true);
+					setResponse('Transaction Successful!');
+				}
+			})
+			.catch((err: any) => {
+				setLoading(false);
+				setConfirmed(true);
+				setResponse('Transaction failed. Please try again!');
 			});
 	};
 
@@ -128,7 +148,7 @@ export default function BuyModal({
 			.toFixed(0);
 
 		axios
-			.get('https://api.zexe.io/market/matched/orders/' + pair.id, {
+			.get(Endpoints[chain] + 'market/matched/orders/' + pair.id, {
 				params: {
 					amount: _amount,
 					exchange_rate: Big(price).times(
@@ -159,7 +179,11 @@ export default function BuyModal({
 					Big(_orderToPlace).times(price)
 				);
 
-				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
+				setOrderToPlace(
+					Number(_orderToPlace) > Number(pair?.minToken0Order)
+						? _orderToPlace
+						: 0
+				);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
 			});
@@ -181,7 +205,7 @@ export default function BuyModal({
 				bgColor={'green2'}
 				onClick={_onOpen}
 				disabled={
-					!isConnected ||
+					!(isConnected || isEvmConnected) ||
 					loading ||
 					Number(amount) <= 0 ||
 					amountExceedsBalance() ||
@@ -189,13 +213,20 @@ export default function BuyModal({
 					price == '' ||
 					Number(price) <= 0
 				}>
-				{!isConnected ? 'Connect Wallet' :amountExceedsMin()
+				{!(isConnected || isEvmConnected)
+					? 'Connect Wallet'
+					: amountExceedsMin()
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'
 					: 'Market Buy'}
 			</Button>
-			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'} scrollBehavior='inside'>
+			<Modal
+				isOpen={isOpen}
+				onClose={_onClose}
+				isCentered
+				size={'xl'}
+				scrollBehavior="inside">
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>
@@ -204,24 +235,34 @@ export default function BuyModal({
 					<ModalBody>
 						<Text>Executing Orders</Text>
 						{orders.map((o) => {
-							if (o.amount > 0) return <Box py={2} my={2} bgColor="gray.900" px={2}>
-								{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
-								<Text fontSize={'xs'}>ID: {o.id}</Text>
+							if (o.amount > 0)
+								return (
+									<Box
+										py={2}
+										my={2}
+										bgColor="gray.900"
+										px={2}>
+										{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
+										<Text fontSize={'xs'}>ID: {o.id}</Text>
 
-								<Text>
-									{tokenFormatter(null).format(
-										o.amount / 10 ** pair.tokens[0].decimals
-									)}{' '}
-									{pair.tokens[0].symbol} @{' '}
-									{tokenFormatter(null).format(
-										o.exchangeRate /
-											10 ** pair.exchangeRateDecimals
-									)}{' '}
-									{pair.tokens[1].symbol}
-								</Text>
-							</Box>;
-							else return null
-									})}
+										<Text>
+											{tokenFormatter(null).format(
+												o.amount /
+													10 **
+														pair.tokens[0].decimals
+											)}{' '}
+											{pair.tokens[0].symbol} @{' '}
+											{tokenFormatter(null).format(
+												o.exchangeRate /
+													10 **
+														pair.exchangeRateDecimals
+											)}{' '}
+											{pair.tokens[1].symbol}
+										</Text>
+									</Box>
+								);
+							else return null;
+						})}
 						{orders.length == 0 && (
 							<Text mb={2} color="gray" fontSize={'sm'}>
 								No orders to execute
@@ -274,17 +315,16 @@ export default function BuyModal({
 												<Text fontSize="md" mb={0}>
 													{response}
 												</Text>
-												<Link
+												{hash && <Link
 													href={
-														'https://nile.tronscan.org/#/transaction/' +
+														explorer() +
 														hash
 													}
 													target="_blank">
-													{' '}
 													<Text fontSize={'sm'}>
 														View on TronScan
 													</Text>
-												</Link>
+												</Link>}
 											</Box>
 										</Alert>
 									</Box>

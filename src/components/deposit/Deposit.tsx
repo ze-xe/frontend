@@ -15,16 +15,20 @@ import { Input, InputGroup, InputRightElement } from '@chakra-ui/react';
 import { Select } from '@chakra-ui/react';
 import { DataContext } from '../../context/DataProvider';
 import Image from 'next/image';
-import { getABI, getAddress } from '../../utils/contract';
+import { getABI, getAddress, getContract, send } from '../../utils/contract';
 import { MdOpenInNew } from 'react-icons/md';
 import axios from 'axios';
 import Link from 'next/link';
+import { ChainID } from '../../utils/chains';
+import { useAccount } from 'wagmi';
 const Big = require('big.js');
 const ethers = require('ethers');
 
 export default function Deposit() {
 	const { address, isConnected } = useContext(WalletContext);
-	const { tokens, userDepositWithdraws } = useContext(DataContext);
+	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
+
+	const { tokens, chain, explorer } = useContext(DataContext);
 	const [selectedToken, setSelectedToken] = React.useState(0);
 	const [amount, setAmount] = React.useState('0');
 
@@ -34,6 +38,8 @@ export default function Deposit() {
 	const [hash, setHash] = React.useState(null);
 	const [confirmed, setConfirmed] = React.useState(false);
 
+	const [isApprovedNow, setIsApprovedNow] = React.useState({});
+
 	const handleMax = () => {
 		// set amount as token balance
 		let token = tokens[selectedToken];
@@ -41,7 +47,7 @@ export default function Deposit() {
 		setAmount(amount);
 	};
 
-	const deposit = () => {
+	const deposit = async () => {
 		setLoading(true);
 		setResponse(null);
 		setConfirmed(false);
@@ -51,16 +57,28 @@ export default function Deposit() {
 		let _amount = Big(amount)
 			.times(10 ** token.decimals)
 			.toFixed(0);
-		(window as any).tronWeb
-			.contract(getABI('Vault'), getAddress('Vault'))
-			.methods.deposit(token.id, _amount)
-			.send({})
-			.then((res: any) => {
+
+		// get contract
+		let vault = await getContract('Vault', chain);
+		send(vault, 'deposit', [token.id, _amount], chain)
+		.then(async (res: any) => {
+			setLoading(false);
+			setResponse('Transaction sent! Waiting for confirmation...');
+			if (chain == ChainID.NILE) {
 				setHash(res);
-				setLoading(false);
 				checkResponse(res);
-				setResponse('Transaction sent! Waiting for confirmation...');
-			});
+			} else {
+				setHash(res.hash);
+				await res.wait(1);
+				setConfirmed(true);
+				setResponse('Transaction Successful!');
+			}
+		})
+		.catch((err: any) => {
+			setLoading(false);
+			setConfirmed(true);
+			setResponse('Transaction failed. Please try again!');
+		});
 	};
 
 	// check response in intervals
@@ -86,26 +104,26 @@ export default function Deposit() {
 			});
 	};
 
-	const approve = () => {
+	const approve = async () => {
 		setLoading(true);
 		// approve amount of selected token
 		let token = tokens[selectedToken];
 		let _amount = Big(amount)
 			.times(10 ** token.decimals)
 			.toString();
-		(window as any).tronWeb
-			.contract(getABI('ERC20'), tokens[selectedToken].id)
-			.methods.approve(
-				getAddress('Vault'),
-				ethers.constants.MaxUint256.toString()
-			)
-			.send()
-			.then((res: any) => {
-				setLoading(false);
-			});
+
+		const erc20 = await getContract('ERC20', chain, tokens[selectedToken].id);
+		send(erc20, 'approve', [getAddress('Vault', chain), ethers.constants.MaxUint256.toString()], chain)
+		.then((res: any) => {
+			const _isApprovedNow = isApprovedNow;
+			_isApprovedNow[selectedToken] = true;
+			setIsApprovedNow(_isApprovedNow);
+			setLoading(false);
+		});
 	};
 
 	const needsApproval = () => {
+		if(isApprovedNow[selectedToken]) return false;
 		let token = tokens[selectedToken];
 		if (amount == '' || !token) return false;
 		let _amount = Big(amount)
@@ -233,11 +251,11 @@ export default function Deposit() {
 							height={3}
 							width={3}
 							borderRadius={10}
-							bgColor={isConnected ? 'green' : 'red'}></Box>
-						{isConnected ? (
+							bgColor={(isConnected || isEvmConnected) ? 'green' : 'red'}></Box>
+						{(isConnected || isEvmConnected) ? (
 							<Box>
 								<Text fontSize={'sm'}>From Wallet</Text>
-								<Text fontSize={'md'}>{address}</Text>
+								<Text fontSize={'md'}>{address??evmAddress}</Text>
 							</Box>
 						) : (
 							<Text>Wallet not connected</Text>
@@ -266,14 +284,14 @@ export default function Deposit() {
 							loading ||
 							Number(amount) == 0 ||
 							amountExceedsBalance() ||
-							!isConnected
+							!(isConnected || isEvmConnected)
 						}
 						onClick={deposit}
 						isLoading={loading}
 						loadingText="Confirm in your wallet"
 						bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
 						size="lg">
-						{!isConnected
+						{!(isConnected || isEvmConnected)
 							? 'Connect wallet'
 							: Number(amount) == 0
 							? 'Enter Amount'
@@ -283,7 +301,7 @@ export default function Deposit() {
 					</Button>
 				)}
 				<Box>
-					{(hash && response) && (
+					{(response) && (
 						<Box width={'100%'} my={2}>
 							<Alert
 								status={
@@ -300,17 +318,13 @@ export default function Deposit() {
 									<Text fontSize="md" mb={0}>
 										{response}
 									</Text>
-									<Link
-										href={
-											'https://nile.tronscan.org/#/transaction/' +
-											hash
-										}
+									{hash && <Link
+										href={explorer() + hash}
 										target="_blank">
-										{' '}
 										<Text fontSize={'sm'}>
 											View on TronScan
 										</Text>
-									</Link>
+									</Link>}
 								</Box>
 							</Alert>
 						</Box>

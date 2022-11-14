@@ -16,7 +16,7 @@ import React from 'react';
 import { useContext } from 'react';
 import { DataContext } from '../context/DataProvider';
 import { WalletContext } from '../context/Wallet';
-import { getABI } from '../utils/contract';
+import { getABI, getContract, send } from '../utils/contract';
 
 const mintAmount = {
 	USDT: 1000,
@@ -25,6 +25,9 @@ const mintAmount = {
 	ETH: 10,
 	WTRX: 10000,
 	BTT: 10000000,
+	AURORA: 100,
+	NEAR: 10,
+	USDC: 1000,
 };
 
 const Big = require('big.js');
@@ -32,6 +35,8 @@ import { Input, InputGroup } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
 import Head from 'next/head';
+import { useAccount } from 'wagmi';
+import { ChainID } from '../utils/chains';
 
 function RadioCard(props) {
 	const { getInputProps, getCheckboxProps } = useRadio(props);
@@ -42,41 +47,40 @@ function RadioCard(props) {
 
 	return (
 		<>
-		<Head>
-				<title>
-					Testnet Faucet | ZEXE | Buy & Sell Crypto on TRON
-				</title>
+			<Head>
+				<title>Testnet Faucet | ZEXE | Buy & Sell Crypto on TRON</title>
 				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
 			</Head>
-		<Box as="label">
-			<input {...input} />
-			<Box
-				{...checkbox}
-				// bgColor={props.isChecked ? '#E11860' : 'transparent'}
-				cursor="pointer"
-				borderWidth="1px"
-				borderRadius="md"
-				boxShadow="md"
-				_checked={{
-					bg: 'white',
-					color: 'black',
-					borderColor: 'gray.600',
-				}}
-				_focus={{
-					boxShadow: 'outline',
-				}}
-				px={5}
-				py={3}>
-				{props.children}
+			<Box as="label">
+				<input {...input} />
+				<Box
+					{...checkbox}
+					// bgColor={props.isChecked ? '#E11860' : 'transparent'}
+					cursor="pointer"
+					borderWidth="1px"
+					borderRadius="md"
+					boxShadow="md"
+					_checked={{
+						bg: 'white',
+						color: 'black',
+						borderColor: 'gray.600',
+					}}
+					_focus={{
+						boxShadow: 'outline',
+					}}
+					px={5}
+					py={3}>
+					{props.children}
+				</Box>
 			</Box>
-		</Box>
 		</>
 	);
 }
 
 export default function faucets() {
-	const { tokens } = useContext(DataContext);
+	const { tokens, chain, explorer } = useContext(DataContext);
 	const { address, isConnected } = useContext(WalletContext);
+	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
 
 	const [selectedToken, setSelectedToken] = React.useState(0);
 
@@ -104,19 +108,34 @@ export default function faucets() {
 
 		const token = tokens[selectedToken];
 		// mint tokens
-		const tokenContract = await (window as any).tronWeb.contract(
-			getABI('ERC20'),
-			token.id
-		);
-		tokenContract.methods
-			.mint(address, Big(mintAmount[token.symbol]).times(1e18).toFixed(0))
-			.send({})
-			.then((res: any) => {
+		const tokenContract = await getContract('ERC20', chain, token.id);
+		send(
+			tokenContract,
+			'mint',
+			[
+				address ?? evmAddress,
+				Big(mintAmount[token.symbol]).times(1e18).toFixed(0),
+			],
+			chain
+		)
+		.then(async (res: any) => {
+			setLoading(false);
+			setResponse('Transaction sent! Waiting for confirmation...');
+			if (chain == ChainID.NILE) {
 				setHash(res);
-				setLoading(false);
 				checkResponse(res);
-				setResponse('Transaction sent! Waiting for confirmation...');
-			});
+			} else {
+				setHash(res.hash);
+				await res.wait(1);
+				setConfirmed(true);
+				setResponse('Transaction Successful!');
+			}
+		})
+		.catch((err: any) => {
+			setLoading(false);
+			setConfirmed(true);
+			setResponse('Transaction failed. Please try again!');
+		});
 	};
 
 	const checkResponse = (tx_id: string) => {
@@ -200,29 +219,6 @@ export default function faucets() {
 							</RadioCard>
 						);
 					})}
-					{/* <Link href="https://tron.com" target={'_blank'}>
-						<Box
-							bgColor={'#E11518'}
-							minW="200px"
-							minH={'155px'}
-							border="1px"
-							borderColor={'gray'}
-							borderRadius="6px"
-							p={4}>
-							<Image
-								src={`/assets/crypto_logos/trx.png`}
-								width={40}
-								height={40}
-								alt={'trx'}
-								style={{
-									maxHeight: 40,
-									borderRadius: '50%',
-								}}></Image>
-							<Text fontSize={'xl'}>Tron</Text>
-							<Text fontSize={'md'}>TRX</Text>
-
-						</Box>
-					</Link> */}
 				</HStack>
 				<Box>
 					<Box my={2}>
@@ -272,10 +268,12 @@ export default function faucets() {
 							bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
 							size="lg"
 							isLoading={loading}
-							disabled={!isConnected}>
-							{isConnected ? 'Mint' : 'Connect Wallet'}
+							disabled={!(isConnected || isEvmConnected) || loading}>
+							{isConnected || isEvmConnected
+								? 'Mint'
+								: 'Connect Wallet'}
 						</Button>
-						{hash && response && (
+						{response && (
 							<Box width={'100%'} my={2}>
 								<Alert
 									status={
@@ -292,17 +290,14 @@ export default function faucets() {
 										<Text fontSize="md" mb={0}>
 											{response}
 										</Text>
-										<Link
-											href={
-												'https://nile.tronscan.org/#/transaction/' +
-												hash
-											}
+										{hash && <Link
+											href={explorer() + hash}
 											target="_blank">
 											{' '}
 											<Text fontSize={'sm'}>
 												View on TronScan
 											</Text>
-										</Link>
+										</Link>}
 									</Box>
 								</Alert>
 							</Box>

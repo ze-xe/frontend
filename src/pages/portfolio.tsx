@@ -28,9 +28,12 @@ import {
 import { dollarFormatter, tokenFormatter } from '../utils/formatters';
 import Head from 'next/head';
 import Image from 'next/image';
+import { useAccount } from 'wagmi';
 
 export default function wallet() {
 	const { address, isConnected } = useContext(WalletContext);
+	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
+
 	const { tokens } = useContext(DataContext);
 	const [balance, setBalance] = React.useState(0);
 	const [tradingBalancesUSD, setTradingBalancesUSD] = React.useState([]);
@@ -74,7 +77,7 @@ export default function wallet() {
 				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
 			</Head>
 			<Flex justify={'center'}>
-				{isConnected ? (
+				{(isConnected || isEvmConnected) ? (
 					<Box mt={2} width="100%" maxW="1400px">
 						<Flex
 							bgColor={'gray.1100'}
@@ -93,7 +96,7 @@ export default function wallet() {
 										ml={4}
 										fontSize="xl"
 										fontWeight={'bold'}>
-										{address}
+										{address??evmAddress}
 									</Text>
 									<Text
 										ml={4}

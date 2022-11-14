@@ -39,6 +39,8 @@ import {
 	useBreakpointValue,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { useAccount, useConnect } from 'wagmi';
+import { ChainID, chainIndex } from '../utils/chains';
 
 export const Header = ({ title }: { title: string }) => {
 	const router = useRouter();
@@ -46,23 +48,40 @@ export const Header = ({ title }: { title: string }) => {
 
 	const { connectionError, connect, isConnected, isConnecting, tronWeb } =
 		useContext(WalletContext);
-	const { isFetchingData, isDataReady, fetchData } = useContext(DataContext);
+	const { isFetchingData, isDataReady, fetchData, setChain } = useContext(DataContext);
 	const [init, setInit] = useState(false);
+
+	const {address: evmAddress, isConnected: isEvmConnected, isConnecting: isEvmConnecting} = useAccount();
+	const {connectAsync: connectEvm, connectors} = useConnect();
 
 	useEffect(() => {
 		if (localStorage.getItem('chakra-ui-color-mode') === 'light') {
 			localStorage.setItem('chakra-ui-color-mode', 'dark');
 		}
 		if (typeof window !== 'undefined') {
-			if (!isConnected && !isConnecting) {
-				if(localStorage.getItem('address')){
-					connect((_address: string | null, _err: string) => {
-						if (!isDataReady && !isFetchingData && _address) {
-							fetchData(tronWeb, _address);
-						}
-					});
+			if (!isConnected && !isConnecting && !isEvmConnected && !isEvmConnecting) {
+				const _address = localStorage.getItem('address');
+				const _chain = localStorage.getItem('chain');
+				if(_address && _chain){
+					if(parseInt(_chain) == ChainID.NILE){
+						connect((_address: string | null, _err: string) => {
+							if (!isDataReady && !isFetchingData && _address) {
+								fetchData(_address, ChainID.NILE);
+								setChain(ChainID.NILE);
+							}
+						});
+					} else {
+						connectEvm({chainId: parseInt(_chain), connector: connectors[chainIndex[parseInt(_chain)]]}).then((res) => {
+							if (!isDataReady && !isFetchingData && res.account) {
+								fetchData(res.account, ChainID.AURORA);
+								setChain(ChainID.AURORA);
+								localStorage.setItem("address", res.account)
+								localStorage.setItem("chain", ChainID.AURORA.toString());
+							}
+						})
+					}
 				} else if(!init) {
-					fetchData((window as any).tronWeb, null);
+					fetchData(null, ChainID.NILE);
 					setInit(true)
 				}
 			}

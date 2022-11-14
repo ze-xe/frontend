@@ -45,6 +45,7 @@ function WalletProvider({children}: any) {
                 setIsDisconnected(false);
                 setIsConnecting(false);
 				localStorage.setItem("address", _addr)
+                localStorage.setItem("chain", '-3');
             })
 			.catch((err: any) => {
 				if(options.errRetryCount >= 3){
@@ -83,6 +84,7 @@ function WalletProvider({children}: any) {
         setIsConnected(false);
         setIsConnecting(false);
         localStorage.removeItem("address");
+        localStorage.removeItem("chain");
     }
 
     const value: WalletValue = {

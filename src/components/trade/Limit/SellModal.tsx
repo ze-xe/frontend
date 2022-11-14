@@ -1,10 +1,18 @@
-import { Alert, AlertIcon, Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
+import {
+	Alert,
+	AlertIcon,
+	Box,
+	Button,
+	Flex,
+	Text,
+	useDisclosure,
+} from '@chakra-ui/react';
 import React, { useContext } from 'react';
 const Big = require('big.js');
 
 const MIN_T0_ORDER = '10000000000000000';
 import axios from 'axios';
-import { getABI, getAddress } from '../../../utils/contract';
+import { getABI, getAddress, getContract, send } from '../../../utils/contract';
 
 import {
 	Modal,
@@ -22,6 +30,9 @@ import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
 import { tokenFormatter } from '../../../utils/formatters';
 import { WalletContext } from '../../../context/Wallet';
+import { ChainID } from '../../../utils/chains';
+import { useAccount } from 'wagmi';
+import { Endpoints } from '../../../utils/const';
 
 export default function SellModal({
 	pair,
@@ -40,37 +51,51 @@ export default function SellModal({
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 	const [offsetAmount, setOffsetAmount] = React.useState(0);
+	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
 
-	const {isConnected} = useContext(WalletContext);
+	const { isConnected } = useContext(WalletContext);
+	const { chain, explorer } = useContext(DataContext);
 
-	const sell = () => {
+	const sell = async () => {
 		setLoading(true);
 		let _amount = Big(amount)
-		.times(10 ** token0.decimals)
-		.minus(offsetAmount)
-		.toFixed(0);
+			.times(10 ** token0.decimals)
+			.minus(offsetAmount)
+			.toFixed(0);
 
-		(window as any).tronWeb
-			.contract(getABI('Exchange'), getAddress('Exchange'))
-			.methods.executeAndPlaceOrder(
+		let exchange = await getContract('Exchange', chain);
+
+		send(
+			exchange,
+			'executeAndPlaceOrder',
+			[
 				pair.tokens[0].id,
 				pair.tokens[1].id,
 				_amount,
 				(Number(price) * 10 ** pair.exchangeRateDecimals).toFixed(0),
 				0,
-				orders.map((order) => '0x' + order.id)
-			)
-			.send({
-				feeLimit: 1000000000
-			})
-			.then((res: any) => {
-				setHash(res);
+				orders.map((order) => order.id),
+			],
+			chain
+		)
+			.then(async (res: any) => {
 				setLoading(false);
-				checkResponse(res);
 				setResponse('Transaction sent! Waiting for confirmation...');
+				if (chain == ChainID.NILE) {
+					setHash(res);
+					checkResponse(res);
+				} else {
+					setHash(res.hash);
+					await res.wait(1);
+					setConfirmed(true);
+					setResponse('Transaction Successful!');
+				}
 			})
 			.catch((err: any) => {
+				console.log(err)
 				setLoading(false);
+				setConfirmed(true);
+				setResponse('Transaction failed. Please try again!');
 			});
 	};
 
@@ -104,7 +129,7 @@ export default function SellModal({
 			.toFixed(0);
 
 		axios
-			.get('https://api.zexe.io/matchedorders/' + pair.id, {
+			.get(Endpoints[chain]+'matchedorders/' + pair.id, {
 				params: {
 					amount: _amount,
 					exchange_rate: Big(price).times(
@@ -116,7 +141,7 @@ export default function SellModal({
 			.then((resp) => {
 				let orders = resp.data.data;
 				let ordersToExecute = [];
-				let _orderToPlace = amount*(10**token0.decimals);
+				let _orderToPlace = amount * 10 ** token0.decimals;
 				let _expectedOutput = Big(0);
 				for (let i in orders) {
 					let execAmount = Math.min(_orderToPlace, orders[i].amount);
@@ -134,10 +159,14 @@ export default function SellModal({
 				_expectedOutput = _expectedOutput.plus(
 					Big(_orderToPlace).div(price)
 				);
-				if(Number(_orderToPlace) < Number(pair?.minToken0Order)){
-					setOffsetAmount(Number(_orderToPlace))
+				if (Number(_orderToPlace) < Number(pair?.minToken0Order)) {
+					setOffsetAmount(Number(_orderToPlace));
 				}
-				setOrderToPlace(Number(_orderToPlace) > Number(pair?.minToken0Order) ? _orderToPlace : 0);
+				setOrderToPlace(
+					Number(_orderToPlace) > Number(pair?.minToken0Order)
+						? _orderToPlace
+						: 0
+				);
 				setOrders(ordersToExecute);
 				setExpectedOutput(_expectedOutput.toFixed(0));
 			});
@@ -163,7 +192,9 @@ export default function SellModal({
 	const amountExceedsMin = () => {
 		if (amount == '0' || amount == '' || !pair || !token0) return false;
 		if (Number(amount) && pair?.minToken0Order && token0.decimals)
-			return Big(amount).lt(Big(pair?.minToken0Order).div(10 ** token0.decimals));
+			return Big(amount).lt(
+				Big(pair?.minToken0Order).div(10 ** token0.decimals)
+			);
 	};
 
 	return (
@@ -174,7 +205,7 @@ export default function SellModal({
 				bgColor={'red'}
 				onClick={_onOpen}
 				disabled={
-					!isConnected ||
+					!(isConnected || isEvmConnected) ||
 					loading ||
 					Number(amount) <= 0 ||
 					amountExceedsBalance() ||
@@ -182,13 +213,20 @@ export default function SellModal({
 					price == '' ||
 					Number(price) <= 0
 				}>
-				{!isConnected ? 'Connect Wallet' : amountExceedsMin()
+				{!(isConnected || isEvmConnected)
+					? 'Connect Wallet'
+					: amountExceedsMin()
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'
 					: 'Limit Sell'}
 			</Button>
-			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'} scrollBehavior='inside'>
+			<Modal
+				isOpen={isOpen}
+				onClose={_onClose}
+				isCentered
+				size={'xl'}
+				scrollBehavior="inside">
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>
@@ -197,37 +235,34 @@ export default function SellModal({
 					<ModalBody>
 						<Text>Executing Orders</Text>
 						{orders.map((o) => {
-								if (o.amount > 0)
-									return (
-										<Box
-											py={2}
-											my={2}
-											bgColor="gray.900"
-											px={2}>
-											{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
-											<Text fontSize={'xs'}>
-												ID: {o.id}
-											</Text>
+							if (o.amount > 0)
+								return (
+									<Box
+										py={2}
+										my={2}
+										bgColor="gray.900"
+										px={2}>
+										{/* <Text textTransform={'uppercase'} fontSize='md'>Order ID</Text> */}
+										<Text fontSize={'xs'}>ID: {o.id}</Text>
 
-											<Text>
-												{tokenFormatter(null).format(
-													o.amount /
-														10 **
-															pair.tokens[0]
-																.decimals
-												)}{' '}
-												{pair.tokens[0].symbol} @{' '}
-												{tokenFormatter(null).format(
-													o.exchangeRate /
-														10 **
-															pair.exchangeRateDecimals
-												)}{' '}
-												{pair.tokens[1].symbol}
-											</Text>
-										</Box>
-									);
-								else return null;
-							})}
+										<Text>
+											{tokenFormatter(null).format(
+												o.amount /
+													10 **
+														pair.tokens[0].decimals
+											)}{' '}
+											{pair.tokens[0].symbol} @{' '}
+											{tokenFormatter(null).format(
+												o.exchangeRate /
+													10 **
+														pair.exchangeRateDecimals
+											)}{' '}
+											{pair.tokens[1].symbol}
+										</Text>
+									</Box>
+								);
+							else return null;
+						})}
 						{orders.length == 0 && (
 							<Text mb={2} color="gray" fontSize={'sm'}>
 								No orders to execute
@@ -238,8 +273,8 @@ export default function SellModal({
 							<Box py={2} my={2} bgColor="gray.900" px={2}>
 								<Text fontSize={'xs'}>OrderType: SELL</Text>
 								<Text>
-									{orderToPlace/(10**token0?.decimals)} {token0?.symbol} @ {price}{' '}
-									{token1?.symbol}
+									{orderToPlace / 10 ** token0?.decimals}{' '}
+									{token0?.symbol} @ {price} {token1?.symbol}
 								</Text>
 							</Box>
 						) : (
@@ -278,17 +313,13 @@ export default function SellModal({
 												<Text fontSize="md" mb={0}>
 													{response}
 												</Text>
-												<Link
-													href={
-														'https://nile.tronscan.org/#/transaction/' +
-														hash
-													}
+												{hash && <Link
+													href={explorer() + hash}
 													target="_blank">
-													{' '}
 													<Text fontSize={'sm'}>
 														View on TronScan
 													</Text>
-												</Link>
+												</Link>}
 											</Box>
 										</Alert>
 									</Box>
