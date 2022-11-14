@@ -55,7 +55,6 @@ function RadioCard(props) {
 				// bgColor={props.isChecked ? '#E11860' : 'transparent'}
 				cursor="pointer"
 				borderWidth="1px"
-				borderRadius="md"
 				boxShadow="md"
 				_checked={{
 					bg: 'white',

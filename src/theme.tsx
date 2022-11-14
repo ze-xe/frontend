@@ -70,6 +70,33 @@ const theme = extendTheme({
       },
     }),
   },
+  components: {
+    Button: {
+      baseStyle: {
+        borderRadius: '0px'
+      }
+    },
+    Input: {
+      baseStyle: {
+        borderRadius: '0px'
+      }
+    },
+    NumberInput: {
+      baseStyle: {
+        borderRadius: '0px'
+      }
+    },
+    InputGroup: {
+      baseStyle: {
+        borderRadius: '0px'
+      }
+    },
+    InputLeftElement: {
+      baseStyle: {
+        borderRadius: '0px'
+      }
+    }
+  }
 })
 
 export default theme

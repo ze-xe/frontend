@@ -167,7 +167,6 @@ export default function BuyModule({ pair }) {
 					onChange={onPriceChange}
 					variant="filled"
 					border={'1px'}
-					borderRadius="6"
 					borderColor={'gray.700'}>
 					<NumberInputField />
 					<NumberInputStepper>
@@ -186,7 +185,6 @@ export default function BuyModule({ pair }) {
 					onChange={updateToken1Amount}
 					variant="filled"
 					border={'1px'}
-					borderRadius="6"
 					borderColor={'gray.700'}>
 					<NumberInputField />
 					<NumberInputStepper>
@@ -208,7 +206,6 @@ export default function BuyModule({ pair }) {
 					onChange={updateToken0Amount}
 					variant="filled"
 					border={'1px'}
-					borderRadius="6"
 					borderColor={'gray.700'}>
 					<NumberInputField />
 					<NumberInputStepper>

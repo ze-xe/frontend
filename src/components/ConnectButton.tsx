@@ -102,10 +102,10 @@ const ConnectButton = ({}) => {
 							{isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
 						</Flex>
 					</MenuButton>
-					<Fade in={isOpen}>
-						<MenuList
+					<Fade in={isOpen} >
+						<MenuList borderRadius={0}
 							style={{ zIndex: 100 }}
-							bgColor={'gray.50'}
+							bgColor={'gray.200'}
 							color={'gray.900'}
 							onMouseEnter={onOpen}
 							onMouseLeave={onClose}>
