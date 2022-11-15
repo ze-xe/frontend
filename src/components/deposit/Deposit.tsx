@@ -43,7 +43,7 @@ export default function Deposit() {
 	const handleMax = () => {
 		// set amount as token balance
 		let token = tokens[selectedToken];
-		let amount = Big(token.balance).div(10 ** token.decimals);
+		let amount = Big(token.balance ?? 0).div(10 ** token.decimals);
 		setAmount(amount);
 	};
 

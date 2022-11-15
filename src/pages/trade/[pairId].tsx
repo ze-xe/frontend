@@ -13,10 +13,13 @@ import { useEffect, useState } from 'react';
 import Exchange from '../../components/trade/Exchange';
 import { WalletContext } from '../../context/Wallet';
 import Head from 'next/head';
+import { useAccount } from 'wagmi';
 
 const Trade = () => {
 	const { pairs } = useContext(DataContext);
 	const { isConnected } = useContext(WalletContext);
+
+	const {isConnected: isEvmConnected} = useAccount();
 
 	const router = useRouter();
 	const { pairId } = router.query;
@@ -32,10 +35,6 @@ const Trade = () => {
 					pairId
 			)
 		);
-		// console.log(pair);
-		// if (!pair) {
-		// 	router.push('/trade')
-		// }
 	});
 
 	return (
@@ -75,7 +74,7 @@ const Trade = () => {
 						<OrdersPanel pair={pair} />
 					</Flex>
 				</Flex>
-				{isConnected && (
+				{(isConnected || isEvmConnected) && (
 					<Box bgColor={'gray.1100'} my={2} width="100%">
 						<PlacedOrders pair={pair} />
 					</Box>

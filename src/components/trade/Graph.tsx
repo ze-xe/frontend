@@ -17,7 +17,6 @@ const Graph = ({ pair }) => {
 
 	if (chart.current && pair) {
 		let exchangeData = pairData[pair?.id]?.exchangeRate ?? [];
-		console.log(exchangeData);
 		if(!Array.isArray(exchangeData)) {
 			exchangeData = []
 		}

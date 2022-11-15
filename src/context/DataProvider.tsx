@@ -131,6 +131,7 @@ function DataProvider({ children }: any) {
 				}
 
 				if(address) {
+					console.log('Fetching data...');
 					getWalletBalances(address, _tokens, chain);
 					fetchPlacedOrders(address, _pairs, chain)
 					fetchCancelledOrders(address, _pairs, chain)

@@ -71,9 +71,9 @@ export default function SellModal({
 				pair.tokens[0].id,
 				pair.tokens[1].id,
 				_amount,
-				'0',
+				pair.exchangeRate,
 				0,
-				orders.map((order) => '0x' + order.id),
+				orders.map((order) => order.id),
 			],
 			chain
 		)
