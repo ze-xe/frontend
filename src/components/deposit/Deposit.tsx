@@ -243,7 +243,7 @@ export default function Deposit() {
 					bgColor="gray.900"
 					my={4}
 					mt={6}
-					borderRadius={7}
+					// borderRadius={7}
 					justify="space-between"
 					align={'center'}>
 					<Flex align={'center'} gap={3}>

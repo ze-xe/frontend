@@ -22,5 +22,5 @@ export const ADDRESSES = {
 
 export const Endpoints = {
 	[ChainID.NILE]: 'https://api.zexe.io/',
-	[ChainID.AURORA]: 'http://localhost:6060/',
+	[ChainID.AURORA]: 'https://aurora.api.zexe.io/',
 };

@@ -115,7 +115,7 @@ const ConnectButton = ({}) => {
 				//     bgGradient="linear(to-r, #E11860, #CB1DC3)"
 				//     color="gray.100" size="sm" _hover={{ bg: 'gray.800' }} onClick={onOpen}>{(tronAddress)?.slice(0, 6) + "..." + (tronAddress)?.slice(-4)}</Button>
 				// </Box>
-				<Menu isOpen={isOpen}>
+				<Menu isOpen={isOpen} >
 					<MenuButton
 						bgColor={'primary'}
 						as={Button}
@@ -138,7 +138,8 @@ const ConnectButton = ({}) => {
 							bgColor={'gray.50'}
 							color={'gray.900'}
 							onMouseEnter={onOpen}
-							onMouseLeave={onClose}>
+							onMouseLeave={onClose}
+							borderRadius={0}>
 							<Box mx={'15px'} my={'15px'} minW="300px" width={'300px'}>
 								<Flex flexDir="column" align={'center'} gap={2} >
 									<Flex width={'100%'} justify={'start'} align='center' gap={2} px={6}>
@@ -217,11 +218,11 @@ const ConnectButton = ({}) => {
 				</Button>
 			)}
 
-			<Modal isCentered isOpen={isConnectOpen} onClose={onConnectClose}>
+			<Modal isCentered isOpen={isConnectOpen} onClose={onConnectClose} >
 				<ModalOverlay bg="blackAlpha.100" backdropFilter="blur(30px)" />
-				<ModalContent maxW={'29rem'} pt={0} pb={2} rounded={20}>
+				<ModalContent maxW={'29rem'} pt={0} pb={2} rounded={20} >
 					{/* <ModalCloseButton rounded={20} bgColor="gray.100" m={2}/> */}
-					<ModalBody>
+					<ModalBody >
 						<Text fontSize={'lg'} fontWeight="bold" mb={5} mt={1}>
 							Choose a network
 						</Text>
@@ -248,7 +249,7 @@ const ConnectButton = ({}) => {
 									/>
 								</Flex>
 							</Button>
-							<Button
+							{/* <Button
 								display={'flex'}
 								bgColor={'red'}
 								minW={'125px'}
@@ -261,7 +262,7 @@ const ConnectButton = ({}) => {
 									height={55}
 									alt="tronlogo"
 								/>
-							</Button>
+							</Button> */}
 							
 							<Button
 								bgColor={'black'}
@@ -275,12 +276,36 @@ const ConnectButton = ({}) => {
 									align="center"
 									justify={'center'}
 									gap={0}>
-									<Text color={'gray.100'} fontSize="xs">
+									<Text color={'gray.100'} fontSize="xs" mb={2}>
 										Coming Soon
 									</Text>
 									<Image
-										src="/BTT.png"
-										width={70}
+										src="/arb.ico"
+										// width={40}
+										height={70}
+										alt="tronlogo"
+									/>
+								</Flex>
+							</Button>
+
+							<Button
+								bgColor={'black'}
+								minW={'125px'}
+								height={'125px'}
+								rounded="20"
+								disabled
+								_hover={{ bg: 'gray.700' }}>
+								<Flex
+									flexDir={'column'}
+									align="center"
+									justify={'center'}
+									gap={0}>
+									<Text color={'gray.100'} fontSize="xs" mb={2}>
+										Coming Soon
+									</Text>
+									<Image
+										src="/eth.png"
+										// width={70}
 										height={70}
 										alt="tronlogo"
 									/>

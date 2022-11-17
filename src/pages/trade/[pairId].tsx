@@ -19,7 +19,7 @@ const Trade = () => {
 	const { pairs } = useContext(DataContext);
 	const { isConnected } = useContext(WalletContext);
 
-	const {isConnected: isEvmConnected} = useAccount();
+	const { isConnected: isEvmConnected } = useAccount();
 
 	const router = useRouter();
 	const { pairId } = router.query;
@@ -28,13 +28,15 @@ const Trade = () => {
 	// pairId = USD_ETH
 
 	useEffect(() => {
-		setPair(
-			pairs.find(
+		if (pairs.length > 0) {
+			let _pair = pairs.find(
 				(pair) =>
 					pair.tokens[0].symbol + '_' + pair.tokens[1].symbol ===
 					pairId
-			)
-		);
+			);
+			setPair(_pair);
+			if(!_pair) router.push('/trade/' + pairs[0].tokens[0].symbol + '_' + pairs[0].tokens[1].symbol)
+		}
 	});
 
 	return (
@@ -42,7 +44,8 @@ const Trade = () => {
 			<Head>
 				<title>
 					{pair?.exchangeRate / 10 ** pair?.exchangeRateDecimals}{' '}
-					{pair?.tokens[1].symbol}/{pair?.tokens[0].symbol} | ZEXE | Buy & Sell Crypto on TRON
+					{pair?.tokens[1].symbol}/{pair?.tokens[0].symbol} | ZEXE |
+					Buy & Sell Crypto on TRON
 				</title>
 				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
 			</Head>

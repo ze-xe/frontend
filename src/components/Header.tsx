@@ -81,7 +81,7 @@ export const Header = ({ title }: { title: string }) => {
 						})
 					}
 				} else if(!init) {
-					fetchData(null, ChainID.NILE);
+					fetchData(null, ChainID.AURORA);
 					setInit(true)
 				}
 			}
