@@ -220,7 +220,7 @@ const ConnectButton = ({}) => {
 
 			<Modal isCentered isOpen={isConnectOpen} onClose={onConnectClose} >
 				<ModalOverlay bg="blackAlpha.100" backdropFilter="blur(30px)" />
-				<ModalContent maxW={'29rem'} pt={0} pb={2} rounded={20} >
+				<ModalContent maxW={'38rem'} pt={0} pb={2} rounded={0} >
 					{/* <ModalCloseButton rounded={20} bgColor="gray.100" m={2}/> */}
 					<ModalBody >
 						<Text fontSize={'lg'} fontWeight="bold" mb={5} mt={1}>
@@ -249,7 +249,7 @@ const ConnectButton = ({}) => {
 									/>
 								</Flex>
 							</Button>
-							{/* <Button
+							<Button
 								display={'flex'}
 								bgColor={'red'}
 								minW={'125px'}
@@ -258,11 +258,11 @@ const ConnectButton = ({}) => {
 								onClick={_connectTron}>
 								<Image
 									src="/tron-outline.png"
-									width={55}
-									height={55}
+									width={70}
+									height={70}
 									alt="tronlogo"
 								/>
-							</Button> */}
+							</Button>
 							
 							<Button
 								bgColor={'black'}

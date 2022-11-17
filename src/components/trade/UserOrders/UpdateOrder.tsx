@@ -14,7 +14,7 @@ const Big = require('big.js');
 
 const MIN_T0_ORDER = '10000000000000000';
 import axios from 'axios';
-import { getABI, getAddress } from '../../../utils/contract';
+import { getABI, getAddress, getContract, send } from '../../../utils/contract';
 
 import {
 	Modal,
@@ -34,48 +34,51 @@ import { MdCancel, MdEdit } from 'react-icons/md';
 import { useEffect } from 'react';
 
 import {
-    Slider,
-    SliderTrack,
-    SliderFilledTrack,
-    SliderThumb,
-    SliderMark,
-  } from '@chakra-ui/react'
+	Slider,
+	SliderTrack,
+	SliderFilledTrack,
+	SliderThumb,
+	SliderMark,
+} from '@chakra-ui/react';
+import { ChainID } from '../../../utils/chains';
 
-export default function UpdateOrder({
-	pair,
-	token1,
-	token0,
-	price,
-    order
-}) {
+export default function UpdateOrder({ pair, token1, token0, price, order }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [loading, setLoading] = React.useState(false);
 	const [response, setResponse] = React.useState(null);
 	const [hash, setHash] = React.useState(null);
-    const [token0Amount, setToken0Amount] = React.useState('0');
-    const [maxAmount, setMaxAmount] = React.useState('0');
+	const [token0Amount, setToken0Amount] = React.useState('0');
+	const [maxAmount, setMaxAmount] = React.useState('0');
 	const [confirmed, setConfirmed] = React.useState(false);
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
-    const [sliderValue, setSliderValue] = React.useState(0);
+	const [sliderValue, setSliderValue] = React.useState(0);
 
-    useEffect(() => {
-		if(token0?.tradingBalance){
-			if(order.orderType == '0'){
-				setMaxAmount((token0.tradingBalance/(10**token0.decimals)).toString())
+	const { chain } = useContext(DataContext);
+
+	useEffect(() => {
+		if (token0?.tradingBalance) {
+			if (order.orderType == '0') {
+				setMaxAmount(
+					(token0.tradingBalance / 10 ** token0.decimals).toString()
+				);
 			} else {
-				setMaxAmount(((token1.tradingBalance/(order.exchangeRate/(10**pair.exchangeRateDecimals)))/(10**token1.decimals)).toString())
+				setMaxAmount(
+					(
+						token1.tradingBalance /
+						(order.exchangeRate / 10 ** pair.exchangeRateDecimals) /
+						10 ** token1.decimals
+					).toString()
+				);
 			}
 		}
-    })
+	});
 
 	const amountExceedsBalance = () => {
-		if (token0Amount == '0' || token0Amount == '' || !token1.tradingBalance) return false;
-		if (Number(token0Amount))
-			return Big(token0Amount).gt(
-				Big(maxAmount)
-			);
+		if (token0Amount == '0' || token0Amount == '' || !token1.tradingBalance)
+			return false;
+		if (Number(token0Amount)) return Big(token0Amount).gt(Big(maxAmount));
 	};
 
 	const amountExceedsMin = () => {
@@ -86,12 +89,12 @@ export default function UpdateOrder({
 			);
 	};
 
-    const changeSliderValue = (value) => {
-        setSliderValue(value)
-        setToken0Amount((value/100 * Number(maxAmount)).toString())
-    }
+	const changeSliderValue = (value) => {
+		setSliderValue(value);
+		setToken0Amount(((value / 100) * Number(maxAmount)).toString());
+	};
 
-	const update = () => {
+	const update = async () => {
 		setLoading(true);
 		setConfirmed(false);
 		setHash(null);
@@ -100,20 +103,30 @@ export default function UpdateOrder({
 			.times(10 ** token0.decimals)
 			.toFixed(0);
 
-		(window as any).tronWeb
-			.contract(getABI('Exchange'), getAddress('Exchange'))
-			.methods.updateLimitOrder(
-				'0x'+order.id,
-                _amount,
-			)
-			.send({
-				feeLimit: 1000000000,
-			})
-			.then((res: any) => {
-				setHash(res);
+		let exchange = await getContract('Exchange', chain);
+		send(
+			exchange,
+			'updateLimitOrder',
+			[(chain == ChainID.NILE ? '0x' : '') + order.id, _amount],
+			chain
+		)
+			.then(async (res: any) => {
 				setLoading(false);
-				checkResponse(res);
 				setResponse('Transaction sent! Waiting for confirmation...');
+				if (chain == ChainID.NILE) {
+					setHash(res);
+					checkResponse(res);
+				} else {
+					setHash(res.hash);
+					await res.wait(1);
+					setConfirmed(true);
+					setResponse('Transaction Successful!');
+				}
+			})
+			.catch((err: any) => {
+				setLoading(false);
+				setConfirmed(true);
+				setResponse('Transaction failed. Please try again!');
 			});
 	};
 
@@ -155,34 +168,61 @@ export default function UpdateOrder({
 	return (
 		<>
 			<IconButton
-                size={'sm'}
-                my={-2}
-                variant='ghost'
-                icon={<MdEdit />}
-                onClick={_onOpen}
-                aria-label={''}>
-			</IconButton>
-            
+				size={'sm'}
+				my={-2}
+				variant="ghost"
+				icon={<MdEdit />}
+				onClick={_onOpen}
+				aria-label={''}></IconButton>
+
 			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
 				<ModalOverlay />
 				<ModalContent bgColor={'gray.1000'}>
-					<ModalHeader>Review {order.orderType == '0'? 'SELL' : 'BUY'}</ModalHeader>
+					<ModalHeader>
+						Review {order.orderType == '0' ? 'SELL' : 'BUY'}
+					</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-                        <Text mb={2}>Exchange Rate {order.exchangeRate/(10**pair?.exchangeRateDecimals)} {token1?.symbol}/{token0?.symbol}</Text>
-                        <Text fontSize={'sm'} mb={1} color='gray'>Previous Amount</Text>
-						<Input disabled value={(order.amount/(10**token0?.decimals)) + ' ' + token0?.symbol} />
-                        <Text fontSize={'sm'} my={1} color='gray'>New Amount</Text>
-						<Input placeholder='Enter Amount' value={token0Amount} onChange={(e) => setToken0Amount(e.target.value)}/>
-                        <Slider aria-label='slider-ex-1' value={sliderValue} onChange={changeSliderValue}>
-                            <SliderTrack>
-                                <SliderFilledTrack bgColor={'orange'} />
-                            </SliderTrack>
-                            <SliderThumb />
-                        </Slider>
+						<Text mb={2}>
+							Exchange Rate{' '}
+							{order.exchangeRate /
+								10 ** pair?.exchangeRateDecimals}{' '}
+							{token1?.symbol}/{token0?.symbol}
+						</Text>
+						<Text fontSize={'sm'} mb={1} color="gray">
+							Previous Amount
+						</Text>
+						<Input
+							disabled
+							value={
+								order.amount / 10 ** token0?.decimals +
+								' ' +
+								token0?.symbol
+							}
+						/>
+						<Text fontSize={'sm'} my={1} color="gray">
+							New Amount
+						</Text>
+						<Input
+							placeholder="Enter Amount"
+							value={token0Amount}
+							onChange={(e) => setToken0Amount(e.target.value)}
+						/>
+						<Slider
+							aria-label="slider-ex-1"
+							value={sliderValue}
+							onChange={changeSliderValue}>
+							<SliderTrack>
+								<SliderFilledTrack bgColor={'orange'} />
+							</SliderTrack>
+							<SliderThumb />
+						</Slider>
 						<Text mt={4}>
-							Estimated Output: {Number(token0Amount)*order.exchangeRate/(10**pair.exchangeRateDecimals)} {token1?.symbol}
+							Estimated Output:{' '}
+							{(Number(token0Amount) * order.exchangeRate) /
+								10 ** pair.exchangeRateDecimals}{' '}
+							{token1?.symbol}
 						</Text>
 					</ModalBody>
 
@@ -235,8 +275,19 @@ export default function UpdateOrder({
 										onClick={update}
 										loadingText="Sign the transaction in your wallet"
 										isLoading={loading}
-                                        disabled={amountExceedsBalance() || !Number(token0Amount) || token0Amount == '0' || amountExceedsMin()}>
-										{amountExceedsMin() ? 'Amount is too less' : amountExceedsBalance() ? 'Insufficient Balance' : token0Amount == '0' ? 'Enter Amount' : 'Confirm Update'}
+										disabled={
+											amountExceedsBalance() ||
+											!Number(token0Amount) ||
+											token0Amount == '0' ||
+											amountExceedsMin()
+										}>
+										{amountExceedsMin()
+											? 'Amount is too less'
+											: amountExceedsBalance()
+											? 'Insufficient Balance'
+											: token0Amount == '0'
+											? 'Enter Amount'
+											: 'Confirm Update'}
 									</Button>
 									<Button onClick={onClose} mt={2}>
 										Back

@@ -94,7 +94,7 @@ export default function BuyModal({
 				_amount,
 				(Number(price) * 10 ** pair.exchangeRateDecimals).toFixed(0),
 				1,
-				orders.map((o) => o.id),
+				orders.map((o) => (chain == ChainID.NILE ? '0x' : '') + o.id),
 			],
 			chain
 		)

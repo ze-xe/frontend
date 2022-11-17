@@ -73,7 +73,7 @@ export default function SellModal({
 				_amount,
 				pair.exchangeRate,
 				0,
-				orders.map((order) => order.id),
+				orders.map((o) => (chain == ChainID.NILE ? '0x' : '') + o.id),
 			],
 			chain
 		)

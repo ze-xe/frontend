@@ -91,7 +91,7 @@ export default function BuyModal({
 				_amount,
 				Number.MAX_SAFE_INTEGER.toString(),
 				1,
-				orders.map((o) => o.id),
+				orders.map((o) => (chain == ChainID.NILE ? '0x' : '') + o.id),
 			],
 			chain
 		)

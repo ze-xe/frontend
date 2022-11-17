@@ -14,7 +14,7 @@ const Big = require('big.js');
 
 const MIN_T0_ORDER = '10000000000000000';
 import axios from 'axios';
-import { getABI, getAddress } from '../../../utils/contract';
+import { getABI, getAddress, getContract, send } from '../../../utils/contract';
 
 import {
 	Modal,
@@ -32,6 +32,7 @@ import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
 import { MdCancel, MdEdit } from 'react-icons/md';
 import { useEffect } from 'react';
+import { ChainID } from '../../../utils/chains';
 
 import {
     Slider,
@@ -53,29 +54,42 @@ export default function CancelOrder({
 	const [response, setResponse] = React.useState(null);
 	const [hash, setHash] = React.useState(null);
 	const [confirmed, setConfirmed] = React.useState(false);
+	const { chain } = useContext(DataContext);
 
-
-	const update = () => {
+	const update = async () => {
 		setLoading(true);
 		setConfirmed(false);
 		setHash(null);
 		setResponse('');
 
-		(window as any).tronWeb
-			.contract(getABI('Exchange'), getAddress('Exchange'))
-			.methods.updateLimitOrder(
-				'0x'+order.id,
+		let exchange = await getContract('Exchange', chain);
+		send(
+			exchange,
+			'updateLimitOrder',
+			[
+				(chain == ChainID.NILE ? '0x' : '') + order.id,
                 '0',
-			)
-			.send({
-				feeLimit: 1000000000,
-			})
-			.then((res: any) => {
+			],
+			chain
+		)
+		.then(async (res: any) => {
+			setLoading(false);
+			setResponse('Transaction sent! Waiting for confirmation...');
+			if (chain == ChainID.NILE) {
 				setHash(res);
-				setLoading(false);
 				checkResponse(res);
-				setResponse('Transaction sent! Waiting for confirmation...');
-			});
+			} else {
+				setHash(res.hash);
+				await res.wait(1);
+				setConfirmed(true);
+				setResponse('Transaction Successful!');
+			}
+		})
+		.catch((err: any) => {
+			setLoading(false);
+			setConfirmed(true);
+			setResponse('Transaction failed. Please try again!');
+		});
 	};
 
 	// // check response in intervals

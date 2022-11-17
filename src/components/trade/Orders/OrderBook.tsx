@@ -23,13 +23,13 @@ const Order = ({ order, index, total, pair, orderType }) => {
 			px={4}
 			_hover={{ bgColor: 'gray.800' }}>
 			<Text fontSize={'xs'}>
-				{tokenFormatter(null).format(order.amount/(10**pair.tokens[0].decimals))}
+				{tokenFormatter(null).format(order.amount/(10**pair?.tokens[0].decimals))}
 			</Text>
 			<Text fontSize={'xs'}>
-				{tokenFormatter(null).format((order.amount/(10**(pair.tokens[0].decimals)))*(order.exchangeRate/(10**pair.exchangeRateDecimals)))}
+				{tokenFormatter(null).format((order.amount/(10**(pair?.tokens[0].decimals)))*(order.exchangeRate/(10**pair?.exchangeRateDecimals)))}
 			</Text>
 			<Text fontSize="xs" fontWeight={'bold'}>
-				{tokenFormatter(pair.exchangeRateDecimals).format(order.exchangeRate/(10**pair.exchangeRateDecimals))} 
+				{tokenFormatter(pair?.exchangeRateDecimals).format(order.exchangeRate/(10**pair?.exchangeRateDecimals))} 
 			</Text>
 		</Flex>
 	);

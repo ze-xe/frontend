@@ -106,7 +106,7 @@ function DataProvider({ children }: any) {
 		})
 	}
 
-	const fetchData = async (address: string|null, chain: ChainID, firstTime = true, _tokens=tokens, _pairs=pairs) => {
+	const fetchData = async (address: string|null, chain: ChainID, loop = true, firstTime = true, _tokens=tokens, _pairs=pairs) => {
 		setIsFetchingData(firstTime);
 		setDataFetchError(null);
 		try {
@@ -140,7 +140,7 @@ function DataProvider({ children }: any) {
 				}
 				fetchOrders(_pairs, chain)
 				fetchExecutedPairData(_pairs, chain);
-				setTimeout(() => fetchData(address, chain, false, _tokens, _pairs), 8000);
+				if(loop) setTimeout(() => fetchData(address, chain, loop, false, _tokens, _pairs), 8000);
 			})
 		} catch (error) {
 			setDataFetchError(error.message);
@@ -287,7 +287,7 @@ interface DataValue {
 	tokenFormatter: any;
 	isFetchingData: boolean;
 	orders: any;
-	fetchData: (address :string, chainId: ChainID) => void;
+	fetchData: (address :string, chainId: ChainID, loop?: boolean) => void;
 	placedOrders: any,
 	pairExecutedData: any,
 	cancelledOrders: any,

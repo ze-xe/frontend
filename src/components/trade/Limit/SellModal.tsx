@@ -74,7 +74,7 @@ export default function SellModal({
 				_amount,
 				(Number(price) * 10 ** pair.exchangeRateDecimals).toFixed(0),
 				0,
-				orders.map((order) => order.id),
+				orders.map((o) => (chain == ChainID.NILE ? '0x' : '') + o.id),
 			],
 			chain
 		)
