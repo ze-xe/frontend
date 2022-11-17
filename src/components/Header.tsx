@@ -67,7 +67,7 @@ export const Header = ({ title }: { title: string }) => {
 						connect((_address: string | null, _err: string) => {
 							if (!isDataReady && !isFetchingData && _address) {
 								fetchData(_address, ChainID.NILE);
-								setChain(ChainID.NILE);
+								setChain(ChainID.NILE); 
 							}
 						});
 					} else {
