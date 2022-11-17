@@ -6,7 +6,7 @@ import LimitOrder from './Limit/index';
 import MarketOrder from './Market';
 
 const Exchange = ({pair}) => {
-	return <Box bgColor={"gray.1100"}>
+	return <Box bgColor={"background2"}>
 			<Tabs
 				variant="line"
 				size={'sm'}

@@ -57,7 +57,7 @@ const Trade = () => {
 					mt={2}>
 					<Box
 						order={{ sm: 1, md: 0 }}
-						bgColor={'gray.1100'}
+						bgColor={'background2'}
 						width={{ sm: '100%', md: '20%', lg: '20%', xl: '15%' }}
 						mb={{ sm: '2', md: 2, lg: 0 }}>
 						<TokensPanel />
@@ -78,7 +78,7 @@ const Trade = () => {
 					</Flex>
 				</Flex>
 				{(isConnected || isEvmConnected) && (
-					<Box bgColor={'gray.1100'} my={2} width="100%">
+					<Box bgColor={'background2'} my={2} width="100%">
 						<PlacedOrders pair={pair} />
 					</Box>
 				)}

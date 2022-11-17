@@ -107,7 +107,7 @@ export const Header = ({ title }: { title: string }) => {
 				justifyContent="space-between"
 				align="center"
 				// bgClip="text"
-				bgColor={'gray.1100'}
+				bgColor={'background2'}
 				// color={"white"}
 				py={1}
 				px={6}>

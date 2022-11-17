@@ -39,7 +39,7 @@ export default function CancelledOrders({ pair }) {
 	const { cancelledOrders } = useContext(DataContext);
 	
 	return (
-		<Box bgColor="gray.1100">
+		<Box bgColor="background2">
 			{cancelledOrders[pair?.id]?.length > 0 ? <TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>

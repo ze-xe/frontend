@@ -56,7 +56,9 @@ const theme = extendTheme({
     // red: '#D82626',
     green2: '#18B05F',
     red2: '#C83232',
-    primary: '#F60DC9'
+    primary: '#F60DC9',
+    background1: '#09001F',
+    background2: '#130B25',
   },
   fonts,
   breakpoints,
@@ -65,7 +67,7 @@ const theme = extendTheme({
       body: {
         fontFamily: 'body',
         color: mode('gray.800', 'whiteAlpha.900')(props),
-        bg: mode('white', 'black')(props),
+        bg: mode('white', '#09001F')(props),
         lineHeight: 'base',
       },
     }),

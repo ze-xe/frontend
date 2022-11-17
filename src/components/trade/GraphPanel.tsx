@@ -9,7 +9,7 @@ const Graph = dynamic(() => import("./Graph"), {
 export default function GraphPanel({pair}) {
   return (
     <>
-    <Flex flexDir={"column"} justify="center" bgColor="gray.800" my={2} zIndex={-1}>
+    <Flex flexDir={"column"} justify="center" bgColor="background2" my={2} zIndex={-1}>
         <Graph pair={pair}/>
     </Flex>
     </>

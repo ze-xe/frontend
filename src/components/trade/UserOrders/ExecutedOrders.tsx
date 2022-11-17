@@ -25,7 +25,7 @@ export default function ExecutedOrders({ pair }) {
 	const { orderHistory } = useContext(DataContext);
 	
 	return (
-		<Box bgColor="gray.1100">
+		<Box bgColor="background2">
 			{orderHistory[pair?.id]?.length ? <TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>

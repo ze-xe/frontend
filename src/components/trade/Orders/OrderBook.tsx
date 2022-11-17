@@ -14,7 +14,7 @@ const Order = ({ order, index, total, pair, orderType }) => {
 			justify="space-between"
 			color={orderType == 'BUY' ? 'green2' : 'red2'}
 			// bgSize={(order.amount / total) * 100 + '% auto'}
-			bgColor="gray.1100"
+			bgColor="background2"
 			width="100%"
 			rounded={2}
 			my={0.5}

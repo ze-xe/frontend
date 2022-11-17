@@ -33,7 +33,7 @@ const Graph = ({ pair }) => {
 			width: chartContainerRef.current.clientWidth,
 			height: 500, //"300px", //chartContainerRef.current.clientHeight,
 			layout: {
-				backgroundColor: '#161616',
+				backgroundColor: '#09001F',
 				textColor: 'rgba(255, 255, 255, 0.9)',
 			},
 			grid: {

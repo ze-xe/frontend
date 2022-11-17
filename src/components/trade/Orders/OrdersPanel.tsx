@@ -7,7 +7,7 @@ export default function OrdersPanel({ pair }) {
 
 	return (
 		<>
-		<Box display={{sm: 'block', md: 'block', lg: 'block', xl: 'none'}} bgColor={'gray.1100'} width={{sm: '100%', md: '100%', lg: '100%', xl: '0'}} height={{sm: '100%', md: '100%', lg: '100%', xl: '0'}}>
+		<Box display={{sm: 'block', md: 'block', lg: 'block', xl: 'none'}} bgColor={'background2'} width={{sm: '100%', md: '100%', lg: '100%', xl: '0'}} height={{sm: '100%', md: '100%', lg: '100%', xl: '0'}}>
 			<Tabs 
 			
 				align="start"
@@ -32,11 +32,11 @@ export default function OrdersPanel({ pair }) {
 
 		</Box>
 		<Box display={{sm: 'none', md: 'none', lg: 'none', xl: 'flex'}} width={'100%'} gap={2} height={'100%'}>
-			<Box width={'50%'} bgColor={'gray.1100'}>
+			<Box width={'50%'} bgColor={'background2'}>
 			<OrderBook pair={pair} />
 
 			</Box>
-			<Box width={'50%'} px={2} bgColor={'gray.1100'}>
+			<Box width={'50%'} px={2} bgColor={'background2'}>
 				{/* <Text fontSize={'xs'} py={1} bgColor={'gray.900'} mx={-2} px={2} color={'gray.400'}>Order History</Text> */}
 
 			<OrderHistory pair={pair} />
