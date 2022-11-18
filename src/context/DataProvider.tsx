@@ -71,7 +71,7 @@ function DataProvider({ children }: any) {
 
 
 	const explorer = () => {
-		return chain === ChainID.NILE ? 'https://nile.tronscan.org/#/transaction/' : chainMapping[chain]?.blockExplorers.default.url+'tx/';
+		return chain === ChainID.NILE ? 'https://nile.explorer.org/#/transaction/' : chainMapping[chain]?.blockExplorers.default.url+'tx/';
 	}
 
 	const getWalletBalances = async (address: string, _tokens = tokens, chain: number) => {

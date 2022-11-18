@@ -317,7 +317,7 @@ export default function SellModal({
 													href={explorer() + hash}
 													target="_blank">
 													<Text fontSize={'sm'}>
-														View on TronScan
+														View on explorer
 													</Text>
 												</Link>
 											</Box>

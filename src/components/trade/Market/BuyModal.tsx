@@ -322,7 +322,7 @@ export default function BuyModal({
 													}
 													target="_blank">
 													<Text fontSize={'sm'}>
-														View on TronScan
+														View on explorer
 													</Text>
 												</Link>}
 											</Box>
