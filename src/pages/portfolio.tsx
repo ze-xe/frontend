@@ -80,7 +80,7 @@ export default function wallet() {
 				{(isConnected || isEvmConnected) ? (
 					<Box mt={2} width="100%" maxW="1400px">
 						<Flex
-							bgColor={'gray.1100'}
+							bgColor={'background2'}
 							align="start"
 							p={4}
 							pt={10}
@@ -126,7 +126,7 @@ export default function wallet() {
 					</Box> */}
 						</Flex>
 
-						<Box bgColor={'gray.1100'} mt={2}>
+						<Box bgColor={'background2'} mt={2}>
 							{/* <Text p={5} fontSize='lg' fontWeight={'bold'}>Trading Balance</Text> */}
 							<TableContainer>
 								<Table variant="simple">

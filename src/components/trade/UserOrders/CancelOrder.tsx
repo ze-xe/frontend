@@ -54,7 +54,7 @@ export default function CancelOrder({
 	const [response, setResponse] = React.useState(null);
 	const [hash, setHash] = React.useState(null);
 	const [confirmed, setConfirmed] = React.useState(false);
-	const { chain } = useContext(DataContext);
+	const { chain, explorer } = useContext(DataContext);
 
 	const update = async () => {
 		setLoading(true);
@@ -177,7 +177,7 @@ export default function CancelOrder({
 												</Text>
 												<Link
 													href={
-														'https://nile.tronscan.org/#/transaction/' +
+														explorer() +
 														hash
 													}
 													target="_blank">

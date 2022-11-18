@@ -55,7 +55,7 @@ export default function UpdateOrder({ pair, token1, token0, price, order }) {
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 	const [sliderValue, setSliderValue] = React.useState(0);
 
-	const { chain } = useContext(DataContext);
+	const { chain, explorer } = useContext(DataContext);
 
 	useEffect(() => {
 		if (token0?.tradingBalance) {
@@ -250,7 +250,7 @@ export default function UpdateOrder({ pair, token1, token0, price, order }) {
 												</Text>
 												<Link
 													href={
-														'https://nile.tronscan.org/#/transaction/' +
+														explorer() +
 														hash
 													}
 													target="_blank">

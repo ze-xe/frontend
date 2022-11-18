@@ -7,7 +7,7 @@ import { tokenFormatter } from '../../utils/formatters';
 import Link from 'next/link';
 
 export default function Recent({ type }) {
-	const { userDepositWithdraws, tokens } = useContext(DataContext);
+	const { userDepositWithdraws, tokens, explorer } = useContext(DataContext);
 
 	return (
 		<>
@@ -60,7 +60,7 @@ export default function Recent({ type }) {
 
 							<Link
 								href={
-									'https://nile.tronscan.org/#/transaction/' +
+									explorer() +
 									item.txnId
 								}
 								target="_blank">

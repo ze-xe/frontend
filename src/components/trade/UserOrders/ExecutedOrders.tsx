@@ -76,7 +76,7 @@ export default function ExecutedOrders({ pair }) {
 				</Table>
 			</TableContainer>
 			:
-			<Box>
+			<Box mx={4}>
 				<Text color={'gray'}>No executed orders</Text>
 			</Box>
 			}

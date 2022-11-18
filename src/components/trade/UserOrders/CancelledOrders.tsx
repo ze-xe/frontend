@@ -90,7 +90,7 @@ export default function CancelledOrders({ pair }) {
 				</Table>
 			</TableContainer>:
 			
-			<Box>
+			<Box mx={4}>
 				<Text color={'gray'}>No cancelled orders</Text>
 			</Box>
 			}

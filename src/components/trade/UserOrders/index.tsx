@@ -15,13 +15,13 @@ export default function index({pair}) {
   </TabList>
 
   <TabPanels>
-    <TabPanel>
+    <TabPanel mx={-4}>
       <PlacedOrders pair={pair}/>
     </TabPanel>
-    <TabPanel>
+    <TabPanel mx={-4}>
       <ExecutedOrders pair={pair}/>
     </TabPanel>
-    <TabPanel>
+    <TabPanel mx={-4}>
       <CancelledOrders pair={pair}/>
     </TabPanel>
   </TabPanels>

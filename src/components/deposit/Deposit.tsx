@@ -240,7 +240,7 @@ export default function Deposit() {
 
 				<Flex
 					p={2}
-					bgColor="gray.900"
+					bgColor="background1"
 					my={4}
 					mt={6}
 					// borderRadius={7}

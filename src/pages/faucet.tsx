@@ -166,7 +166,7 @@ export default function faucets() {
 				my={2}
 				px={4}
 				py={4}
-				bgColor="gray.1000"
+				bgColor="background2"
 				// width={'70%'}
 				// maxW="1400px"
 			>

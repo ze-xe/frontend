@@ -16,13 +16,13 @@ export default function deposit() {
 			</Head>
 		<Flex justify={'center'}>
 			<Flex mt={2} flex="stretch" gap={2} width="100%" maxW="1400px">
-				<Box bgColor="gray.1100" width={'30%'} p={4}>
+				<Box bgColor="background2" width={'30%'} p={4}>
 					<WalletBalance />
 				</Box>
-				<Box bgColor="gray.1100" width={'50%'} p={4}>
+				<Box bgColor="background2" width={'50%'} p={4}>
 					<Deposit />
 				</Box>
-				<Box bgColor="gray.1100" width={'20%'} p={4}>
+				<Box bgColor="background2" width={'20%'} p={4}>
 					<Recent type={'deposits'} />
 				</Box>
 			</Flex>

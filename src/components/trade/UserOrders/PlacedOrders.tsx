@@ -110,7 +110,7 @@ export default function PlacedOrders({ pair }) {
 					</Tbody>
 				</Table>
 			</TableContainer>:
-			<Box>
+			<Box mx={4}>
 				<Text color={'gray'}>No orders placed</Text>
 			</Box>
 			}

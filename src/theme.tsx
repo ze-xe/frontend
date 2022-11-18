@@ -57,7 +57,7 @@ const theme = extendTheme({
     green2: '#18B05F',
     red2: '#C83232',
     primary: '#F60DC9',
-    background1: '#09001F',
+    background1: '#0E0020',
     background2: '#130B25',
   },
   fonts,
@@ -67,7 +67,7 @@ const theme = extendTheme({
       body: {
         fontFamily: 'body',
         color: mode('gray.800', 'whiteAlpha.900')(props),
-        bg: mode('white', '#09001F')(props),
+        bg: mode('white', '#0E0020')(props),
         lineHeight: 'base',
       },
     }),

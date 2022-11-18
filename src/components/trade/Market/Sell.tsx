@@ -23,6 +23,7 @@ import axios from 'axios';
 import { getABI, getAddress } from '../../../utils/contract';
 import SellModal from './SellModal';
 import { tokenFormatter } from '../../../utils/formatters';
+import { AppDataContext } from '../../../context/AppData';
 const Big = require('big.js');
 
 const MIN_T0_ORDER = '10000000000000000';
@@ -34,7 +35,6 @@ export default function BuyModule({ pair }) {
 	const [loading, setLoading] = React.useState(false);
 	const [response, setResponse] = React.useState(null);
 
-	const [price, setPrice] = React.useState('0');
 	const [sliderValue, setSliderValue] = React.useState(NaN);
 
 	const [token0, setToken0] = React.useState(null);
@@ -42,6 +42,7 @@ export default function BuyModule({ pair }) {
 
 	const { tokens } = useContext(DataContext);
 
+	const {exchangeRate: price, setExchangeRate: setPrice} = useContext(AppDataContext);
 
 	useEffect(() => {
 		const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);

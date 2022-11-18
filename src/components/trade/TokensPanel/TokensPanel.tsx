@@ -24,7 +24,7 @@ export default function TokensPanel() {
             </Box>
             <Divider my={3}/>
 			<Box mt={4} >
-			<Input size={'md'} fontSize='sm' placeholder="Search token" mb={0} borderRadius={0} variant={'outlined'} onChange={(e) => setSearch(e.target.value)} bgColor='gray.900'></Input>
+			<Input size={'md'} fontSize='sm' placeholder="Search market" mb={0} borderRadius={0} variant={'outlined'} onChange={(e) => setSearch(e.target.value)} bgColor='whiteAlpha.200'></Input>
 			</Box>
 			<Tabs
                 mt={3}

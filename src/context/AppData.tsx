@@ -5,11 +5,11 @@ const { Big } = require('big.js');
 const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
 
 function AppDataProvider({ children }: any) {
-	const [activePair, setActivePair] = React.useState<any>({});
+	const [exchangeRate, setExchangeRate] = React.useState<any>('0');
 
 	const value: AppDataValue = {
-		activePair,
-        setActivePair,
+		exchangeRate,
+        setExchangeRate,
 	};
 
 	return (
@@ -20,8 +20,8 @@ function AppDataProvider({ children }: any) {
 }
 
 interface AppDataValue {
-	activePair: any;
-    setActivePair: React.Dispatch<React.SetStateAction<any>>;
+	exchangeRate: any;
+    setExchangeRate: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export { AppDataProvider, AppDataContext };

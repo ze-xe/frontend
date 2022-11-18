@@ -5,33 +5,35 @@ import { useContext } from 'react';
 import { DataContext } from '../../../context/DataProvider';
 import {useEffect, useState} from 'react';
 import { tokenFormatter } from '../../../utils/formatters';
+import { AppDataContext } from '../../../context/AppData';
 
 const Order = ({ order, index, total, pair, orderType }) => {
+	const {setExchangeRate} = useContext(AppDataContext);
 
 	return (
-		<Flex
-			key={index}
-			justify="space-between"
-			color={orderType == 'BUY' ? 'green2' : 'red2'}
-			// bgSize={(order.amount / total) * 100 + '% auto'}
-			bgColor="background2"
-			width="100%"
-			rounded={2}
-			my={0.5}
-			py={'1px'}
-			textAlign="right"
-			px={4}
-			_hover={{ bgColor: 'gray.800' }}>
-			<Text fontSize={'xs'}>
-				{tokenFormatter(null).format(order.amount/(10**pair?.tokens[0].decimals))}
-			</Text>
-			<Text fontSize={'xs'}>
-				{tokenFormatter(null).format((order.amount/(10**(pair?.tokens[0].decimals)))*(order.exchangeRate/(10**pair?.exchangeRateDecimals)))}
-			</Text>
-			<Text fontSize="xs" fontWeight={'bold'}>
-				{tokenFormatter(pair?.exchangeRateDecimals).format(order.exchangeRate/(10**pair?.exchangeRateDecimals))} 
-			</Text>
-		</Flex>
+		<Box onClick={() => setExchangeRate(order.exchangeRate/(10**pair?.exchangeRateDecimals))} _hover={{ cursor: 'pointer' }}>
+			<Flex
+				key={index}
+				justify="space-between"
+				color={orderType == 'BUY' ? 'green2' : 'red2'}
+				py={'3px'}
+				px={4}
+				_hover={{ bgColor: orderType == 'BUY' ? 'rgba(24, 176, 95, 20%)' : 'rgba(200, 50, 50, 20%)' }}
+				bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 40%), rgba(24, 176, 95, 30%))' : 'rgba(200, 50, 50, 40%), rgba(200, 50, 50, 30%))')}
+				bgSize={100*order.amount/total + '%'}
+				bgRepeat='no-repeat'
+				>
+				<Text fontSize={'xs'}>
+					{tokenFormatter(null).format(order.amount/(10**pair?.tokens[0].decimals))}
+				</Text>
+				<Text fontSize={'xs'}>
+					{tokenFormatter(null).format((order.amount/(10**(pair?.tokens[0].decimals)))*(order.exchangeRate/(10**pair?.exchangeRateDecimals)))}
+				</Text>
+				<Text fontSize="xs" fontWeight={'bold'}>
+					{tokenFormatter(pair?.exchangeRateDecimals).format(order.exchangeRate/(10**pair?.exchangeRateDecimals))} 
+				</Text>
+			</Flex>
+		</Box>
 	);
 };
 
@@ -42,21 +44,21 @@ export default function OrderBook({ pair }) {
 	const [totalBuy, setTotalBuy] = useState(0);
 	const [totalSell, setTotalSell] = useState(0);
 
-	// const totalSell = orders.sellOrders.reduce((acc, order) => acc + order.amount, 0);
-	// const totalBuy = orders.buyOrders.reduce((acc, order) => acc + order.amount, 0);
 
 	useEffect(() => {
 		if(orders[pair?.id]){
 			setBuyOrders(orders[pair.id].buyOrders);
 			setSellOrders(orders[pair.id].sellOrders);
-			setTotalBuy(orders[pair.id].totalBuy);
-			setTotalSell(orders[pair.id].totalSell);
+			// calculate total buy
+			setTotalBuy(orders[pair.id].buyOrders.reduce((acc: any, order: any) => acc + order.amount, 0));
+			// calculate total sell
+			setTotalSell(orders[pair.id].sellOrders.reduce((acc: any, order: any) => acc + order.amount, 0));
 		}
 	})
 
 	return (
 		<Flex flexDir={'column'}>
-			<Flex justify={'space-between'} px={4} py={1} mb={1} mt={0} bgColor='gray.900' gap={2}>
+			<Flex justify={'space-between'} px={4} py={1} mb={1} mt={0} gap={2}>
 				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[0].symbol} </Text>
 				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize={'xs'} fontWeight='bold'>Price {pair?.tokens[1].symbol}</Text>
