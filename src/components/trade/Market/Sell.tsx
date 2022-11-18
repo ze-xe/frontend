@@ -166,7 +166,7 @@ export default function BuyModule({ pair }) {
 					isDisabled
 					min={0}
 					precision={pair?.exchangeRateDecimals}
-					value={price}
+					value={'Place order at market price'}
 					onChange={onPriceChange}
 					variant="filled"
 					border={'1px'}
@@ -180,7 +180,7 @@ export default function BuyModule({ pair }) {
 				</NumberInput>
 			</Flex>
 
-			<Flex flexDir={'column'} gap={1}>
+			{/* <Flex flexDir={'column'} gap={1}>
 				<Text fontSize={'sm'}>Amount ({pair?.tokens[1].symbol})</Text>
 				<NumberInput
 					min={0}
@@ -197,7 +197,7 @@ export default function BuyModule({ pair }) {
 						<NumberDecrementStepper />
 					</NumberInputStepper>
 				</NumberInput>
-			</Flex>
+			</Flex> */}
 
 			<Flex flexDir={'column'} gap={1}>
 				<Flex justify={'space-between'}>
