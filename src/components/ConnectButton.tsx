@@ -220,7 +220,7 @@ const ConnectButton = ({}) => {
 
 			<Modal isCentered isOpen={isConnectOpen} onClose={onConnectClose} >
 				<ModalOverlay bg="blackAlpha.100" backdropFilter="blur(30px)" />
-				<ModalContent maxW={'38rem'} pt={0} pb={2} rounded={0} >
+				<ModalContent maxW={'300px'} pt={0} pb={2} rounded={0} >
 					{/* <ModalCloseButton rounded={20} bgColor="gray.100" m={2}/> */}
 					<ModalBody >
 						<Text fontSize={'lg'} fontWeight="bold" mb={5} mt={1}>
@@ -229,27 +229,33 @@ const ConnectButton = ({}) => {
 						<Flex gap={5}>
 						<Button
 								bgColor={'black'}
-								minW={'125px'}
+								// minW={'0px'}
 								height={'125px'}
 								rounded="20"
 								// disabled
 								_hover={{ bg: 'gray.800' }}
 								onClick={() => _connectEvm(0)}
+								px={8}
 								>
 								<Flex
-									flexDir={'column'}
+									flexDir={'row'}
 									align="center"
 									justify={'center'}
-									gap={0}>
+									gap={5}>
 									<Image
 										src="/aurora.png"
 										width={70}
 										height={70}
 										alt="tronlogo"
 									/>
+									<Box>
+									<Text mb={1} fontSize='lg'>Aurora Testnet</Text>
+									<Text fontSize={'sm'}>{ChainID.AURORA}</Text>
+									</Box>
+
 								</Flex>
 							</Button>
-							<Button
+							{/* <Button
 								display={'flex'}
 								bgColor={'red'}
 								minW={'125px'}
@@ -262,8 +268,8 @@ const ConnectButton = ({}) => {
 									height={70}
 									alt="tronlogo"
 								/>
-							</Button>
-							
+							</Button> */}
+{/* 							
 							<Button
 								bgColor={'black'}
 								minW={'125px'}
@@ -280,15 +286,15 @@ const ConnectButton = ({}) => {
 										Coming Soon
 									</Text>
 									<Image
-										src="/arb.ico"
+										src="/near.ico"
 										// width={40}
 										height={70}
 										alt="tronlogo"
 									/>
 								</Flex>
-							</Button>
+							</Button> */}
 
-							<Button
+							{/* <Button
 								bgColor={'black'}
 								minW={'125px'}
 								height={'125px'}
@@ -310,7 +316,7 @@ const ConnectButton = ({}) => {
 										alt="tronlogo"
 									/>
 								</Flex>
-							</Button>
+							</Button> */}
 						</Flex>
 					</ModalBody>
 				</ModalContent>
