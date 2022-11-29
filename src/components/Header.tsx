@@ -40,13 +40,13 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useAccount, useConnect } from 'wagmi';
-import { ChainID, chainIndex } from '../utils/chains';
+import { ChainID, chainIndex, chains } from '../utils/chains';
 
 export const Header = ({ title }: { title: string }) => {
 	const router = useRouter();
 	const { isOpen, onToggle } = useDisclosure();
 
-	const { connectionError, connect, isConnected, isConnecting, tronWeb } =
+	const { connectionError, connect, isConnected, isConnecting, setConnectionError } =
 		useContext(WalletContext);
 	const { isFetchingData, isDataReady, fetchData, setChain } = useContext(DataContext);
 	const [init, setInit] = useState(false);
@@ -59,7 +59,7 @@ export const Header = ({ title }: { title: string }) => {
 			localStorage.setItem('chakra-ui-color-mode', 'dark');
 		}
 		if (typeof window !== 'undefined') {
-			if (!isConnected && !isConnecting && !isEvmConnected && !isEvmConnecting) {
+			if (!isConnected && !isConnecting && !isEvmConnected && !isEvmConnecting && !init) {
 				const _address = localStorage.getItem('address');
 				const _chain = localStorage.getItem('chain');
 				if(_address && _chain){
@@ -68,6 +68,7 @@ export const Header = ({ title }: { title: string }) => {
 							if (!isDataReady && !isFetchingData && _address) {
 								fetchData(_address, ChainID.NILE);
 								setChain(ChainID.NILE); 
+								setInit(true)
 							}
 						});
 					} else {
@@ -77,7 +78,33 @@ export const Header = ({ title }: { title: string }) => {
 								setChain(ChainID.AURORA);
 								localStorage.setItem("address", res.account)
 								localStorage.setItem("chain", ChainID.AURORA.toString());
+								setInit(true)
 							}
+						})
+						.catch((err: any) => {
+							err = JSON.stringify(err);
+							if(err.includes('ChainNotConfigured')){
+								window.ethereum.request({method: 'wallet_addEthereumChain', params: [{
+									chainId: '0x' + ChainID.AURORA.toString(16),
+									chainName: 'Aurora Testnet',
+									nativeCurrency: {
+										name: 'Aurora',
+										symbol: 'ETH',
+										decimals: 18
+									},
+									rpcUrls: [chains[chainIndex[ChainID.AURORA]].rpcUrls.default],
+									blockExplorerUrls: [chains[chainIndex[ChainID.AURORA]].blockExplorers.default.url]
+								}]})
+								.then((res) => {
+									setInit(false);
+								})
+							} else if (err.includes("ConnectorNotFoundError")) {
+								setConnectionError("Please install Metamask wallet extension.");
+							} else {
+								setConnectionError(err);
+							}
+							setInit(true)
+							fetchData(null, ChainID.AURORA, false);
 						})
 					}
 				} else if(!init) {

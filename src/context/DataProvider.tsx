@@ -269,7 +269,7 @@ function DataProvider({ children }: any) {
 		pairStats,
 		userDepositWithdraws,
 		chain, setChain,
-		explorer
+		explorer,
 	};
 
 	return (
@@ -295,7 +295,7 @@ interface DataValue {
 	pairStats: any,
 	userDepositWithdraws: any,
 	chain: number, setChain: (chain: number) => void,
-	explorer: () => string
+	explorer: () => string,
 }
 
 export { DataProvider, DataContext };

@@ -20,9 +20,6 @@ import { BsCurrencyExchange } from 'react-icons/bs';
 import { RiExchangeFundsFill } from 'react-icons/ri';
 import { GiBank, GiCardExchange } from 'react-icons/gi';
 
-import { Tweet } from 'react-twitter-widgets';
-import theme from '../theme';
-
 const Index = () => {
 	const { colorMode, toggleColorMode } = useColorMode();
 
@@ -154,7 +151,7 @@ const Index = () => {
 						</Link>
 						<Link
 							href={
-								'https://drive.google.com/file/d/1j2sCnlfbsgolGQDeXib6GoBhdCdIY5dF/view?usp=sharing'
+								'https://drive.google.com/file/d/1Jkc0QIvCIiMqdFbl0g39NF5bQIF0cnmZ/view?usp=sharing'
 							}
 							target="_blank">
 							<Button size={'lg'} variant={'outline'}>

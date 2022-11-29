@@ -30,7 +30,7 @@ export default function OrderHistory({pair}) {
 
 	return (
 		<Box >
-			<Flex justify={'space-between'} py={1} mb={1} mt={0} mx={-4} px={4}  bgColor='background2' gap={2}>
+			<Flex justify={'space-between'} py={1} mb={1} mt={0} mx={-2} px={{sm: 4, md: 2}}  bgColor='background2' gap={2}>
 				<Text fontSize="xs" fontWeight={"bold"}>Amount {pair?.tokens[0].symbol}</Text>
 				<Text fontSize="xs" fontWeight={"bold"}>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize="xs" fontWeight={"bold"}>Price {pair?.tokens[1].symbol}</Text>

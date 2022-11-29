@@ -40,7 +40,7 @@ import { MdCopyAll, MdLogout } from 'react-icons/md';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { chains, ChainID } from '../utils/chains';
+import { chains, ChainID, chainIndex } from '../utils/chains';
 
 const ConnectButton = ({}) => {
 	const {address: evmAddress, isConnected: isEvmConnected, isConnecting: isEvmConnecting} = useAccount();
@@ -53,6 +53,7 @@ const ConnectButton = ({}) => {
 		address: tronAddress,
 		connect: connectTron,
 		disconnect,
+		setConnectionError
 	} = useContext(WalletContext);
 
 	const { isDataReady, isFetchingData, fetchData, setChain, chain } = useContext(DataContext);
@@ -78,12 +79,35 @@ const ConnectButton = ({}) => {
 	};
 
 	const _connectEvm = (chain: number) => {
-		connectEvm({chainId: chains[chain].id, connector: connectors[chain]}).then((res) => {
-			fetchData(res.account, ChainID.AURORA);
-			setChain(ChainID.AURORA);
-			localStorage.setItem("address", res.account)
-			localStorage.setItem("chain", ChainID.AURORA.toString());
-		})
+			connectEvm({chainId: chains[chain].id, connector: connectors[chain]}).then((res) => {
+				fetchData(res.account, ChainID.AURORA);
+				setChain(ChainID.AURORA);
+				localStorage.setItem("address", res.account)
+				localStorage.setItem("chain", ChainID.AURORA.toString());
+			})
+			.catch((err: any) => {
+				err = JSON.stringify(err);
+				if(err.includes('ChainNotConfigured')){
+					window.ethereum.request({method: 'wallet_addEthereumChain', params: [{
+						chainId: '0x' + ChainID.AURORA.toString(16),
+						chainName: 'Aurora Testnet',
+						nativeCurrency: {
+							name: 'Aurora',
+							symbol: 'ETH',
+							decimals: 18
+						},
+						rpcUrls: [chains[chainIndex[ChainID.AURORA]].rpcUrls.default],
+						blockExplorerUrls: [chains[chainIndex[ChainID.AURORA]].blockExplorers.default.url]
+					}]})
+					.then((res: any) => {
+						_connectEvm(chain);
+					})
+				} else if (err.includes("ConnectorNotFoundError")) {
+					setConnectionError("Please install Metamask wallet extension.");
+				} else {
+					setConnectionError(err);
+				}
+			})
 		onConnectClose();
 	};
 

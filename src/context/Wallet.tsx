@@ -91,7 +91,8 @@ function WalletProvider({children}: any) {
         address, tronWeb, isConnected, isConnecting, isDisconnected, chain, 
         connect,
         connectionError,
-        disconnect
+        disconnect,
+        setConnectionError
     };
 
     return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
@@ -107,6 +108,8 @@ interface WalletValue {
     connect: (callback: any, options?: any) => void;
     disconnect: () => void;
 	connectionError: string|null;
+    setConnectionError: (error: string) => void
+
 }
 
 export {WalletProvider, WalletContext}
