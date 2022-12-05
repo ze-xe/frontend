@@ -9,7 +9,6 @@ import { AppDataContext } from '../../../context/AppData';
 
 const Order = ({ order, index, total, pair, orderType }) => {
 	const {setExchangeRate} = useContext(AppDataContext);
-
 	return (
 		<Box onClick={() => setExchangeRate(order.exchangeRate/(10**pair?.exchangeRateDecimals))} _hover={{ cursor: 'pointer' }}>
 			<Flex
@@ -50,21 +49,22 @@ export default function OrderBook({ pair }) {
 			setBuyOrders(orders[pair.id].buyOrders);
 			setSellOrders(orders[pair.id].sellOrders);
 			// calculate total buy
-			setTotalBuy(orders[pair.id].buyOrders.reduce((acc: any, order: any) => acc + order.amount, 0));
+			setTotalBuy(orders[pair.id].buyOrders.reduce((acc: any, order: any) => acc + parseFloat(order.amount), 0));
 			// calculate total sell
-			setTotalSell(orders[pair.id].sellOrders.reduce((acc: any, order: any) => acc + order.amount, 0));
+			setTotalSell(orders[pair.id].sellOrders.reduce((acc: any, order: any) => acc + parseFloat(order.amount), 0));
 		}
 	})
 
 	return (
 		<Flex flexDir={'column'}>
-			<Flex justify={'space-between'} px={4} py={1} mb={1} mt={0} gap={2}>
+			<Flex justify={'space-between'} px={4} py={1} mb={1} mt={-2} gap={2}>
 				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[0].symbol} </Text>
 				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize={'xs'} fontWeight='bold'>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
 			{[...sellOrders].reverse().map((order: any, index: number) => {
 				return (
+					<Box key={index}>
 					<Order
 						order={order}
 						index={index}
@@ -73,6 +73,7 @@ export default function OrderBook({ pair }) {
 						key={index}
 						orderType={'SELL'}
 					/>
+					</Box>
 				);
 			})}
 			<Divider mt={2} bgColor="transparent" />
@@ -94,6 +95,8 @@ export default function OrderBook({ pair }) {
 			<Divider mb={2} bgColor="transparent" />
 			{buyOrders.map((order: any, index: number) => {
 				return (
+					<Box key={index}>
+
 					<Order
 						order={order}
 						index={index}
@@ -102,6 +105,7 @@ export default function OrderBook({ pair }) {
 						key={index}
 						orderType={'BUY'}
 					/>
+					</Box>
 				);
 			})}
 		</Flex>
