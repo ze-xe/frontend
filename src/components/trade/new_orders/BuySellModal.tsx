@@ -115,7 +115,7 @@ export default function BuySellModal({
 		initialStep: 0,
 	});
 
-	const _onClose = () => {
+	const _onClose = () => { 
 		setOrderToPlace(null);
 		setOrders(null);
 		onClose();
