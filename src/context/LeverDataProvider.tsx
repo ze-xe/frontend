@@ -1,13 +1,13 @@
-import * as React from 'react';
-import { DUMMY_ADDRESS, HELPER, Endpoints, ADDRESSES } from '../utils/const';
-const { Big } = require('big.js');
-import tronWeb from '../utils/tronWeb';
-import axios from 'axios';
-import { call, getABI, getAddress, getContract } from '../utils/contract';
-import { ChainID, chains, chainMapping } from '../utils/chains';
-import { getBalancesAndApprovals } from '../utils/balances';
-import { BigNumber, ethers } from 'ethers';
-import { Interface } from 'ethers/lib/utils.js';
+import * as React from "react";
+import { DUMMY_ADDRESS, HELPER, Endpoints, ADDRESSES } from "../utils/const";
+const { Big } = require("big.js");
+import tronWeb from "../utils/tronWeb";
+import axios from "axios";
+import { call, getABI, getAddress, getContract } from "../utils/contract";
+import { ChainID, chains, chainMapping } from "../utils/chains";
+import { getBalancesAndApprovals } from "../utils/balances";
+import { BigNumber, ethers } from "ethers";
+import { Interface } from "ethers/lib/utils.js";
 
 const LeverDataContext = React.createContext<DataValue>({} as DataValue);
 
@@ -16,82 +16,143 @@ const LeverDataContext = React.createContext<DataValue>({} as DataValue);
 
 // list of tokens
 const coingeckoIds = {
-	'BTC': 'bitcoin',
-	'ETH': 'ethereum',
-	'USDT': 'tether',
-	'USDD': 'usdd',
-	'WTRX': 'tron',
-	'BTT': 'bittorrent',
-	'NEAR': 'near',
-	'AURORA': 'aurora-near',
-	'USDC': 'usd-coin',
+	BTC: "bitcoin",
+	ETH: "ethereum",
+	USDT: "tether",
+	USDD: "usdd",
+	WTRX: "tron",
+	BTT: "bittorrent",
+	NEAR: "near",
+	AURORA: "aurora-near",
+	USDC: "usd-coin",
 };
 
 const dummyPrices = {
-	'BTC': '18000',
-	'ETH': '1200',
-	'USDT': '1',
-	'USDD': '1',
-	'WTRX': '0.006',
-	'BTT': '0.0000008',
-	'NEAR': '3.2',
-	'AURORA': '0.8',
-	'USDC': '1',
+	BTC: "18000",
+	ETH: "1200",
+	USDT: "1",
+	USDD: "1",
+	WTRX: "0.006",
+	BTT: "0.0000008",
+	NEAR: "3.2",
+	AURORA: "0.8",
+	USDC: "1",
 };
 
-import erc20 from '../abis/ERC20.json'
-import multicall from '../abis/Multicall2.json'
-
+import erc20 from "../abis/ERC20.json";
+import ctoken from "../abis/CToken.json";
+import multicall from "../abis/Multicall2.json";
 
 function LeverDataProvider({ children }: any) {
 	const [isDataReady, setIsDataReady] = React.useState(false);
 	const [isFetchingData, setIsFetchingData] = React.useState(false);
-	const [dataFetchError, setDataFetchError] = React.useState<string | null>(null);
+	const [dataFetchError, setDataFetchError] = React.useState<string | null>(
+		null
+	);
 	const [markets, setMarkets] = React.useState<any[]>([]);
+	const [totalCollateralBalance, setTotalCollateralBalance] = React.useState('0')
+	const [totalBorrowBalance, setTotalBorrowBalance] = React.useState('0')
+	const [availableToBorrow, setAvailableToBorrow] = React.useState('0')
 
 	React.useEffect(() => {
-        // fetch data if not fetched yet / is not fetching
-        // if (!isDataReady && !isFetchingData) {
-        //     fetchData();
-        // }
-    }, [])	
+		// fetch data if not fetched yet / is not fetching
+		// if (!isDataReady && !isFetchingData) {
+		//     fetchData();
+		// }
+	}, []);
 
-	const getWalletBalances = async (address: string, _markets = markets, chain: ChainID) => {
-		const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+	const getWalletBalances = async (
+		address: string,
+		_markets = markets,
+		chain: ChainID
+	) => {
+		const provider = new ethers.providers.Web3Provider(
+			window.ethereum,
+			"any"
+		);
 
-    const itf = new Interface(erc20.abi);
-    const multicallContract = new ethers.Contract(
-        ADDRESSES[chain].Multicall,
-        multicall.abi,
-        provider.getSigner()
-    );
+		const itf = new Interface(erc20.abi);
+		const ctokenitf = new Interface(ctoken.abi);
 
-    let calls = []
-    for (let i = 0; i<_markets.length; i++) {
-        calls.push([_markets[i].inputToken.id, itf.encodeFunctionData('balanceOf', [address])])
-        calls.push([_markets[i].inputToken.id, itf.encodeFunctionData('allowance', [address, _markets[i].id])])
-        calls.push([_markets[i].id, itf.encodeFunctionData('balanceOf', [address])])
-    }
+		const multicallContract = new ethers.Contract(
+			ADDRESSES[chain].Multicall,
+			multicall.abi,
+			provider.getSigner()
+		);
 
-	return multicallContract.callStatic.aggregate(calls)
+		let calls = [];
+		for (let i = 0; i < _markets.length; i++) {
+			calls.push([
+				_markets[i].inputToken.id,
+				itf.encodeFunctionData("balanceOf", [address]),
+			]);
+			calls.push([
+				_markets[i].inputToken.id,
+				itf.encodeFunctionData("allowance", [address, _markets[i].id]),
+			]);
+			calls.push([
+				_markets[i].id,
+				itf.encodeFunctionData("balanceOf", [address]),
+			]);
+			calls.push([
+				_markets[i].id,
+				ctokenitf.encodeFunctionData("borrowBalanceCurrent", [address]),
+			]);
+		}
+
+		return multicallContract.callStatic.aggregate(calls)
 		.then((res) => {
-			for(let i = 0; i < res[1].length; i+=3){
-				_markets[i/3].balance = BigNumber.from(res[1][i]).toString();
-				_markets[i/3].allowance = BigNumber.from(res[1][i+1]).toString();
-				_markets[i/3].cTokenBalance = BigNumber.from(res[1][i+2]).toString();
+			let _totalCollateralBalance = Big(0);
+			let _totalBorrowBalance = Big(0);
+			let _availableToBorrow = Big(0);
+
+			for (let i = 0; i < res[1].length; i += 4) {
+				_markets[i / 4].balance = BigNumber.from(res[1][i]).toString();
+				_markets[i / 4].allowance = BigNumber.from(res[1][i + 1]).toString();
+				_markets[i / 4].collateralBalance = Big(BigNumber.from(res[1][i + 2]).toString())
+					.mul(_markets[i / 4]?.exchangeRate * 10 ** 10)
+					.div(1e18)
+					.toString();
+				_markets[i / 4].borrowBalance = BigNumber.from(res[1][i + 3]).toString();
+
+				_totalCollateralBalance = _totalCollateralBalance.add(
+					Big(_markets[i / 4].collateralBalance).mul(_markets[i / 4].inputTokenPriceUSD)
+				);
+				_totalBorrowBalance = _totalBorrowBalance.add(
+					Big(_markets[i / 4].borrowBalance).mul(_markets[i / 4].inputTokenPriceUSD).div(1e18)
+				);
+				_availableToBorrow = _availableToBorrow.add(
+					Big(_markets[i / 4].collateralBalance).mul(_markets[i / 4].inputTokenPriceUSD).mul(_markets[i / 4].maximumLTV).div(100)
+				);
 			}
+			setTotalCollateralBalance(_totalCollateralBalance.toString());
+			setTotalBorrowBalance(_totalBorrowBalance.toString());
+			setAvailableToBorrow(_availableToBorrow.sub(_totalBorrowBalance).toString());
 			setMarkets(_markets);
-		})
+		});
 	};
+
+	const incrementAllowance = async (marketId: any, amount: string) => {
+		console.log('incrementing', marketId, amount)
+		let _markets = [...markets];
+		for(let i in _markets) {
+			if(_markets[i].id === marketId) {
+				_markets[i].allowance = Big(_markets[i].allowance).add(amount).toString()
+			}
+		}
+		setMarkets(_markets);
+	}
 
 	const fetchData = async (address: string, chain: ChainID) => {
 		setIsFetchingData(true);
 		setDataFetchError(null);
 		try {
 			// fetch data
-			const requests = [axios.post('https://api.thegraph.com/subgraphs/name/ze-xe/lever', {
-                query: 
-                `{
+			const requests = [
+				axios.post(
+					"https://api.thegraph.com/subgraphs/name/ze-xe/lever",
+					{
+						query: `{
 					markets{
 						id
 						inputToken{
@@ -107,17 +168,20 @@ function LeverDataProvider({ children }: any) {
 						inputTokenPriceUSD
 						totalDepositBalanceUSD
 						totalBorrowBalanceUSD
+						maximumLTV
 					}
-				}`
-            })]
+				}`,
+					}
+				),
+			];
 			Promise.all(requests).then(async (res) => {
-                if(res[0].data.errors){
-                    setDataFetchError(res[0].data.errors[0].message)
-                    return
-                }                
-                setMarkets(res[0].data.data.markets)
+				if (res[0].data.errors) {
+					setDataFetchError(res[0].data.errors[0].message);
+					return;
+				}
+				setMarkets(res[0].data.data.markets);
 				getWalletBalances(address, res[0].data.data.markets, chain);
-			})
+			});
 		} catch (error) {
 			setDataFetchError(error.message);
 		}
@@ -126,14 +190,20 @@ function LeverDataProvider({ children }: any) {
 
 	const value: DataValue = {
 		isDataReady,
-        markets,
+		markets,
 		dataFetchError,
 		isFetchingData,
 		fetchData,
+		totalCollateralBalance,
+		totalBorrowBalance,
+		availableToBorrow,
+		incrementAllowance
 	};
 
 	return (
-		<LeverDataContext.Provider value={value}>{children}</LeverDataContext.Provider>
+		<LeverDataContext.Provider value={value}>
+			{children}
+		</LeverDataContext.Provider>
 	);
 }
 
@@ -142,7 +212,11 @@ interface DataValue {
 	markets: any[];
 	dataFetchError: string | null;
 	isFetchingData: boolean;
-	fetchData: (address :string, chainId: ChainID, loop?: boolean) => void;
+	fetchData: (address: string, chainId: ChainID, loop?: boolean) => void;
+	totalCollateralBalance: string;
+	totalBorrowBalance: string;
+	availableToBorrow: string;
+	incrementAllowance: (market: any, amount: string) => void;
 }
 
 export { LeverDataProvider, LeverDataContext };

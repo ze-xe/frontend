@@ -54,6 +54,7 @@ import Big from "big.js";
 import { ChainID } from "../../../utils/chains";
 import axios from "axios";
 import { PlusSquareIcon } from "@chakra-ui/icons";
+import { LeverDataContext } from "../../../context/LeverDataProvider";
 
 export default function LendModal({ market, token }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -67,6 +68,8 @@ export default function LendModal({ market, token }) {
 	const [confirmed, setConfirmed] = React.useState(false);
 
 	const { chain, explorer } = useContext(DataContext);
+	const { incrementAllowance } = useContext(LeverDataContext);
+
 	const { isConnected: isEvmConnected, address: EvmAddress } = useAccount();
 	const { isConnected, address: TronAddress } = useContext(WalletContext);
 
@@ -101,7 +104,7 @@ export default function LendModal({ market, token }) {
 		setResponse("");
 		let amount = Big(inputAmount).times(10 ** token?.decimals);
 		const ctoken = await getContract("CToken", chain, market?.id);
-		send(ctoken, "mint", [amount.toString()], chain)
+		send(ctoken, "mint", [amount.toFixed(0)], chain)
 			.then(async (res: any) => {
 				setLoading(false);
 				setResponse("Transaction sent! Waiting for confirmation...");
@@ -116,6 +119,7 @@ export default function LendModal({ market, token }) {
 				}
 			})
 			.catch((err: any) => {
+				console.log(err);
 				setLoading(false);
 				setConfirmed(true);
 				setResponse("Transaction failed. Please try again!");
@@ -156,10 +160,15 @@ export default function LendModal({ market, token }) {
 			"approve",
 			[market?.id, ethers.constants.MaxUint256],
 			chain
-		).then((res: any) => {
-			console.log(res);
+		).then(async (res: any) => {
+			await res.wait();
 			setLoading(false);
-		});
+			incrementAllowance(market.id, ethers.constants.MaxUint256.toString());
+		})
+		.catch((err: any) => {
+			console.log(err);
+			setLoading(false);
+		})
 	};
 
 	const _onClose = () => {

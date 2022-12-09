@@ -3,14 +3,15 @@ import axios from "axios";
 import Big from "big.js";
 import { ethers, TypedDataDomain } from "ethers";
 import Link from "next/link";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useAccount, useSignTypedData } from "wagmi";
 import { DataContext } from "../../../context/DataProvider";
 import { WalletContext } from "../../../context/Wallet";
-import { getAddress } from "../../../utils/contract";
-
+import { getAddress, getContract, send } from "../../../utils/contract";
+import Image from "next/image";
+import { imageIds } from "../../../utils/const";
 export default function PlaceOrder({
-    orderAmount,
+	orderAmount,
 	amountToPlace,
 	token0,
 	token1,
@@ -23,11 +24,56 @@ export default function PlaceOrder({
 	const [hash, setHash] = React.useState(null);
 	const [confirmed, setConfirmed] = React.useState(false);
 
-	const { data, isError, isLoading, isSuccess, signTypedDataAsync } = useSignTypedData();
+	const [tokenAmountToSpend, setTokenAmountToSpend] = React.useState("0");
 
-	const { chain, explorer } = useContext(DataContext);
+	const { data, isError, isLoading, isSuccess, signTypedDataAsync } =
+		useSignTypedData();
+
+	const { chain, explorer, incrementAllowance } = useContext(DataContext);
 	const { address: TronAddress } = useContext(WalletContext);
 	const { address: EvmAddress } = useAccount();
+
+	const tokenToSpend = buy ? token1 : token0;
+
+	const approve = async () => {
+		setLoading(true);
+		const token = await getContract("ERC20", chain, tokenToSpend.id);
+		send(
+			token,
+			"approve",
+			[getAddress("Exchange", chain), ethers.constants.MaxUint256],
+			chain
+		)
+			.then(async (res: any) => {
+				await res.wait(1);
+				setLoading(false);
+				incrementAllowance(
+					tokenToSpend.id,
+					ethers.constants.MaxUint256.toString()
+				);
+			})
+			.catch((err: any) => {
+				setLoading(false);
+				console.log(err);
+			});
+	};
+
+	useEffect(() => {
+		if (token0 && token1) {
+			if (!buy) {
+				const _tokenAmountToSpend = Big(amountToPlace)
+					.times(10 ** token0.decimals)
+					.toFixed(0);
+				setTokenAmountToSpend(_tokenAmountToSpend);
+			} else {
+				const _tokenAmountToSpend = Big(amountToPlace)
+					.times(10 ** token1.decimals)
+					.times(price)
+					.toFixed(0);
+				setTokenAmountToSpend(_tokenAmountToSpend);
+			}
+		}
+	});
 
 	const place = async () => {
 		setLoading(true);
@@ -66,7 +112,7 @@ export default function PlaceOrder({
 			amount: _amount,
 			buy,
 			salt: (Math.random() * 1000000).toFixed(0),
-			exchangeRate: ethers.utils.parseEther((price).toString()).toString(),
+			exchangeRate: ethers.utils.parseEther(price.toString()).toString(),
 		};
 
 		signTypedDataAsync({
@@ -96,85 +142,167 @@ export default function PlaceOrder({
 		});
 	};
 
-
 	return (
-		<Box>
-            <Text fontSize={"sm"} color="gray" mt={1}>Order amount</Text>
-            <Text>{orderAmount}</Text>
+		<>
+			{!Big(tokenAmountToSpend).gt(tokenToSpend.allowance) ? (
+				<Box>
+					<Text fontSize={"sm"} color="gray" mt={1}>
+						Order amount
+					</Text>
+					<Text>{orderAmount}</Text>
 
-            <Text fontSize={"sm"} color="gray" mt={1}>Executed amount</Text>
-            <Text>{Big(orderAmount).minus(Big(amountToPlace).div(10 ** 18)).toFixed(10)}</Text>
-
-			{amountToPlace == 0 ? (
-                <>
-				<Box my={4}>
-                    <Text fontSize={'lg'} fontWeight='bold'>Limit order was executed successfully!</Text>
-                </Box>
-                    <Button width={'100%'} onClick={nextStep}>Close</Button>
-                </>
-			) : (
-				<>
-                <Text fontSize={"sm"} color="gray" mt={1}>Order amount to place</Text>
-                <Text>{Big(amountToPlace).div(10**18).toFixed(10)}</Text>
-
-					<Flex flexDir={"column"} width={"100%"} mt={4}>
-						{response ? (
-							<Box mb={2}>
-								<Box width={"100%"} mb={2}>
-									<Alert
-										status={
-											response.includes("confirm")
-												? "info"
-												: confirmed &&
-												  response.includes("success")
-												? "success"
-												: "error"
-										}
-										variant="subtle"
-									>
-										<AlertIcon />
-										<Box>
-											<Text fontSize="md" mb={0}>
-												{response}
-											</Text>
-											{hash && (
-												<Link
-													href={explorer() + hash}
-													target="_blank"
-												>
-													{" "}
-													<Text fontSize={"sm"}>
-														View on explorer
-													</Text>
-												</Link>
-											)}
-										</Box>
-									</Alert>
-								</Box>
-								<Button onClick={nextStep} width="100%">
-									Close
-								</Button>
-							</Box>
-						) : (
+					{(!Big(orderAmount).eq(Big(amountToPlace).div(10 ** 18))) && (
 							<>
-								<Button
-									bgColor={buy ? "green2" : "red2"}
-									mt={4}
-									width="100%"
-									onClick={place}
-									loadingText="Sign the transaction in your wallet"
-									isLoading={loading}
-								>
-									Place {buy? 'buy' : 'sell'} order
-								</Button>
-								{/* <Button onClick={onClose} mt={2}>
-										Cancel
-									</Button>{' '} */}
+								<Text fontSize={"sm"} color="gray" mt={1}>
+									Executed amount
+								</Text>
+								<Text>
+									{Big(orderAmount)
+										.minus(Big(amountToPlace).div(10 ** 18))
+										.toFixed(10)}
+								</Text>
 							</>
 						)}
+
+					{amountToPlace == 0 ? (
+						<>
+							<Box my={4}>
+								<Text fontSize={"lg"} fontWeight="bold">
+									Limit order was executed successfully!
+								</Text>
+							</Box>
+							<Button width={"100%"} onClick={nextStep}>
+								Close
+							</Button>
+						</>
+					) : (
+						<>
+							{!Big(orderAmount).eq(amountToPlace) && (
+									<>
+										{" "}
+										<Text
+											fontSize={"sm"}
+											color="gray"
+											mt={1}
+										>
+											Order amount to place
+										</Text>
+										<Text>
+											{Big(amountToPlace)
+												.div(10 ** 18)
+												.toFixed(10)}
+										</Text>
+									</>
+								)}
+
+										<Text
+											fontSize={"sm"}
+											color="gray"
+											mt={1}
+										>
+											Limit Price
+										</Text>
+										<Text>
+											{price}
+										</Text>
+
+							<Flex flexDir={"column"} width={"100%"} mt={4}>
+								{response ? (
+									<Box mb={2}>
+										<Box width={"100%"} mb={2}>
+											<Alert
+												status={
+													response.includes("confirm")
+														? "info"
+														: confirmed &&
+														  response.includes(
+																"success"
+														  )
+														? "success"
+														: "error"
+												}
+												variant="subtle"
+											>
+												<AlertIcon />
+												<Box>
+													<Text fontSize="md" mb={0}>
+														{response}
+													</Text>
+													{hash && (
+														<Link
+															href={
+																explorer() +
+																hash
+															}
+															target="_blank"
+														>
+															{" "}
+															<Text
+																fontSize={"sm"}
+															>
+																View on explorer
+															</Text>
+														</Link>
+													)}
+												</Box>
+											</Alert>
+										</Box>
+										<Button onClick={nextStep} width="100%">
+											Close
+										</Button>
+									</Box>
+								) : (
+									<>
+										<Button
+											bgColor={buy ? "green2" : "red2"}
+											mt={4}
+											width="100%"
+											onClick={place}
+											loadingText="Sign the transaction in your wallet"
+											isLoading={loading}
+										>
+											Place {buy ? "buy" : "sell"} order
+										</Button>
+										{/* <Button onClick={onClose} mt={2}>
+										Cancel
+									</Button>{' '} */}
+									</>
+								)}
+							</Flex>
+						</>
+					)}
+				</Box>
+			) : (
+				<>
+					<Flex gap={3} my={5}>
+						<Image
+							src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${
+								imageIds[tokenToSpend.symbol]
+							}.png`}
+							alt={""}
+							width={40}
+							height={40}
+							style={{
+								minWidth: "50px",
+								minHeight: "45px",
+							}}
+						/>
+						<Text fontSize={"md"}>
+							You need to approve zexe to use your{" "}
+							{tokenToSpend.symbol} tokens to place this order.
+						</Text>
 					</Flex>
+					<Button
+						width={"100%"}
+						mt={5}
+						onClick={approve}
+						loadingText="Approving..."
+						isLoading={loading}
+					>
+						Approve
+					</Button>
 				</>
 			)}
-		</Box>
+		</>
 	);
 }

@@ -62,7 +62,7 @@ export const Header = ({ title }: { title: string }) => {
 			fetchData(address, connector.chains[0].id);
 			fetchLeverData(address, connector.chains[0].id);
 			setChain(connector.chains[0].id);
-		},
+		}
 	});
 	// const {connectAsync: connectEvm, connectors} = useConnect();
 

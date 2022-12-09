@@ -78,25 +78,18 @@ function DataProvider({ children }: any) {
 		return chain === ChainID.NILE ? 'https://nile.explorer.org/#/transaction/' : chainMapping[chain]?.blockExplorers.default.url+'tx/';
 	}
 
-	const getWalletBalances = async (address: string, _tokens = tokens, chain: number) => {
-		// let multicall = await getContract('Helper', chain);
-		// Promise.all([
-		// 	call(multicall, 'balanceOf', [_tokens.map(token => token.id), address], chain), 
-		// 	call(multicall, 'allowance', [_tokens.map(token => token.id), address, getAddress('Vault', chain)], chain), 
-		// 	call(multicall, 'tradingBalanceOf', [getAddress('Vault', chain), _tokens.map(token => token.id), address], chain), 
-		// ]).then(async (res) => {
-		// 	// set balance in token
-		// 	let newTokens = []
-		// 	for(let index in _tokens) {
-		// 		let token = _tokens[index];
-		// 		token.balance = res[0][index].toString();
-		// 		token.allowance = res[1][index].toString();
-		// 		token.tradingBalance = res[2][index].toString();
-		// 		newTokens.push(token);
-		// 	}
-		// 	setTokens(newTokens);
-		// })
+	const incrementAllowance = async (marketId: any, amount: string) => {
+		console.log('incrementing', marketId, amount)
+		let _markets = [...tokens];
+		for(let i in _markets) {
+			if(_markets[i].id === marketId) {
+				_markets[i].allowance = Big(_markets[i].allowance).add(amount).toString()
+			}
+		}
+		setTokens(_markets);
+	}
 
+	const getWalletBalances = async (address: string, _tokens = tokens, chain: number) => {
 		getBalancesAndApprovals(_tokens.map(token => token.id), address, chain)
 		.then((res) => {
 			setBlock(res[0].toString());
@@ -292,6 +285,7 @@ function DataProvider({ children }: any) {
 		userDepositWithdraws,
 		chain, setChain,
 		explorer,
+		incrementAllowance
 	};
 
 	return (
@@ -318,6 +312,7 @@ interface DataValue {
 	userDepositWithdraws: any,
 	chain: number, setChain: (chain: number) => void,
 	explorer: () => string,
+	incrementAllowance: (token: string, amount: string) => Promise<void>
 }
 
 export { DataProvider, DataContext };

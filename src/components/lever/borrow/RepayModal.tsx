@@ -81,14 +81,14 @@ export default function LendModal({ market, token }) {
 		setSliderValue(value);
 		setInputAmount(
 			(
-				(value * (token?.balance / 10 ** token?.decimals)) /
+				(value * (market?.borrowBalance / 10 ** token?.decimals)) /
 				100
 			).toString()
 		);
 	};
 
 	const updateMax = () => {
-		setInputAmount((token?.balance / 10 ** token?.decimals).toString());
+		setInputAmount((market?.borrowBalance / 10 ** token?.decimals).toString());
 		setSliderValue(100);
 	};
 
@@ -98,7 +98,7 @@ export default function LendModal({ market, token }) {
 	};
 
 	const amountExceedsBalance = () => {
-		return Number(inputAmount) > token?.balance / 10 ** token?.decimals;
+		return Number(inputAmount) > market?.borrowBalance / 10 ** token?.decimals;
 	};
 
 	const deposit = async () => {
@@ -108,7 +108,7 @@ export default function LendModal({ market, token }) {
 		setResponse("");
 		let amount = Big(inputAmount).times(10 ** token?.decimals);
 		const ctoken = await getContract("CToken", chain, market?.id);
-		send(ctoken, "mint", [amount.toString()], chain)
+		send(ctoken, "repayBorrow", [amount.toFixed(0)], chain)
 			.then(async (res: any) => {
 				setLoading(false);
 				setResponse("Transaction sent! Waiting for confirmation...");
@@ -155,20 +155,6 @@ export default function LendModal({ market, token }) {
 			});
 	};
 
-	const approve = async () => {
-		setLoading(true);
-		const cToken = await getContract("ERC20", chain, market?.inputToken.id);
-		send(
-			cToken,
-			"approve",
-			[market?.id, ethers.constants.MaxUint256],
-			chain
-		).then((res: any) => {
-			console.log(res);
-			setLoading(false);
-		});
-	};
-
 	const _onClose = () => {
 		setInputAmount("0");
 		setLoading(false);
@@ -193,11 +179,10 @@ export default function LendModal({ market, token }) {
 				<ModalOverlay />
 				<ModalContent bgColor={"#1D1334"} borderRadius={0}>
 					<ModalHeader>
-						Depositing {market?.inputToken.name}
+						Repaying {market?.inputToken.name}
 					</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody mb={2}>
-						{Number(inputAmount) < Number(market?.allowance) ? (
 							<Box>
 								<Text
 									textAlign={"right"}
@@ -206,7 +191,7 @@ export default function LendModal({ market, token }) {
 									mt={-2}
 								>
 									Balance{" "}
-									{token?.balance / 10 ** token?.decimals}
+									{market?.borrowBalance / 10 ** token?.decimals}
 								</Text>
 
 								<InputGroup>
@@ -234,7 +219,7 @@ export default function LendModal({ market, token }) {
 										w={"100%"}
 										defaultValue={0}
 										max={
-											token?.balance /
+											market?.borrowBalance /
 											10 ** token?.decimals
 										}
 										clampValueOnBlur={false}
@@ -372,39 +357,6 @@ export default function LendModal({ market, token }) {
 									</Box>
 								)}
 							</Box>
-						) : (
-							<Box>
-								<Flex gap={3} mb={5}>
-									<Image
-										src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${
-											imageIds[market.inputToken.symbol]
-										}.png`}
-										alt={""}
-										width={40}
-										height={40}
-										style={{
-											minWidth: "50px",
-											minHeight: "45px",
-										}}
-									/>
-									<Box>
-										<Text>
-											To Deposit {token?.name} tokens to
-											zexe, you need to enable it first{" "}
-										</Text>
-									</Box>
-								</Flex>
-
-								<Button
-									width={"100%"}
-									onClick={approve}
-									isLoading={loading}
-									loadingText="Approving..."
-								>
-									Approve {token?.name}
-								</Button>
-							</Box>
-						)}
 					</ModalBody>
 				</ModalContent>
 			</Modal>

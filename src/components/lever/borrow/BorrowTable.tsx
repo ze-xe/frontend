@@ -19,7 +19,7 @@ import Image from "next/image";
 import { LeverDataContext } from "../../../context/LeverDataProvider";
 import { dollarFormatter } from "../../../utils/formatters";
 
-import LendModal from "./RepayModal";
+import RepayModal from "./RepayModal";
 import BorrowModal from "./BorrowModal";
 import { DataContext } from "../../../context/DataProvider";
 
@@ -139,18 +139,19 @@ export default function LendingTable() {
 													gap={2}
 													justify="flex-end"
 												>
-													<LendModal
-														market={market}
-														token={token(
-															market.inputToken.id
-														)}
-													/>
 													<BorrowModal
 														market={market}
 														token={token(
 															market.inputToken.id
 														)}
 													/>
+													<RepayModal
+														market={market}
+														token={token(
+															market.inputToken.id
+														)}
+													/>
+													
 												</Flex>
 											</Td>
 										</Tr>

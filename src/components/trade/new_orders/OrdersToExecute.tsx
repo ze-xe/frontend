@@ -45,7 +45,7 @@ export default function OrdersToExecute({
 	const [hash, setHash] = React.useState(null);
 	const [confirmed, setConfirmed] = React.useState(false);
 
-	const { chain, explorer } = useContext(DataContext);
+	const { chain, explorer, incrementAllowance } = useContext(DataContext);
 
 	const execute = async () => {
 		setLoading(true);
@@ -114,9 +114,15 @@ export default function OrdersToExecute({
 			"approve",
 			[getAddress("Exchange", chain), ethers.constants.MaxUint256],
 			chain
-		).then((res: any) => {
+		).then(async(res: any) => {
+			await res.wait(1);
 			setLoading(false);
-		});
+			incrementAllowance(tokenToSpend.id, ethers.constants.MaxUint256.toString());
+		})
+		.catch((err: any) => {
+			setLoading(false);
+			console.log(err);
+		})
 	};
 
 	const checkResponse = (tx_id: string) => {

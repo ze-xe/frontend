@@ -107,7 +107,7 @@ export default function WithdrawModal({ market, token }) {
 		let amount = Big(inputAmount).div(market?.exchangeRate).times(10 ** (token?.decimals-10));
 		console.log(amount.toString());
 		const ctoken = await getContract("CToken", chain, market?.id);
-		send(ctoken, "redeem", [amount.toString()], chain)
+		send(ctoken, "redeem", [amount.toFixed(0)], chain)
 			.then(async (res: any) => {
 				setLoading(false);
 				setResponse("Transaction sent! Waiting for confirmation...");
@@ -176,7 +176,7 @@ export default function WithdrawModal({ market, token }) {
 		onClose();
 	};
 
-	const depositBalance = () => market?.cTokenBalance * market?.exchangeRate / 10 ** (token?.decimals - 10);
+	const depositBalance = () => market?.collateralBalance;
 
 	return (
 		<>

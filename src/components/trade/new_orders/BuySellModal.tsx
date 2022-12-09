@@ -43,6 +43,10 @@ export default function BuySellModal({
 	buy,
 	limit
 }) {
+	if(token0Amount == '') token0Amount = '0';
+	if(token1Amount == '') token1Amount = '0';
+	if(price == '') price = '0';
+
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [orders, setOrders] = React.useState<any[] | null>(null);
 	const [orderToPlace, setOrderToPlace] = React.useState(null);
@@ -58,17 +62,9 @@ export default function BuySellModal({
 		const balance = buy
 			? token1?.balance / 10 ** token1?.decimals
 			: token0?.balance / 10 ** token0?.decimals;
-		if (amount == "0" || amount == "" || !balance) return false;
-		if (Number(amount) && Number(balance)) return Big(amount).gt(balance);
-	};
 
-	const amountExceedsMin = () => {
-		if (token0Amount == "0" || token0Amount == "" || !token0 || !pair)
-			return false;
-		if (Number(token0Amount) && pair?.minToken0Order && token0.decimals)
-			return Big(token0Amount).lt(
-				Big(pair?.minToken0Order).div(10 ** token0.decimals)
-			);
+		if (isNaN(Number(amount))) return false;
+		return Big(amount).gt(balance);
 	};
 
 	useEffect(() => {
@@ -130,17 +126,16 @@ export default function BuySellModal({
 				bgColor={buy ? "green2" : "red2"}
 				onClick={_onOpen}
 				disabled={
+					!Big(token0Amount).gt(0) ||
 					!(isConnected || isEvmConnected) ||
 					amountExceedsBalance() ||
-					amountExceedsMin() ||
 					price == "" ||
 					Number(price) <= 0
 				}
 			>
 				{!(isConnected || isEvmConnected)
 					? "Connect Wallet"
-					: amountExceedsMin()
-					? "Amount is too less"
+					: !Big(token0Amount).gt(0) ? "Enter Amount" 
 					: amountExceedsBalance()
 					? "Insufficient Trading Balance"
 					: buy
