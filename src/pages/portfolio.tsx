@@ -105,7 +105,7 @@ export default function wallet() {
 										{tokenFormatter(null).format(
 											balance / 1e6
 										)}{' '}
-										TRX
+										ETH
 									</Text>
 								</Box>
 							</Flex>
@@ -132,18 +132,18 @@ export default function wallet() {
 								<Table variant="simple">
 									<Thead>
 										<Tr>
-											<Th>Asset</Th>
-											<Th>Trading Balance</Th>
-											<Th>Wallet Balance</Th>
-											<Th></Th>
-											<Th isNumeric>Actions</Th>
+											<Th borderColor={'primary'}>Asset</Th>
+											<Th borderColor={'primary'}>Trading Balance</Th>
+											<Th borderColor={'primary'}>Wallet Balance</Th>
+											<Th borderColor={'primary'}></Th>
+											<Th borderColor={'primary'} isNumeric></Th>
 										</Tr>
 									</Thead>
 									<Tbody>
 										{tokens.map((token, index) => {
 											return (
 												<Tr key={index}>
-													<Td>
+													<Td borderColor={'whiteAlpha.200'}>
 														<Flex
 															gap="8px"
 															align="center">
@@ -166,7 +166,7 @@ export default function wallet() {
 															</Text>
 														</Flex>
 													</Td>
-													<Td>
+													<Td borderColor={'whiteAlpha.200'}>
 														<Box>
 															<Text>
 																{tokenFormatter(
@@ -191,7 +191,7 @@ export default function wallet() {
 															</Text>
 														</Box>
 													</Td>
-													<Td>
+													<Td borderColor={'whiteAlpha.200'}>
 														<Box>
 															<Text>
 																{tokenFormatter(
@@ -217,7 +217,7 @@ export default function wallet() {
 															</Text>
 														</Box>
 													</Td>
-													<Td>
+													<Td borderColor={'whiteAlpha.200'}>
 														<Progress
 															value={
 																(100 *
@@ -228,26 +228,18 @@ export default function wallet() {
 															}
 															height="2"
 															width={40}
-															colorScheme="red"
+															colorScheme="gray"
 														/>
 													</Td>
 													<Td
+														borderColor={'whiteAlpha.200'}
 														textAlign={'right'}
 														isNumeric>
-														<Link href={'/deposit'}>
+														<Link href={'/faucet'}>
 															<Button
 																size={'sm'}
 																variant="ghost">
-																Deposit
-															</Button>
-														</Link>
-														<Link
-															href={'/withdraw'}>
-															<Button
-																size={'sm'}
-																ml={2}
-																variant="ghost">
-																Withdraw
+																💰 Faucet
 															</Button>
 														</Link>
 													</Td>

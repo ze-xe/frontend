@@ -33,8 +33,8 @@ export default function AllTokens({search}) {
 							<Image
 								src={
 									`/assets/crypto_logos/` +
-								pair.tokens[0].symbol.toLowerCase() +
-								'.png'
+									pair.tokens[0].symbol.toLowerCase() +
+									'.png'
 								}
 								width={30}
 								height={30}
@@ -51,7 +51,7 @@ export default function AllTokens({search}) {
 						<Box textAlign={'right'} color={Number(pairStats[pair.id]?.[1].changeInER) >= 0 ? 'green2' : 'red2'}>
 							<Text fontWeight={'bold'} color='gray.200'>
 								{tokenFormatter(pair.exchangeRateDecimals).format(pair.exchangeRate /
-									10 ** pair.exchangeRateDecimals)}
+									10 ** 18)}
 							</Text>
 							<Text fontSize={'xs'} fontWeight='bold'>{tokenFormatter(2).format(pairStats[pair.id]?.[0].changeInER ?? 0)}%</Text>
 						</Box>

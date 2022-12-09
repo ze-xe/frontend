@@ -10,8 +10,9 @@ import {
 import React, { useContext } from 'react';
 const Big = require('big.js');
 
+const MIN_T0_ORDER = '10000000000000000';
 import axios from 'axios';
-import { getABI, getAddress, getContract, send } from '../../../utils/contract';
+import { getABI, getAddress, getContract, send } from '../../utils/contract';
 
 import {
 	Modal,
@@ -23,68 +24,49 @@ import {
 	ModalCloseButton,
 } from '@chakra-ui/react';
 
-import { DataContext } from '../../../context/DataProvider';
+import { DataContext } from '../../context/DataProvider';
 import Link from 'next/link';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { CheckIcon } from '@chakra-ui/icons';
-import { tokenFormatter } from '../../../utils/formatters';
-import { WalletContext } from '../../../context/Wallet';
-import { useAccount } from 'wagmi';
-import { ChainID } from '../../../utils/chains';
-import { Endpoints } from '../../../utils/const';
+import { tokenFormatter } from '../../utils/formatters';
+import { WalletContext } from '../../context/Wallet';
+import { ChainID } from '../../utils/chains';
+import { useAccount, useSignTypedData } from 'wagmi';
+import { ADDRESSES, Endpoints } from '../../utils/const';
+import { ethers, TypedDataDomain, BigNumber } from 'ethers';
 
-export default function BuyModal({
+export default function SellModal({
 	pair,
 	token1,
 	token0,
-	token0Amount,
+	token1Amount,
 	amount,
 	price,
 }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	
 	const [loading, setLoading] = React.useState(false);
 	const [response, setResponse] = React.useState(null);
 	const [hash, setHash] = React.useState(null);
 	const [confirmed, setConfirmed] = React.useState(false);
-	
 	const [orders, setOrders] = React.useState([]);
 	const [orderToPlace, setOrderToPlace] = React.useState(0);
 	const [expectedOutput, setExpectedOutput] = React.useState(0);
 	const [offsetAmount, setOffsetAmount] = React.useState(0);
-	
-	const { isConnected } = useContext(WalletContext);
-	const { isConnected: isEvmConnected } = useAccount();
+	const { address: EvmAddress, isConnected: isEvmConnected } = useAccount();
+	const { data, isError, isLoading, isSuccess, signTypedDataAsync } = useSignTypedData()
+
+	const { isConnected, address: TronAddress } = useContext(WalletContext);
 	const { chain, explorer } = useContext(DataContext);
 
-	const amountExceedsBalance = () => {
-		if (amount == '0' || amount == '' || !token1?.tradingBalance)
-			return false;
-		if (Number(amount) && token1?.tradingBalance)
-			return Big(amount).gt(
-				Big(token1?.tradingBalance).div(10 ** token1?.decimals)
-			);
-	};
-
-	const amountExceedsMin = () => {
-		if (token0Amount == '0' || token0Amount == '' || !token0 || !pair)
-			return false;
-		if (Number(token0Amount) && pair?.minToken0Order && token0.decimals)
-			return Big(token0Amount).lt(
-				Big(pair?.minToken0Order).div(10 ** token0.decimals)
-			);
-	};
-
-	const buy = async () => {
+	const sell2 = async () => {
 		setLoading(true);
-		setConfirmed(false);
-		setHash(null);
-		setResponse('');
-		let _amount = Big(token0Amount)
+		let _amount = Big(amount)
 			.times(10 ** token0.decimals)
+			.minus(offsetAmount)
 			.toFixed(0);
 
 		let exchange = await getContract('Exchange', chain);
+
 		send(
 			exchange,
 			'executeAndPlaceOrder',
@@ -93,30 +75,100 @@ export default function BuyModal({
 				pair.tokens[1].id,
 				_amount,
 				(Number(price) * 10 ** pair.exchangeRateDecimals).toFixed(0),
-				1,
+				0,
 				orders.map((o) => (chain == ChainID.NILE ? '0x' : '') + o.id),
 			],
 			chain
 		)
-		.then(async (res: any) => {
-			setLoading(false);
-			setResponse('Transaction sent! Waiting for confirmation...');
-			if (chain == ChainID.NILE) {
-				setHash(res);
-				checkResponse(res);
-			} else {
-				setHash(res.hash);
-				await res.wait(1);
+			.then(async (res: any) => {
+				setLoading(false);
+				setResponse('Transaction sent! Waiting for confirmation...');
+				if (chain == ChainID.NILE) {
+					setHash(res);
+					checkResponse(res);
+				} else {
+					setHash(res.hash);
+					await res.wait(1);
+					setConfirmed(true);
+					setResponse('Transaction Successful!');
+				}
+			})
+			.catch((err: any) => {
+				console.log(err)
+				setLoading(false);
 				setConfirmed(true);
-				setResponse('Transaction Successful!');
-			}
-		})
-		.catch((err: any) => {
-			setLoading(false);
-			setConfirmed(true);
-			setResponse('Transaction failed. Please try again!');
-		});
+				setResponse('Transaction failed. Please try again!');
+			});
 	};
+
+	const sell = async () => {
+		setLoading(true);
+		setConfirmed(false);
+		setHash(null);
+		setResponse('');
+
+		let _amount = Big(amount)
+			.times(10 ** token0.decimals)
+			.minus(offsetAmount)
+			.toFixed(0);
+
+			const domain: any = {
+				name: 'zexe',
+				version: '1',
+				chainId: chain.toString(),
+				verifyingContract: ADDRESSES[chain].Exchange,
+			};
+	
+			// The named list of all type definitions
+			const types = {
+				Order: [
+					{ name: 'maker', type: 'address' },
+					{ name: 'token0', type: 'address' },
+					{ name: 'token1', type: 'address' },
+					{ name: 'amount', type: 'uint256' },
+					{ name: 'buy', type: 'bool' },
+					{ name: 'salt', type: 'uint32' },
+					{ name: 'exchangeRate', type: 'uint216' }
+				],
+			};
+
+			console.log(price);
+		const value = {
+			maker: TronAddress ?? EvmAddress,
+			token0: token0.id, 
+            token1: token1.id,
+			amount: _amount,
+			buy: false,
+            salt: (Math.random()*1000000).toFixed(0),
+            exchangeRate: ethers.utils.parseEther(price).toString(),
+		};
+
+		signTypedDataAsync({
+			domain,
+			types,
+			value,
+		})
+		.then((signature) => {
+			console.log(signature)
+			axios.post("http://localhost:3010/order/create", {
+				signature,
+				data: value,
+				chainId: chain.toString()
+			})
+			.then((res) => {
+				setLoading(false);
+				setConfirmed(true);
+				setResponse('Order created successfully!');
+				console.log(res)
+			})
+			.catch((err) => {
+				setLoading(false);
+				setConfirmed(true);
+				setResponse('Order failed. Please try again!');
+				console.log("err", err)
+			})
+		})
+	}
 
 	// check response in intervals
 	const checkResponse = (tx_id: string) => {
@@ -143,52 +195,52 @@ export default function BuyModal({
 
 	const _onOpen = () => {
 		onOpen();
-		let _amount = Big(token0Amount)
+		let _amount = Big(amount)
 			.times(10 ** token0.decimals)
 			.toFixed(0);
 
-		axios
-			.get(Endpoints[chain]+'matchedorders/' + pair.id, {
-				params: {
-					amount: _amount,
-					exchange_rate: Big(price).times(
-						10 ** pair.exchangeRateDecimals
-					),
-					order_type: 1,
-				},
-			})
-			.then((resp) => {
-				let orders = resp.data.data;
-				let ordersToExecute = [];
-				let _orderToPlace = token0Amount * 10 ** token0.decimals;
-				let _expectedOutput = Big(0);
-				for (let i in orders) {
-					let execAmount = Math.min(_orderToPlace, orders[i].amount);
-					orders[i].amount = execAmount;
-					ordersToExecute.push(orders[i]);
-					_orderToPlace = Big(_orderToPlace)
-						.minus(execAmount)
-						.toFixed(0);
-					_expectedOutput = _expectedOutput.plus(
-						Big(execAmount)
-							.times(orders[i].exchangeRate)
-							.div(10 ** pair.exchangeRateDecimals)
-					);
-				}
-				_expectedOutput = _expectedOutput.plus(
-					Big(_orderToPlace).times(price)
-				);
-				if (Number(_orderToPlace) < Number(pair?.minToken0Order)) {
-					setOffsetAmount(Number(_orderToPlace));
-				}
-				setOrderToPlace(
-					Number(_orderToPlace) > Number(pair?.minToken0Order)
-						? _orderToPlace
-						: 0
-				);
-				setOrders(ordersToExecute);
-				setExpectedOutput(_expectedOutput.toFixed(0));
-			});
+		// axios
+		// 	.get(Endpoints[chain]+'matchedorders/' + pair.id, {
+		// 		params: {
+		// 			amount: _amount,
+		// 			exchange_rate: Big(price).times(
+		// 				10 ** pair.exchangeRateDecimals
+		// 			),
+		// 			order_type: 0,
+		// 		},
+		// 	})
+		// 	.then((resp) => {
+		// 		let orders = resp.data.data;
+		// 		let ordersToExecute = [];
+		// 		let _orderToPlace = amount * 10 ** token0.decimals;
+		// 		let _expectedOutput = Big(0);
+		// 		for (let i in orders) {
+		// 			let execAmount = Math.min(_orderToPlace, orders[i].amount);
+		// 			orders[i].amount = execAmount;
+		// 			ordersToExecute.push(orders[i]);
+		// 			_orderToPlace = Big(_orderToPlace)
+		// 				.minus(execAmount)
+		// 				.toFixed(0);
+		// 			_expectedOutput = _expectedOutput.plus(
+		// 				Big(execAmount)
+		// 					.div(orders[i].exchangeRate)
+		// 					.times(10 ** pair.exchangeRateDecimals)
+		// 			);
+		// 		}
+		// 		_expectedOutput = _expectedOutput.plus(
+		// 			Big(_orderToPlace).div(price)
+		// 		);
+		// 		if (Number(_orderToPlace) < Number(pair?.minToken0Order)) {
+		// 			setOffsetAmount(Number(_orderToPlace));
+		// 		}
+		// 		setOrderToPlace(
+		// 			Number(_orderToPlace) > Number(pair?.minToken0Order)
+		// 				? _orderToPlace
+		// 				: 0
+		// 		);
+		// 		setOrders(ordersToExecute);
+		// 		setExpectedOutput(_expectedOutput.toFixed(0));
+		// 	});
 	};
 
 	const _onClose = () => {
@@ -200,12 +252,28 @@ export default function BuyModal({
 		onClose();
 	};
 
+	const amountExceedsBalance = () => {
+		if (amount == '0' || amount == '' || !token0 || !token1) return false;
+		if (Number(amount) && token0.tradingBalance && token1.decimals)
+			return Big(amount).gt(
+				Big(token0.tradingBalance).div(10 ** token1.decimals)
+			);
+	};
+
+	const amountExceedsMin = () => {
+		if (amount == '0' || amount == '' || !pair || !token0) return false;
+		if (Number(amount) && pair?.minToken0Order && token0.decimals)
+			return Big(amount).lt(
+				Big(pair?.minToken0Order).div(10 ** token0.decimals)
+			);
+	};
+
 	return (
 		<>
 			<Button
 				width={'100%'}
 				mt="2"
-				bgColor={'green2'}
+				bgColor={'red'}
 				onClick={_onOpen}
 				disabled={
 					!(isConnected || isEvmConnected) ||
@@ -222,7 +290,7 @@ export default function BuyModal({
 					? 'Amount is too less'
 					: amountExceedsBalance()
 					? 'Insufficient Trading Balance'
-					: 'Limit Buy'}
+					: 'Limit Sell'}
 			</Button>
 			<Modal
 				isOpen={isOpen}
@@ -274,7 +342,7 @@ export default function BuyModal({
 						<Text>Placing Orders</Text>
 						{orderToPlace > 0 ? (
 							<Box py={2} my={2} bgColor="gray.900" px={2}>
-								<Text fontSize={'xs'}>OrderType: BUY</Text>
+								<Text fontSize={'xs'}>OrderType: SELL</Text>
 								<Text>
 									{orderToPlace / 10 ** token0?.decimals}{' '}
 									{token0?.symbol} @ {price} {token1?.symbol}
@@ -287,12 +355,10 @@ export default function BuyModal({
 						)}
 
 						<Text>
-							Estimated Output: {token0Amount} {token0?.symbol}
+							Estimated Output: {amount} {token0?.symbol}
 						</Text>
 						<Text>
-							Total Amount:{' '}
-							{expectedOutput / 10 ** token1?.decimals}{' '}
-							{token1?.symbol}
+							Total Amount: {token1Amount} {token1?.symbol}
 						</Text>
 					</ModalBody>
 
@@ -307,7 +373,7 @@ export default function BuyModal({
 													? 'info'
 													: confirmed &&
 													  response.includes(
-															'Success'
+															'success'
 													  )
 													? 'success'
 													: 'error'
@@ -319,12 +385,8 @@ export default function BuyModal({
 													{response}
 												</Text>
 												{hash && <Link
-													href={
-														explorer() +
-														hash
-													}
+													href={explorer() + hash}
 													target="_blank">
-													{' '}
 													<Text fontSize={'sm'}>
 														View on explorer
 													</Text>
@@ -339,13 +401,13 @@ export default function BuyModal({
 							) : (
 								<>
 									<Button
-										bgColor="green2"
+										bgColor="red"
 										mr={3}
 										width="100%"
-										onClick={buy}
+										onClick={sell}
 										loadingText="Sign the transaction in your wallet"
 										isLoading={loading}>
-										Confirm Buy
+										Confirm Sell
 									</Button>
 									<Button onClick={onClose} mt={2}>
 										Cancel

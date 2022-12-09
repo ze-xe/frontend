@@ -1,5 +1,6 @@
 import { extendTheme, ThemeConfig } from '@chakra-ui/react'
 import { createBreakpoints, mode, StyleFunctionProps } from '@chakra-ui/theme-tools'
+import { StepsStyleConfig as Steps } from 'chakra-ui-steps';
 
 const fonts = { mono: `'Menlo', monospace` }
 
@@ -73,6 +74,7 @@ const theme = extendTheme({
     }),
   },
   components: {
+    Steps,
     Button: {
       baseStyle: {
         borderRadius: '0px'

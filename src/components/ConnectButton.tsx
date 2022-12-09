@@ -41,6 +41,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { chains, ChainID, chainIndex } from '../utils/chains';
+import { LeverDataContext } from '../context/LeverDataProvider';
 
 const ConnectButton = ({}) => {
 	const {address: evmAddress, isConnected: isEvmConnected, isConnecting: isEvmConnecting} = useAccount();
@@ -57,6 +58,8 @@ const ConnectButton = ({}) => {
 	} = useContext(WalletContext);
 
 	const { isDataReady, isFetchingData, fetchData, setChain, chain } = useContext(DataContext);
+	const { fetchData: fetchLeverData } = useContext(LeverDataContext);
+
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const {
 		isOpen: isConnectOpen,
@@ -68,6 +71,7 @@ const ConnectButton = ({}) => {
 		connectTron((_address: string | null, _err: string) => {
 			if (!isDataReady && !isFetchingData && _address) {
 				fetchData(_address, ChainID.NILE);
+				fetchLeverData(_address, ChainID.NILE);
 				setChain(ChainID.NILE);
 			}
 		});
@@ -79,9 +83,10 @@ const ConnectButton = ({}) => {
 	};
 
 	const _connectEvm = (chain: number) => {
-			connectEvm({chainId: chains[chain].id, connector: connectors[chain]}).then((res) => {
-				fetchData(res.account, ChainID.AURORA);
-				setChain(ChainID.AURORA);
+			connectEvm({chainId: chains[chain].id, connector: connectors[0]}).then((res) => {
+				fetchData(res.account, chain);
+				fetchLeverData(res.account, chain);
+				setChain(chain);
 				localStorage.setItem("address", res.account)
 				localStorage.setItem("chain", ChainID.AURORA.toString());
 			})
@@ -140,6 +145,7 @@ const ConnectButton = ({}) => {
 				//     color="gray.100" size="sm" _hover={{ bg: 'gray.800' }} onClick={onOpen}>{(tronAddress)?.slice(0, 6) + "..." + (tronAddress)?.slice(-4)}</Button>
 				// </Box>
 				<Menu isOpen={isOpen} >
+					<ConnectButton/>
 					<MenuButton
 						bgColor={'primary'}
 						as={Button}
@@ -156,9 +162,7 @@ const ConnectButton = ({}) => {
 							{isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
 						</Flex>
 					</MenuButton>
-					<Fade in={isOpen}>
 						<MenuList
-							style={{ zIndex: 100 }}
 							bgColor={'gray.50'}
 							color={'gray.900'}
 							onMouseEnter={onOpen}
@@ -228,7 +232,7 @@ const ConnectButton = ({}) => {
 								</Flex>
 							</Box>
 						</MenuList>
-					</Fade>
+					{/* </Fade> */}
 				</Menu>
 			) : (
 				<Button
@@ -244,22 +248,23 @@ const ConnectButton = ({}) => {
 
 			<Modal isCentered isOpen={isConnectOpen} onClose={onConnectClose} >
 				<ModalOverlay bg="blackAlpha.100" backdropFilter="blur(30px)" />
-				<ModalContent maxW={'300px'} pt={0} pb={2} rounded={0} >
-					{/* <ModalCloseButton rounded={20} bgColor="gray.100" m={2}/> */}
+				<ModalContent  pt={0} pb={2} rounded={0} >
+					<ModalCloseButton rounded={20}  m={2}/>
 					<ModalBody >
 						<Text fontSize={'lg'} fontWeight="bold" mb={5} mt={1}>
 							Choose a network
 						</Text>
-						<Flex gap={5}>
+						<Flex flexDir={'column'} gap={5} align='flex-start'>
 						<Button
-								bgColor={'black'}
-								// minW={'0px'}
-								height={'125px'}
-								rounded="20"
+								bgColor={'#131821'}
+								w={'280px'}
+								height={'110px'}
+								// rounded="2"
 								// disabled
-								_hover={{ bg: 'gray.800' }}
+								_hover={{ bg: 'gray.900' }}
 								onClick={() => _connectEvm(0)}
 								px={8}
+								textAlign='left'
 								>
 								<Flex
 									flexDir={'row'}
@@ -268,13 +273,42 @@ const ConnectButton = ({}) => {
 									gap={5}>
 									<Image
 										src="/aurora.png"
+										width={'60px'}
+										height={'60px'}
+										alt="tronlogo"
+									/>
+									<Box>
+									<Text mb={1} fontSize='xl'>Aurora Testnet</Text>
+									<Text fontSize={'sm'}>{ChainID.AURORA}</Text>
+									</Box>
+
+								</Flex>
+							</Button>
+							<Button
+								bgColor={'#222429'}
+								w={'280px'}
+								height={'110px'}
+								// rounded="2"
+								// disabled
+								_hover={{ bg: 'blackAlpha.400' }}
+								onClick={() => _connectEvm(1)}
+								px={8}
+								textAlign='left'
+								>
+								<Flex
+									flexDir={'row'}
+									align="center"
+									justify={'center'}
+									gap={5}>
+									<Image
+										src="https://arbitrum.io/wp-content/uploads/2021/01/Arbitrum_Symbol-Full-color-White-background.png"
 										width={70}
 										height={70}
 										alt="tronlogo"
 									/>
 									<Box>
-									<Text mb={1} fontSize='lg'>Aurora Testnet</Text>
-									<Text fontSize={'sm'}>{ChainID.AURORA}</Text>
+									<Text mb={1} fontSize='xl'>Arbitrum Goerli</Text>
+									<Text fontSize={'sm'}>{ChainID.ARB_GOERLI}</Text>
 									</Box>
 
 								</Flex>

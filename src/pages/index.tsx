@@ -20,22 +20,21 @@ import { BsCurrencyExchange } from 'react-icons/bs';
 import { RiExchangeFundsFill } from 'react-icons/ri';
 import { GiBank, GiCardExchange } from 'react-icons/gi';
 
+const featuresTitle = {
+	fontSize: 'xl',
+	fontWeight: 'bold',
+	mt: 2,
+};
+
+const featuresText = {
+	fontSize: 'sm',
+};
+
+const featuresIcon = {
+	size: '25',
+};
+
 const Index = () => {
-	const { colorMode, toggleColorMode } = useColorMode();
-
-	const featuresTitle = {
-		fontSize: 'xl',
-		fontWeight: 'bold',
-		mt: 2,
-	};
-
-	const featuresText = {
-		fontSize: 'sm',
-	};
-
-	const featuresIcon = {
-		size: '25',
-	};
 
 	return (
 		<>

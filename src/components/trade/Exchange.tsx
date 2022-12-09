@@ -2,10 +2,15 @@ import { Box, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import LimitOrder from './Limit/index';
-import MarketOrder from './Market';
+import LimitOrder from './new_orders/Limit';
+import MarketOrder from './new_orders/Market';
 
 const Exchange = ({pair}) => {
+	const [hydrated, setHydrated] = React.useState(false);
+	React.useEffect(() => {
+		setHydrated(true);
+	}, []);
+	if (!hydrated) return <></>;
 	return <Box bgColor={"background2"}>
 			<Tabs
 				variant="line"

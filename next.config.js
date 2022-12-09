@@ -1,6 +1,6 @@
 const config = {
   images: {
-    domains: ['static.okx.com'],
+    domains: ['static.okx.com', 's2.coinmarketcap.com'],
   },
 }
 

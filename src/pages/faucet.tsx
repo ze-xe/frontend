@@ -19,18 +19,19 @@ import { WalletContext } from '../context/Wallet';
 import { getABI, getContract, send } from '../utils/contract';
 
 const mintAmount = {
-	USDT: 1000,
-	USDD: 1000,
+	USDT: 10000,
+	USDD: 10000,
 	BTC: 1,
 	ETH: 10,
-	WTRX: 10000,
+	WTRX: 100000,
 	BTT: 10000000,
-	AURORA: 100,
-	NEAR: 10,
-	USDC: 1000,
+	AURORA: 1000,
+	NEAR: 100,
+	USDC: 10000,
 };
 
 const Big = require('big.js');
+
 import { Input, InputGroup } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
@@ -40,7 +41,6 @@ import { ChainID } from '../utils/chains';
 
 function RadioCard(props) {
 	const { getInputProps, getCheckboxProps } = useRadio(props);
-	const { address, isConnected } = useContext(WalletContext);
 
 	const input = getInputProps();
 	const checkbox = getCheckboxProps();
@@ -81,6 +81,7 @@ export default function faucets() {
 	const { tokens, chain, explorer } = useContext(DataContext);
 	const { address, isConnected } = useContext(WalletContext);
 	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
+	const [hydrated, setHydrated] = React.useState(false);
 
 	const [selectedToken, setSelectedToken] = React.useState(0);
 
@@ -160,6 +161,11 @@ export default function faucets() {
 			});
 	};
 
+	React.useEffect(() => {
+		setHydrated(true);
+	}, []);
+
+	if (!hydrated) return <></>;
 	return (
 		<Flex justify={'center'}>
 			<Box
@@ -182,6 +188,7 @@ export default function faucets() {
 				</Text>
 				<HStack {...group}>
 					{tokens.map((token, index) => {
+						console.log(token);
 						const radio = getRadioProps({ value: index });
 						return (
 							<RadioCard

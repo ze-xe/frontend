@@ -61,7 +61,7 @@ function WalletProvider({children}: any) {
 				}
 			})
         } else {
-			if(typeof window !== 'undefined'){
+			// if(typeof window !== 'undefined'){
 				if(options.errRetryCount >= 3){
 					setConnectionError('Please install TronLink wallet extension');
 					setIsConnecting(false);
@@ -73,7 +73,7 @@ function WalletProvider({children}: any) {
 				} else  {
 					setTimeout(() => {connect(callback, {errRetryCount: options.errRetryCount + 1})}, 1000);
 				}
-			}
+			// }
 		}
     }
 

@@ -10,7 +10,11 @@ import { AppDataContext } from '../../../context/AppData';
 const Order = ({ order, index, total, pair, orderType }) => {
 	const {setExchangeRate} = useContext(AppDataContext);
 	return (
-		<Box onClick={() => setExchangeRate(order.exchangeRate/(10**pair?.exchangeRateDecimals))} _hover={{ cursor: 'pointer' }}>
+		<Box onClick={() => setExchangeRate(order.exchangeRate/(10**18))} _hover={{ cursor: 'pointer' }}
+		bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 100%), rgba(24, 176, 95, 100%))' : 'rgba(200, 50, 50, 100%), rgba(200, 50, 50, 100%))')}
+		bgSize={'1%'}
+		bgRepeat='no-repeat'
+		>
 			<Flex
 				key={index}
 				justify="space-between"
@@ -18,21 +22,23 @@ const Order = ({ order, index, total, pair, orderType }) => {
 				py={'3px'}
 				px={4}
 				_hover={{ bgColor: orderType == 'BUY' ? 'rgba(24, 176, 95, 20%)' : 'rgba(200, 50, 50, 20%)' }}
-				bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 40%), rgba(24, 176, 95, 30%))' : 'rgba(200, 50, 50, 40%), rgba(200, 50, 50, 30%))')}
-				bgSize={100*order.amount/total + '%'}
+				bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 20%), rgba(24, 176, 95, 20%))' : 'rgba(200, 50, 50, 20%), rgba(200, 50, 50, 20%))')}
+				
+				bgSize={300*order.amount/total + '%'}
 				bgRepeat='no-repeat'
 				>
 				<Text fontSize={'xs'}>
 					{tokenFormatter(null).format(order.amount/(10**pair?.tokens[0].decimals))}
 				</Text>
 				<Text fontSize={'xs'}>
-					{tokenFormatter(null).format((order.amount/(10**(pair?.tokens[0].decimals)))*(order.exchangeRate/(10**pair?.exchangeRateDecimals)))}
+					{tokenFormatter(null).format((order.amount/(10**(pair?.tokens[0].decimals)))*(order.exchangeRate/(10**18)))}
 				</Text>
 				<Text fontSize="xs" fontWeight={'bold'}>
-					{tokenFormatter(pair?.exchangeRateDecimals).format(order.exchangeRate/(10**pair?.exchangeRateDecimals))} 
+					{tokenFormatter(pair?.exchangeRateDecimals).format(order.exchangeRate/(10**18))} 
 				</Text>
 			</Flex>
-		</Box>
+			</Box>
+
 	);
 };
 
@@ -81,7 +87,7 @@ export default function OrderBook({ pair }) {
 				<Flex textAlign={'right'} mb={1.5} mr={-1}>
 				
 				{pair?.priceDiff < 0 ? <ArrowDownIcon width={3}/> : <ArrowUpIcon width={3}/>}
-				<Text fontSize={'xs'} mt={-0.5}>{pair?.priceDiff/ (10**pair?.exchangeRateDecimals)}</Text>
+				<Text fontSize={'xs'} mt={-0.5}>{pair?.priceDiff/ (10**18)}</Text>
 
 				</Flex>
 				<Text
@@ -89,7 +95,7 @@ export default function OrderBook({ pair }) {
 					fontWeight="bold"
 					textAlign={'right'}
 					mr={4}>
-					{tokenFormatter(pair?.exchangeRateDecimals).format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
+					{tokenFormatter(pair?.exchangeRateDecimals).format(pair?.exchangeRate / (10**18))}
 				</Text>
 			</Flex>
 			<Divider mb={2} bgColor="transparent" />

@@ -36,7 +36,7 @@ export default function TitlePanel({ pair }) {
 			</Flex>
 			<Box textAlign={'right'} color={pair?.priceDiff < 0 ? 'red2' : 'green2'}>
 				{/* <Text fontSize={'xs'} textTransform='uppercase'>Price</Text> */}
-				<Text fontSize={'3xl'} fontWeight='bold'>{tokenFormatter(pair?.exchangeRateDecimals).format(pair?.exchangeRate / (10**pair?.exchangeRateDecimals))} </Text>
+				<Text fontSize={'3xl'} fontWeight='bold'>{tokenFormatter(pair?.exchangeRateDecimals).format(pair?.exchangeRate / (10**18))} </Text>
 				<Text fontSize={'sm'} mt={-1}>{tokenFormatter(null).format(pairStats[pair?.id]?.[0].changeInER)}%</Text>
 			</Box>
 			</Flex>
@@ -51,7 +51,7 @@ export default function TitlePanel({ pair }) {
 						Trading Volume
 					</Text>
 					<Text fontSize={'sm'} fontWeight="bold">
-					{dollarFormatter(null).format(pairStats[pair?.id]?.[0].volume * pair?.exchangeRate / (10**pair?.exchangeRateDecimals))}
+					{dollarFormatter(null).format(pairStats[pair?.id]?.[0].volume * pair?.exchangeRate / (10**18))}
 					</Text>
 				</Box>
 				<Box>

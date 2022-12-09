@@ -4,7 +4,7 @@ import GraphPanel from '../../components/trade/GraphPanel';
 import TokensPanel from '../../components/trade/TokensPanel/TokensPanel';
 import OrdersPanel from '../../components/trade/Orders/OrdersPanel';
 import TitlePanel from '../../components/trade/TitlePanel';
-import Swap from '../../components/trade/Limit';
+import Swap from '../../components/trade/new_orders/Limit';
 import { useContext } from 'react';
 import { DataContext } from '../../context/DataProvider';
 import { useRouter } from 'next/router';
@@ -43,7 +43,7 @@ const Trade = () => {
 		<>
 			<Head>
 				<title>
-					{pair?.exchangeRate / 10 ** pair?.exchangeRateDecimals}{' '}
+					{pair?.exchangeRate / 10 ** 18}{' '}
 					{pair?.tokens[1].symbol}/{pair?.tokens[0].symbol} | ZEXE |
 					Buy & Sell Crypto on TRON
 				</title>
@@ -77,11 +77,11 @@ const Trade = () => {
 						<OrdersPanel pair={pair} />
 					</Flex>
 				</Flex>
-				{(isConnected || isEvmConnected) && (
+				{/* {(isConnected || isEvmConnected) && (
 					<Box bgColor={'background2'} my={2} width="100%">
 						<PlacedOrders pair={pair} />
 					</Box>
-				)}
+				)} */}
 			</Box>
 		</>
 	);

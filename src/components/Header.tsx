@@ -23,7 +23,10 @@ import {
 } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
-import ConnectButton from './ConnectButton';
+
+// import ConnectButton from './ConnectButton';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+
 import { WalletContext } from '../context/Wallet';
 import { DataContext } from '../context/DataProvider';
 
@@ -39,8 +42,9 @@ import {
 	useBreakpointValue,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { useAccount, useConnect } from 'wagmi';
+import { useAccount, useConnect, chain } from 'wagmi';
 import { ChainID, chainIndex, chains } from '../utils/chains';
+import { LeverDataContext } from '../context/LeverDataProvider';
 
 export const Header = ({ title }: { title: string }) => {
 	const router = useRouter();
@@ -50,69 +54,77 @@ export const Header = ({ title }: { title: string }) => {
 		useContext(WalletContext);
 	const { isFetchingData, isDataReady, fetchData, setChain } = useContext(DataContext);
 	const [init, setInit] = useState(false);
+	const { fetchData: fetchLeverData } = useContext(LeverDataContext);
 
-	const {address: evmAddress, isConnected: isEvmConnected, isConnecting: isEvmConnecting} = useAccount();
-	const {connectAsync: connectEvm, connectors} = useConnect();
+	const {address: evmAddress, isConnected: isEvmConnected, isConnecting: isEvmConnecting} = useAccount({
+		onConnect({ address, connector, isReconnected }) {
+			console.log('Connected', address)
+			fetchData(address, connector.chains[0].id);
+			fetchLeverData(address, connector.chains[0].id);
+			setChain(connector.chains[0].id);
+		},
+	});
+	// const {connectAsync: connectEvm, connectors} = useConnect();
 
 	useEffect(() => {
 		if (localStorage.getItem('chakra-ui-color-mode') === 'light') {
 			localStorage.setItem('chakra-ui-color-mode', 'dark');
 		}
-		if (typeof window !== 'undefined') {
-			if (!isConnected && !isConnecting && !isEvmConnected && !isEvmConnecting && !init) {
-				const _address = localStorage.getItem('address');
-				const _chain = localStorage.getItem('chain');
-				if(_address && _chain){
-					if(parseInt(_chain) == ChainID.NILE){
-						connect((_address: string | null, _err: string) => {
-							if (!isDataReady && !isFetchingData && _address) {
-								fetchData(_address, ChainID.NILE);
-								setChain(ChainID.NILE); 
-								setInit(true)
-							}
-						});
-					} else {
-						connectEvm({chainId: parseInt(_chain), connector: connectors[chainIndex[parseInt(_chain)]]}).then((res) => {
-							if (!isDataReady && !isFetchingData && res.account) {
-								fetchData(res.account, ChainID.AURORA);
-								setChain(ChainID.AURORA);
-								localStorage.setItem("address", res.account)
-								localStorage.setItem("chain", ChainID.AURORA.toString());
-								setInit(true)
-							}
-						})
-						.catch((err: any) => {
-							err = JSON.stringify(err);
-							if(err.includes('ChainNotConfigured')){
-								window.ethereum.request({method: 'wallet_addEthereumChain', params: [{
-									chainId: '0x' + ChainID.AURORA.toString(16),
-									chainName: 'Aurora Testnet',
-									nativeCurrency: {
-										name: 'Aurora',
-										symbol: 'ETH',
-										decimals: 18
-									},
-									rpcUrls: [chains[chainIndex[ChainID.AURORA]].rpcUrls.default],
-									blockExplorerUrls: [chains[chainIndex[ChainID.AURORA]].blockExplorers.default.url]
-								}]})
-								.then((res) => {
-									setInit(false);
-								})
-							} else if (err.includes("ConnectorNotFoundError")) {
-								setConnectionError("Please install Metamask wallet extension.");
-							} else {
-								setConnectionError(err);
-							}
-							setInit(true)
-							fetchData(null, ChainID.AURORA, false);
-						})
-					}
-				} else if(!init) {
-					fetchData(null, ChainID.AURORA, false);
-					setInit(true)
-				}
-			}
-		}
+		// if (typeof window !== 'undefined') {
+			// if (!isConnected && !isConnecting && !isEvmConnected && !isEvmConnecting && !init) {
+			// 	const _address = localStorage.getItem('address');
+			// 	const _chain = localStorage.getItem('chain');
+			// 	if(_address && _chain){
+			// 		if(parseInt(_chain) == ChainID.NILE){
+			// 			connect((_address: string | null, _err: string) => {
+			// 				if (!isDataReady && !isFetchingData && _address) {
+			// 					fetchData(_address, ChainID.NILE);
+			// 					setChain(ChainID.NILE); 
+			// 					setInit(true)
+			// 				}
+			// 			});
+			// 		} else {
+			// 			connectEvm({chainId: parseInt(_chain), connector: connectors[chainIndex[parseInt(_chain)]]}).then((res) => {
+			// 				if (!isDataReady && !isFetchingData && res.account) {
+			// 					fetchData(res.account, ChainID.AURORA);
+			// 					setChain(ChainID.AURORA);
+			// 					localStorage.setItem("address", res.account)
+			// 					localStorage.setItem("chain", ChainID.AURORA.toString());
+			// 					setInit(true)
+			// 				}
+			// 			})
+			// 			.catch((err: any) => {
+			// 				err = JSON.stringify(err);
+			// 				if(err.includes('ChainNotConfigured')){
+			// 					window.ethereum.request({method: 'wallet_addEthereumChain', params: [{
+			// 						chainId: '0x' + ChainID.AURORA.toString(16),
+			// 						chainName: 'Aurora Testnet',
+			// 						nativeCurrency: {
+			// 							name: 'Aurora',
+			// 							symbol: 'ETH',
+			// 							decimals: 18
+			// 						},
+			// 						rpcUrls: [chains[chainIndex[ChainID.AURORA]].rpcUrls.default],
+			// 						blockExplorerUrls: [chains[chainIndex[ChainID.AURORA]].blockExplorers.default.url]
+			// 					}]})
+			// 					.then((res) => {
+			// 						setInit(false);
+			// 					})
+			// 				} else if (err.includes("ConnectorNotFoundError")) {
+			// 					setConnectionError("Please install Metamask wallet extension.");
+			// 				} else {
+			// 					setConnectionError(err);
+			// 				}
+			// 				setInit(true)
+			// 				fetchData(null, ChainID.AURORA, false);
+			// 			})
+			// 		}
+			// 	} else if(!init) {
+			// 		fetchData(null, ChainID.AURORA, false);
+			// 		setInit(true)
+			// 	}
+			// }
+		// }
 	});
 	if (router.pathname === '/') {
 		return <></>;
@@ -172,16 +184,19 @@ export const Header = ({ title }: { title: string }) => {
 				</Flex>
 
 				<Stack
-					flex={{ base: 1, md: 0 }}
+					flex={{ base: 1, md: 1 }}
 					justify={'flex-end'}
 					align="center"
 					direction={'row'}>
 					<Flex
 						display={{ sm: 'none', md: 'flex' }}
 						align="center"
-						gap={4}>
+						justify={'flex-end'}
+						gap={4} 
+						// minW={'330px'}
+						>
 						{/* <WalletMenu /> */}
-						<Box>
+						{/* <Box>
 							<Link href={'/deposit'}>
 								<Button variant={'unstyled'} fontSize="sm">
 									Deposit
@@ -194,6 +209,13 @@ export const Header = ({ title }: { title: string }) => {
 									Withdraw
 								</Button>
 							</Link>
+						</Box> */}
+						<Box>
+							<Link href={'/portfolio'}>
+								<Button variant={'unstyled'} fontSize="sm">
+									Portfolio
+								</Button>
+							</Link>
 						</Box>
 						{/* <Box>
 							<Link href={'/portfolio'}>
@@ -202,7 +224,9 @@ export const Header = ({ title }: { title: string }) => {
 								</Button>
 							</Link>
 						</Box> */}
-						<ConnectButton />
+						<Box>
+						<ConnectButton chainStatus={'icon'} showBalance={false}/>
+						</Box>
 					</Flex>
 				</Stack>
 			</Flex>
@@ -295,8 +319,8 @@ const DesktopNav = () => {
 		<Stack direction={'row'} spacing={2} align="center" mt={1}>
 			<MenuOption href={'/trade'} title={'Spot'} />
 			<MenuOption href={'/'} title={'Margin'} disabled={true} />
-			<MenuOption href={'/'} title={'Perpetuals'} disabled={true} />
-			<MenuOption href={'/'} title={'Options'} disabled={true} />
+			<MenuOption href={'/lend'} title={'Lend'} />
+			{/* <MenuOption href={'/'} title={'Options'} disabled={true} /> */}
 		</Stack>
 	);
 };
@@ -309,8 +333,8 @@ const MobileNav = () => {
 			display={{ md: 'none' }}>
 			<MenuOption href={'/trade'} title={'Spot'} />
 			<MenuOption href={'/'} title={'Margin'} disabled={true} />
-			<MenuOption href={'/'} title={'Perpetuals'} disabled={true} />
-			<MenuOption href={'/'} title={'Options'} disabled={true} />
+			<MenuOption href={'/'} title={'Lend'} disabled={true} />
+			{/* <MenuOption href={'/'} title={'Options'} disabled={true} /> */}
 			<MenuOption href={'/faucet'} title={'💰 Faucet'} />
 			<MenuOption href={'/deposit'} title={'Deposit'} />
 			<MenuOption href={'/withdraw'} title={'Withdraw'} />

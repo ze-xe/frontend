@@ -16,10 +16,10 @@ const Order = ({ order, pair, index }) => {
 				{tokenFormatter(null).format(order.fillAmount/(10**pair?.tokens[0].decimals))} 
 			</Text>
 			<Text fontSize={'xs'}>
-				{tokenFormatter(null).format(order.fillAmount*(order.exchangeRate/(10**pair.exchangeRateDecimals))/(10**pair?.tokens[0].decimals))} 
+				{tokenFormatter(null).format(order.fillAmount*(order.exchangeRate/(10**18))/(10**pair?.tokens[0].decimals))} 
 			</Text>
 			<Text fontSize="xs">
-				{tokenFormatter(pair.exchangeRateDecimals).format(order.exchangeRate/(10**pair.exchangeRateDecimals))}
+				{tokenFormatter(pair.exchangeRateDecimals).format(order.exchangeRate/(10**18))}
 			</Text>
 		</Flex>
 	);

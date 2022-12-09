@@ -7,8 +7,8 @@ import BuyModule from './Buy';
 const LimitOrder = ({ pair }) => {
 	return (
 		<Flex gap={10}>
-			<BuyModule pair={pair} />
-			<SellModule pair={pair} />
+			<BuyModule pair={pair} limit={true}/>
+			<SellModule pair={pair} limit={true} />
 		</Flex>
 	);
 };

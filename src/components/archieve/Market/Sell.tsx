@@ -26,6 +26,7 @@ import { tokenFormatter } from '../../../utils/formatters';
 import { AppDataContext } from '../../../context/AppData';
 const Big = require('big.js');
 
+const MIN_T0_ORDER = '10000000000000000';
 
 export default function BuyModule({ pair }) {
 	const [pairNow, setPairNow] = React.useState(null);
@@ -40,8 +41,8 @@ export default function BuyModule({ pair }) {
 	const [token1, setToken1] = React.useState(null);
 
 	const { tokens } = useContext(DataContext);
-	const {exchangeRate: price, setExchangeRate: setPrice} = useContext(AppDataContext);
 
+	const {exchangeRate: price, setExchangeRate: setPrice} = useContext(AppDataContext);
 
 	useEffect(() => {
 		const _token0 = tokens.find((t) => t.id === pair?.tokens[0].id);
@@ -54,7 +55,7 @@ export default function BuyModule({ pair }) {
 			const _token1 = tokens.find((t) => t.id === pair?.tokens[1].id);
 			setToken0(_token0);
 			setToken1(_token1);
-			const newExchangeRate = (pair?.exchangeRate/(10**pair?.exchangeRateDecimals))			
+			const newExchangeRate = (pair?.exchangeRate/(10**18))			
 			setPrice(newExchangeRate.toFixed(pair?.exchangeRateDecimals));
 			settoken1Amount(Big(amount).mul(newExchangeRate).toNumber().toFixed(pair?.exchangeRateDecimals ?? 0));
 			setPairNow(pair?.id);
@@ -67,13 +68,13 @@ export default function BuyModule({ pair }) {
 			isNaN(sliderValue)
 		) {
 			const _price = Big(pair.exchangeRate).div(
-				10 ** pair.exchangeRateDecimals
+				10 ** 18
 			);
 			setPrice(_price.toString());
 			setSliderValue(20);
 			if (_price.toNumber() > 0) {
 				const token0Amount = Big(30)
-					.times(token0.tradingBalance)
+					.times(token0.balance)
 					.div(100)
 					.div(10 ** token1.decimals);
 				setAmount(token0Amount.toNumber().toFixed(pair.exchangeRateDecimals));
@@ -107,7 +108,7 @@ export default function BuyModule({ pair }) {
 		setSliderValue(e);
 		if(!token0 || !price) return;
 		const token0Amount = Big(e)
-			.times(token0?.tradingBalance ?? 0)
+			.times(token0?.balance ?? 0)
 			.div(100)
 			.div(10 ** token1?.decimals);
 		setAmount(token0Amount.toNumber().toString());
@@ -162,9 +163,10 @@ export default function BuyModule({ pair }) {
 			<Flex flexDir={'column'} gap={1}>
 				<Text fontSize={'sm'}>Price ({pair?.tokens[1].symbol})</Text>
 				<NumberInput
+					isDisabled
 					min={0}
 					precision={pair?.exchangeRateDecimals}
-					value={price}
+					value={'Place order at market price'}
 					onChange={onPriceChange}
 					variant="filled"
 					border={'1px'}
@@ -178,7 +180,7 @@ export default function BuyModule({ pair }) {
 				</NumberInput>
 			</Flex>
 
-			<Flex flexDir={'column'} gap={1}>
+			{/* <Flex flexDir={'column'} gap={1}>
 				<Text fontSize={'sm'}>Amount ({pair?.tokens[1].symbol})</Text>
 				<NumberInput
 					min={0}
@@ -195,12 +197,12 @@ export default function BuyModule({ pair }) {
 						<NumberDecrementStepper />
 					</NumberInputStepper>
 				</NumberInput>
-			</Flex>
+			</Flex> */}
 
 			<Flex flexDir={'column'} gap={1}>
 				<Flex justify={'space-between'}>
 				<Text fontSize={'sm'}>Total ({pair?.tokens[0].symbol})</Text>
-				<Text fontSize={'xs'}>Balance {tokenFormatter(null).format((token0?.tradingBalance ?? 0)/(10**token0?.decimals))}</Text>
+				<Text fontSize={'xs'}>Balance {tokenFormatter(null).format((token0?.balance ?? 0)/(10**token0?.decimals))}</Text>
 				</Flex>
 				<NumberInput
 					min={0}

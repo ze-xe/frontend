@@ -52,7 +52,7 @@ export default function BuyModule({ pair }) {
 			setToken0(_token0);
 			setToken1(_token1);
 			const newExchangeRate =
-				pair?.exchangeRate / 10 ** pair?.exchangeRateDecimals;
+				pair?.exchangeRate / 10 ** 18;
 
 			setPrice(newExchangeRate.toFixed(pair?.exchangeRateDecimals));
 			newExchangeRate > 0
@@ -73,13 +73,13 @@ export default function BuyModule({ pair }) {
 			isNaN(sliderValue)
 		) {
 			const _price = Big(pair.exchangeRate).div(
-				10 ** pair.exchangeRateDecimals
+				10 ** 18
 			);
 			setPrice(_price.toString());
 			setSliderValue(20);
 			if (_price.toNumber() > 0) {
 				const token1Amount = Big(30)
-					.times(token1.tradingBalance)
+					.times(token1.balance)
 					.div(100)
 					.div(10 ** token1.decimals);
 
@@ -96,13 +96,13 @@ export default function BuyModule({ pair }) {
 		}
 	});
 
-	const setSlider = (e) => {
+	const setSlider = (e: any) => {
 		setSliderValue(e);
-		if(!token1 || !price) return;
+		if(!token0 || !price) return;
 		const token1Amount = Big(e)
-			.times(token1.tradingBalance ?? 0)
+			.times(token1?.balance ?? 0)
 			.div(100)
-			.div(10 ** token1.decimals);
+			.div(10 ** token1?.decimals);
 		setAmount(token1Amount.toString());
 		if (price != '0' && price != '' && Number(price))
 			if (Number(price) > 0)
@@ -153,9 +153,10 @@ export default function BuyModule({ pair }) {
 			<Flex flexDir={'column'} gap={1}>
 				<Text fontSize={'sm'}>Price ({token1?.symbol})</Text>
 				<NumberInput
+					isDisabled
 					min={0}
 					precision={pair?.exchangeRateDecimals}
-					value={price}
+					value={'Place order at market price'}
 					onChange={onPriceChange}
 					variant="filled"
 					border={'1px'}
@@ -169,7 +170,7 @@ export default function BuyModule({ pair }) {
 				</NumberInput>
 			</Flex>
 
-			<Flex flexDir={'column'} gap={1}>
+			{/* <Flex flexDir={'column'} gap={1}>
 				<Text fontSize={'sm'}>Amount ({token0?.symbol})</Text>
 				<NumberInput
 					min={0}
@@ -186,7 +187,7 @@ export default function BuyModule({ pair }) {
 						<NumberDecrementStepper />
 					</NumberInputStepper>
 				</NumberInput>
-			</Flex>
+			</Flex> */}
 
 			<Flex flexDir={'column'} gap={1}>
 				<Flex justify={'space-between'}>
@@ -194,7 +195,7 @@ export default function BuyModule({ pair }) {
 					<Text fontSize={'xs'}>
 						Balance{' '}
 						{tokenFormatter(null).format(
-							(token1?.tradingBalance ?? 0) /
+							(token1?.balance ?? 0) /
 								10 ** token1?.decimals
 						)}
 					</Text>

@@ -3,7 +3,7 @@ import { Chain } from 'wagmi';
 
 export enum ChainID {
     AURORA = 1313161555,
-    BTTC = 1029,
+    ARB_GOERLI = 421613,
     NILE = -3,
 	HARMONY = 1666700000
 }
@@ -46,36 +46,36 @@ const aurora: Chain = {
 	//     blockCreated: number;
 	// };
 	/** Flag for test networks */
-	// testnet: true,
+	testnet: true,
 };
 
-const bttc: Chain = {
+const arbitrumGoerli: Chain = {
 	/** ID in number form */
-	id: ChainID.BTTC,
+	id: ChainID.ARB_GOERLI,
 	/** Human-readable name */
-	name: 'Bittorent Donau',
+	name: 'Arbitrum Goerli',
 	/** Internal network name */
-	network: 'Bittorent Donau',
+	network: 'Arbitrum Goerli',
 	/** Currency used by chain */
 	nativeCurrency: {
-		name: 'Bittorrent',
-		symbol: 'BTT',
+		name: 'Ethereum',
+		symbol: 'ETH',
 		decimals: 18,
 	},
 	/** Collection of RPC endpoints */
 	rpcUrls: {
-		public: 'https://pre-rpc.bt.io/',
-		default: 'https://pre-rpc.bt.io/',
+		public: 'https://arbitrum-goerli.infura.io/v3/bb621c9372d048979f8677ba78fe41d7',
+		default: 'https://arbitrum-goerli.infura.io/v3/bb621c9372d048979f8677ba78fe41d7',
 	},
 	/** Collection of block explorers */
 	blockExplorers: {
 		etherscan: {
-			name: 'BTTScan',
-			url: 'https://testnet.bttcscan.com/',
+			name: 'Arbiscan',
+			url: 'https://goerli.arbiscan.io/',
 		},
 		default: {
-			name: 'BTTScan',
-			url: 'https://testnet.bttcscan.com/',
+			name: 'Arbiscan',
+			url: 'https://goerli.arbiscan.io/',
 		},
 	},
 
@@ -87,7 +87,7 @@ const bttc: Chain = {
 	//     blockCreated: number;
 	// };
 	/** Flag for test networks */
-	// testnet: true,
+	testnet: true,
 };
 
 const harmony: Chain = {
@@ -128,23 +128,23 @@ const harmony: Chain = {
 	//     blockCreated: number;
 	// };
 	/** Flag for test networks */
-	// testnet: true,
+	testnet: true,
 };
 
 export const chains: Chain[] = [
     aurora, 
-    bttc,
+    arbitrumGoerli,
 	harmony
 ];
 
 export const chainMapping = {
 	[ChainID.AURORA]: aurora,
-	[ChainID.BTTC]: bttc,
+	[ChainID.ARB_GOERLI]: arbitrumGoerli,
 	[ChainID.HARMONY]: harmony,
 }
 
 export const chainIndex = {
 	[ChainID.AURORA]: 0,
-	[ChainID.BTTC]: 1,
+	[ChainID.ARB_GOERLI]: 1,
 	[ChainID.HARMONY]: 2,
 }

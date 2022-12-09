@@ -18,9 +18,23 @@ export const ADDRESSES = {
 		Exchange: '0x047d17892cd3D3226C455B12E5edef7d75b3E50D',
 		Vault: '0x4811419e3c5e1d91Ac83427562a455C22B5eA95F',
 	},
+	[ChainID.ARB_GOERLI]: {
+		Exchange: '0xD3D3A8146Cb6E5045eFb4739Ae88592744aE81BA',
+		Multicall: '0x511f64296fa72526231E5A55615d8e4eE5a2d4cF',
+		Lever: '0x7861292fd666f7c744a694D3B83B708b13a419f7'
+	}
 };
 
 export const Endpoints = {
 	[ChainID.NILE]: 'https://api.zexe.io/',
 	[ChainID.AURORA]: 'https://aurora.api.zexe.io/',
+	[ChainID.ARB_GOERLI]: 'http://localhost:3010/',
+};
+
+
+export const imageIds = {
+	ETH: "1027",
+	BTC: "1",
+	USDC: "3408",
+	DAI: "4943",
 };

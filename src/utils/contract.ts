@@ -23,6 +23,17 @@ export async function getContract(contractName: string, chain: number, address: 
   }
 }
 
+export async function getInterface(contractName: string, chain: number, address: string = null) {
+  address = address ?? getAddress(contractName, chain);
+  if(chain == ChainID.NILE){
+    let contract = await ((window as any).tronWeb).contract(getABI(contractName), address)
+    return contract;
+  } else {
+    let contract = new ethers.utils.Interface(getABI(contractName));
+    return contract;
+  }
+}
+
 export function call(contract: any, method: string, params: any[], chain: number) {
   if(chain == ChainID.NILE){
     return contract[method](...params).call();

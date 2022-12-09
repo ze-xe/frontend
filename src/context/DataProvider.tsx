@@ -1,10 +1,13 @@
 import * as React from 'react';
-import { DUMMY_ADDRESS, HELPER, Endpoints } from '../utils/const';
+import { DUMMY_ADDRESS, HELPER, Endpoints, ADDRESSES } from '../utils/const';
 const { Big } = require('big.js');
 import tronWeb from '../utils/tronWeb';
 import axios from 'axios';
 import { call, getABI, getAddress, getContract } from '../utils/contract';
 import { ChainID, chains, chainMapping } from '../utils/chains';
+import Exchange from '../components/trade/Exchange';
+import { getBalancesAndApprovals } from '../utils/balances';
+import { BigNumber } from 'ethers';
 
 const DataContext = React.createContext<DataValue>({} as DataValue);
 
@@ -54,6 +57,7 @@ function DataProvider({ children }: any) {
 	const [tokens, setTokens] = React.useState<any[]>([]);
 	const [userDepositWithdraws, setUserDepositWithdraws] = React.useState<any>([]);
 	const [chain, setChain] = React.useState(null);
+	const [block, setBlock] = React.useState(null);
 
 	const [dollarFormatter, setDollarFormatter] = React.useState<null | {}>(
 		new Intl.NumberFormat('en-US', {
@@ -75,22 +79,32 @@ function DataProvider({ children }: any) {
 	}
 
 	const getWalletBalances = async (address: string, _tokens = tokens, chain: number) => {
-		let multicall = await getContract('Helper', chain);
-		Promise.all([
-			call(multicall, 'balanceOf', [_tokens.map(token => token.id), address], chain), 
-			call(multicall, 'allowance', [_tokens.map(token => token.id), address, getAddress('Vault', chain)], chain), 
-			call(multicall, 'tradingBalanceOf', [getAddress('Vault', chain), _tokens.map(token => token.id), address], chain), 
-		]).then(async (res) => {
-			// set balance in token
-			let newTokens = []
-			for(let index in _tokens) {
-				let token = _tokens[index];
-				token.balance = res[0][index].toString();
-				token.allowance = res[1][index].toString();
-				token.tradingBalance = res[2][index].toString();
-				newTokens.push(token);
+		// let multicall = await getContract('Helper', chain);
+		// Promise.all([
+		// 	call(multicall, 'balanceOf', [_tokens.map(token => token.id), address], chain), 
+		// 	call(multicall, 'allowance', [_tokens.map(token => token.id), address, getAddress('Vault', chain)], chain), 
+		// 	call(multicall, 'tradingBalanceOf', [getAddress('Vault', chain), _tokens.map(token => token.id), address], chain), 
+		// ]).then(async (res) => {
+		// 	// set balance in token
+		// 	let newTokens = []
+		// 	for(let index in _tokens) {
+		// 		let token = _tokens[index];
+		// 		token.balance = res[0][index].toString();
+		// 		token.allowance = res[1][index].toString();
+		// 		token.tradingBalance = res[2][index].toString();
+		// 		newTokens.push(token);
+		// 	}
+		// 	setTokens(newTokens);
+		// })
+
+		getBalancesAndApprovals(_tokens.map(token => token.id), address, chain)
+		.then((res) => {
+			setBlock(res[0].toString());
+			for(let i = 0; i < res[1].length; i+=2){
+				_tokens[i/2].balance = BigNumber.from(res[1][i]).toString();
+				_tokens[i/2].allowance = BigNumber.from(res[1][i+1]).toString();
 			}
-			setTokens(newTokens);
+			setTokens(_tokens);
 		})
 	};
 
@@ -111,13 +125,13 @@ function DataProvider({ children }: any) {
 		setDataFetchError(null);
 		try {
 			// fetch data
-			const requests = [axios.get(Endpoints[chain]+'allpairs')]
-			if(firstTime) requests.push(axios.get(Endpoints[chain]+'alltokens'))
+			const requests = [axios.get(Endpoints[chain]+'pair/allpairs', {params: {chainId: chain}})]
+			if(firstTime) requests.push(axios.get(Endpoints[chain]+'tokens', {params: {chainId: chain}}))
 			Promise.all(requests).then(async (res) => {
 				_pairs = res[0].data.data;
 				setPairs(_pairs);
-				fetchPairData(_pairs, chain);
-				fetchPairStatus(_pairs, chain);
+				// fetchPairData(_pairs, chain);
+				// fetchPairStatus(_pairs, chain);
 
 				if(firstTime) {
 					_tokens = res[1].data.data;
@@ -133,14 +147,14 @@ function DataProvider({ children }: any) {
 				if(address) {
 					console.log('Fetching data...');
 					getWalletBalances(address, _tokens, chain);
-					fetchPlacedOrders(address, _pairs, chain)
-					fetchCancelledOrders(address, _pairs, chain)
-					fetchExecutedOrders(address, _pairs, chain)
-					fetchUserDepositsWithdraws(address, chain)
+					// fetchPlacedOrders(address, _pairs, chain)
+					// fetchCancelledOrders(address, _pairs, chain)
+					// fetchExecutedOrders(address, _pairs, chain)
+					// fetchUserDepositsWithdraws(address, chain)
 				}
 				fetchOrders(_pairs, chain)
 				fetchExecutedPairData(_pairs, chain);
-				if(loop) setTimeout(() => fetchData(address, chain, loop, false, _tokens, _pairs), 8000);
+				if(loop) setTimeout(() => fetchData(address, chain, loop, false, _tokens, _pairs), 20000);
 			})
 		} catch (error) {
 			setDataFetchError(error.message);
@@ -149,9 +163,13 @@ function DataProvider({ children }: any) {
 	};
 
 	const fetchOrders = (pairs: any[], chain: number) => {
-		let orderRequests = pairs.map((pair) => {
-			return axios.get(Endpoints[chain]+`orders/${pair.id}`);
-		})
+		let orderRequests = pairs.map((pair) => (
+			 axios.get(Endpoints[chain]+`pair/orders/${pair.id}`, {
+				params: {
+					chainId: chain
+				}
+			 })
+		))
 		Promise.all(orderRequests).then((res) => {
 			let newOrders = {};
 			res.forEach((order, index) => {
@@ -191,7 +209,11 @@ function DataProvider({ children }: any) {
 	// /pair/orders/history/:id
 	const fetchExecutedPairData = async (pairs: any[], chain: number) => {
 		let pairRequests = pairs.map((pair) => {
-			return axios.get(Endpoints[chain]+`pair/orders/history/${pair.id}`);
+			return axios.get(Endpoints[chain]+`pair/orders/history/${pair.id}`, {
+				params: {
+					chainId: chain
+				}
+			});
 		})
 		Promise.all(pairRequests).then((res) => {
 			let newPairs = {};
