@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DUMMY_ADDRESS, HELPER, Endpoints, ADDRESSES } from '../utils/const';
+import { DUMMY_ADDRESS, HELPER, Endpoints, ADDRESSES, coingeckoIds, dummyPrices } from '../utils/const';
 const { Big } = require('big.js');
 import tronWeb from '../utils/tronWeb';
 import axios from 'axios';
@@ -8,36 +8,12 @@ import { ChainID, chains, chainMapping } from '../utils/chains';
 import Exchange from '../components/trade/Exchange';
 import { getBalancesAndApprovals } from '../utils/balances';
 import { BigNumber } from 'ethers';
+import socket from '../utils/socket';
 
 const DataContext = React.createContext<DataValue>({} as DataValue);
 
 // http://localhost:3010/allpairs
 // http://localhost:3010/orders/1a7f0acc09e078a414a7d74d2d00434427ef2c021a09d075996d2441f0d4ab9c
-
-// list of tokens
-const coingeckoIds = {
-	'BTC': 'bitcoin',
-	'ETH': 'ethereum',
-	'USDT': 'tether',
-	'USDD': 'usdd',
-	'WTRX': 'tron',
-	'BTT': 'bittorrent',
-	'NEAR': 'near',
-	'AURORA': 'aurora-near',
-	'USDC': 'usd-coin',
-};
-
-const dummyPrices = {
-	'BTC': '18000',
-	'ETH': '1200',
-	'USDT': '1',
-	'USDD': '1',
-	'WTRX': '0.006',
-	'BTT': '0.0000008',
-	'NEAR': '3.2',
-	'AURORA': '0.8',
-	'USDC': '1',
-};
 
 
 function DataProvider({ children }: any) {
@@ -123,6 +99,8 @@ function DataProvider({ children }: any) {
 			Promise.all(requests).then(async (res) => {
 				_pairs = res[0].data.data;
 				setPairs(_pairs);
+				subscribePairHistory(_pairs);
+				
 				// fetchPairData(_pairs, chain);
 				// fetchPairStatus(_pairs, chain);
 
@@ -147,13 +125,28 @@ function DataProvider({ children }: any) {
 				}
 				fetchOrders(_pairs, chain)
 				fetchExecutedPairData(_pairs, chain);
-				if(loop) setTimeout(() => fetchData(address, chain, loop, false, _tokens, _pairs), 20000);
+				// if(loop) setTimeout(() => fetchData(address, chain, loop, false, _tokens, _pairs), 20000);
 			})
 		} catch (error) {
 			setDataFetchError(error.message);
 		}
 		setIsFetchingData(false);
 	};
+
+	const subscribePairHistory = (_pairs: any[]) => {
+		socket.on('PAIR_HISTORY', ({pair, amount, buy, exchangeRate}) => {
+			for(let i in _pairs) {
+				if(_pairs[i].id === pair) {
+					_pairs[i].priceDiff = Big(_pairs[i].exchangeRate).minus(exchangeRate).toString();
+					_pairs[i].exchangeRate = exchangeRate;
+					console.log('found pair', _pairs[i]);
+				}
+			}
+			setPairs(_pairs);
+		})
+
+		
+	}
 
 	const fetchOrders = (pairs: any[], chain: number) => {
 		let orderRequests = pairs.map((pair) => (

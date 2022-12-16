@@ -1,23 +1,28 @@
-import * as React from 'react';
-import styles from './index.module.css';
-import { widget, version } from '../../../public/static/charting_library';
+import * as React from "react";
+import styles from "./index.module.css";
+import { widget, version } from "../../../public/static/charting_library";
+import axios from "axios";
+import { Endpoints } from "../../utils/const";
+import { ChainID } from "../../utils/chains";
 
 function getLanguageFromURL() {
-	const regex = new RegExp('[\\?&]lang=([^&#]*)');
+	const regex = new RegExp("[\\?&]lang=([^&#]*)");
 	const results = regex.exec(window.location.search);
-	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+	return results === null
+		? null
+		: decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 export class TVChartContainer extends React.PureComponent {
 	static defaultProps = {
-		symbol: 'AAPL',
-		interval: 'D',
-		datafeedUrl: 'https://demo_feed.tradingview.com',
-		libraryPath: '/static/charting_library/',
-		chartsStorageUrl: 'https://saveload.tradingview.com',
-		chartsStorageApiVersion: '1.1',
-		clientId: 'tradingview.com',
-		userId: 'public_user_id',
+		symbol: "BTC_USDC",
+		interval: "15",
+		datafeedUrl: "https://demo_feed.tradingview.com",
+		libraryPath: "/static/charting_library/",
+		chartsStorageUrl: "https://saveload.tradingview.com",
+		chartsStorageApiVersion: "1.1",
+		clientId: "tradingview.com",
+		userId: "public_user_id",
 		fullscreen: false,
 		autosize: true,
 		studiesOverrides: {},
@@ -27,7 +32,6 @@ export class TVChartContainer extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
-
 		this.ref = React.createRef();
 	}
 
@@ -35,42 +39,51 @@ export class TVChartContainer extends React.PureComponent {
 		const widgetOptions = {
 			symbol: this.props.symbol,
 			// BEWARE: no trailing slash is expected in feed URL
-			datafeed: new window.Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
+			datafeed: DataFeed,
 			interval: this.props.interval,
 			container: this.ref.current,
 			library_path: this.props.libraryPath,
 
-			locale: getLanguageFromURL() || 'en',
-			disabled_features: ['use_localstorage_for_settings'],
-			enabled_features: ['study_templates'],
-			charts_storage_url: this.props.chartsStorageUrl,
-			charts_storage_api_version: this.props.chartsStorageApiVersion,
-			client_id: this.props.clientId,
-			user_id: this.props.userId,
-			fullscreen: this.props.fullscreen,
-			autosize: this.props.autosize,
-			studies_overrides: this.props.studiesOverrides,
+			locale: getLanguageFromURL() || "en",
+			disabled_features: ["use_localstorage_for_settings", "header_symbol_search", "header_compare", "header_undo_redo", "header_screenshot"],
+			// enabled_features: ["study_templates"],
+			// charts_storage_url: this.props.chartsStorageUrl,
+			// charts_storage_api_version: this.props.chartsStorageApiVersion,
+			// client_id: this.props.clientId,
+			// user_id: this.props.userId,
+			// fullscreen: this.props.fullscreen,
+			// autosize: this.props.autosize,
+			// studies_overrides: this.props.studiesOverrides,
+			theme: 'dark',
+			toolbar_bg: '#130B25',
+
+			width: '100%',
+			height: '600',
 		};
 
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
 
-		tvWidget.onChartReady(() => {
-			tvWidget.headerReady().then(() => {
-				const button = tvWidget.createButton();
-				button.setAttribute('title', 'Click to show a notification popup');
-				button.classList.add('apply-common-tooltip');
-				button.addEventListener('click', () => tvWidget.showNoticeDialog({
-					title: 'Notification',
-					body: 'TradingView Charting Library API works correctly',
-					callback: () => {
-						console.log('Noticed!');
-					},
-				}));
-
-				button.innerHTML = 'Check API';
-			});
-		});
+		// tvWidget.onChartReady(() => {
+		// 	tvWidget.headerReady().then(() => {
+		// 		const button = tvWidget.createButton();
+		// 		button.setAttribute(
+		// 			"title",
+		// 			"Click to show a notification popup"
+		// 		);
+		// 		button.classList.add("apply-common-tooltip");
+		// 		button.addEventListener("click", () =>
+		// 			tvWidget.showNoticeDialog({
+		// 				title: "Notification",
+		// 				body: "zexe API works correctly",
+		// 				callback: () => {
+		// 					console.log("Noticed!");
+		// 				},
+		// 			})
+		// 		);
+		// 		button.innerHTML = "Check API";
+		// 	});
+		// });
 	}
 
 	componentWillUnmount() {
@@ -81,10 +94,147 @@ export class TVChartContainer extends React.PureComponent {
 	}
 
 	render() {
-		return (	
+		return (
 			<>
 				<div ref={this.ref} className={styles.TVChartContainer} />
 			</>
 		);
 	}
 }
+
+// import { getExchangeServerTime, getSymbols, getKlines, subscribeKline, unsubscribeKline, checkInterval } from './helpers'
+
+const configurationData = {
+	// supports_marks: false,
+	// supports_timescale_marks: false,
+	// supports_time: true,
+	supported_resolutions: ["5", "15", "30"],
+};
+
+const DataFeed = {
+	onReady: (callback) => {
+		console.log("[onReady]: Method call");
+		setTimeout(() => callback(configurationData)); // callback must be called asynchronously.
+	},
+
+	resolveSymbol: (
+		symbolName,
+		onSymbolResolvedCallback,
+		onResolveErrorCallback
+	) => {
+		axios
+			.get(Endpoints[ChainID.ARB_GOERLI] + "chart/symbol", {
+				params: {
+					symbol: symbolName,
+				},
+			})
+			.then((resp) => {
+				const symbolItem = resp.data.data;
+				const symbolInfo = {
+					ticker: symbolItem.symbol,
+					name: symbolItem.symbol,
+					description: symbolItem.symbol,
+					type: "crypto",
+					session: "24x7",
+					timezone: "UTC",
+					exchange: "zexe",
+					minmov: 1,
+					pricescale: 100,
+					has_intraday: true,
+					has_no_volume: true,
+					has_weekly_and_monthly: false,
+					supported_resolutions:
+						configurationData.supported_resolutions,
+					volume_precision: 2,
+					pairId: symbolItem.ticker,
+					// data_status: 'streaming',
+				};
+
+				console.log("[resolveSymbol]: Symbol resolved", symbolInfo);
+				onSymbolResolvedCallback(symbolInfo);
+			});
+		console.log("[resolveSymbol]: Method call", symbolName);
+	},
+
+	getBars: (
+		symbolInfo,
+		resolution,
+		{ from, to, firstDataRequest },
+		onHistoryCallback,
+		onErrorCallback
+	) => {
+		// console.log("[getBars]: Method call", firstDataRequest);
+		// console.log(symbolInfo.pairId, from, to, resolution);
+		axios
+			.get(
+				Endpoints[ChainID.ARB_GOERLI] +
+					"chart/bar/history/" +
+					symbolInfo.pairId,
+				{
+					params: {
+						from,
+						to,
+						interval: resolution,
+						firstDataRequest
+					},
+				}
+			)
+			.then((resp) => {
+				if (resp.data.data.length == 0) {
+					onHistoryCallback([], { noData: true });
+					return;
+				} else {
+					const data = resp.data.data.exchangeRate;
+					onHistoryCallback(data, { noData: false });
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+				onErrorCallback(err);
+			});
+	},
+
+	// subscription to real-time updates
+	subscribeBars: (
+		symbolInfo,
+		interval,
+		onRealtimeCallback,
+		subscribeUID,
+		onResetCacheNeededCallback
+	) => {
+		console.log(
+			"[subscribeBars]: Method call with subscribeUID:",
+			subscribeUID
+		);
+		// window.interval = setInterval(
+		// 	() =>
+		// console.log(Date.now() - 100000)
+				// onRealtimeCallback([{
+				// 	time: '1671087897000',
+				// 	open: 1,
+				// 	high: 2,
+				// 	low: 1,
+				// 	close: 2,
+				// 	volume: 100,
+				// }])
+		// 	10000
+		// );
+
+		// subscribeKline({ symbol: symbolInfo.name, interval, uniqueID: subscribeUID, }, cb => onRealtimeCallback(cb))
+	},
+	unsubscribeBars: (subscriberUID) => {
+		console.log(
+			"[unsubscribeBars]: Method call with subscriberUID:",
+			subscriberUID
+		);
+		// unsubscribeKline(subscriberUID)
+		clearInterval(window.interval);
+	},
+	// getServerTime: (callback) => {
+	// getExchangeServerTime().then(time => {
+	// 	callback(Math.floor(time / 1000))
+	// }).catch(err => {
+	// 	console.error(err)
+	// })
+	// }
+};

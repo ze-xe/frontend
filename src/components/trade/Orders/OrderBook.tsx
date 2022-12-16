@@ -21,10 +21,9 @@ const Order = ({ order, index, total, pair, orderType }) => {
 				color={orderType == 'BUY' ? 'green2' : 'red2'}
 				py={'3px'}
 				px={4}
-				_hover={{ bgColor: orderType == 'BUY' ? 'rgba(24, 176, 95, 20%)' : 'rgba(200, 50, 50, 20%)' }}
+				_hover={{ bgColor: orderType == 'BUY' ? 'rgba(24, 176, 95, 10%)' : 'rgba(200, 50, 50, 10%)' }}
 				bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 20%), rgba(24, 176, 95, 20%))' : 'rgba(200, 50, 50, 20%), rgba(200, 50, 50, 20%))')}
-				
-				bgSize={300*order.amount/total + '%'}
+				bgSize={600*order.amount/total + '%'}
 				bgRepeat='no-repeat'
 				>
 				<Text fontSize={'xs'}>
@@ -68,7 +67,7 @@ export default function OrderBook({ pair }) {
 				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize={'xs'} fontWeight='bold'>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
-			{[...sellOrders].reverse().map((order: any, index: number) => {
+			{[...sellOrders].slice(0, 22).reverse().map((order: any, index: number) => {
 				return (
 					<Box key={index}>
 					<Order
