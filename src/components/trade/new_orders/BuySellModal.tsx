@@ -41,11 +41,11 @@ export default function BuySellModal({
 	token0Amount,
 	price, // needed for limit orders
 	buy,
-	limit
+	limit,
 }) {
-	if(token0Amount == '') token0Amount = '0';
-	if(token1Amount == '') token1Amount = '0';
-	if(price == '') price = '0';
+	if (token0Amount == "") token0Amount = "0";
+	if (token1Amount == "") token1Amount = "0";
+	if (price == "") price = "0";
 
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [orders, setOrders] = React.useState<any[] | null>(null);
@@ -82,25 +82,28 @@ export default function BuySellModal({
 		let _amount = Big(token0Amount)
 			.times(10 ** token0.decimals)
 			.toFixed(0);
-		if(buy && !limit){
+		if (buy && !limit) {
 			_amount = Big(token1Amount)
-			.times(10 ** token1.decimals)
-			.toFixed(0);
+				.times(10 ** token1.decimals)
+				.toFixed(0);
 		}
 
-		console.log(_amount);
-
 		axios
-			.get(Endpoints[chain] + `order/${limit ? 'limit' : 'market'}/matched/` + pair.id, {
-				params: {
-					amount: _amount,
-					exchangeRate: Big(price)
-						.times(10 ** 18)
-						.toFixed(0),
-					buy,
-					chainId: chain,
-				},
-			})
+			.get(
+				Endpoints[chain] +
+					`order/${limit ? "limit" : "market"}/matched/` +
+					pair.id,
+				{
+					params: {
+						amount: _amount,
+						exchangeRate: Big(price)
+							.times(10 ** 18)
+							.toFixed(0),
+						buy,
+						chainId: chain,
+					},
+				}
+			)
 			.then((resp) => {
 				let _orders = resp.data.data;
 				setOrders(_orders);
@@ -111,7 +114,7 @@ export default function BuySellModal({
 		initialStep: 0,
 	});
 
-	const _onClose = () => { 
+	const _onClose = () => {
 		setOrderToPlace(null);
 		setOrders(null);
 		onClose();
@@ -135,7 +138,8 @@ export default function BuySellModal({
 			>
 				{!(isConnected || isEvmConnected)
 					? "Connect Wallet"
-					: !Big(token0Amount).gt(0) ? "Enter Amount" 
+					: !Big(token0Amount).gt(0)
+					? "Enter Amount"
 					: amountExceedsBalance()
 					? "Insufficient Trading Balance"
 					: buy
@@ -162,97 +166,100 @@ export default function BuySellModal({
 					<ModalCloseButton />
 					<ModalBody>
 						<Flex flexDir="column" width="100%">
-							{orders ? limit ? (
-								orders.length > 0 ? (
-									<Steps activeStep={activeStep}>
-										<Step label={"Execute"}>
-											<Box mt={4}>
-											<OrdersToExecute
-												limit={limit}
-												price={price}
-												orders={orders}
-												pair={pair}
-												amountToFill={token0Amount}
-												nextStep={nextStep}
-												buy={buy}
-												token0={token0}
-												token1={token1}
-												setOrderToPlace={
-													setOrderToPlace
-												}
-											/>
-											</Box>
-										</Step>
-										<Step label={"Place"}>
-										<Box mt={4}>
-
-											<PlaceOrder
-												orderAmount={token0Amount}
-												amountToPlace={orderToPlace}
-												nextStep={_onClose}
-												buy={buy}
-												token0={token0}
-												token1={token1}
-												price={price}
-											/>
-											</Box>
-										</Step>
-									</Steps>
+							{orders ? (
+								limit ? (
+									orders.length > 0 ? (
+										<Steps activeStep={activeStep}>
+											<Step label={"Execute"}>
+												<Box mt={4}>
+													<OrdersToExecute
+														limit={limit}
+														price={price}
+														orders={orders}
+														pair={pair}
+														amountToFill={
+															token0Amount
+														}
+														close={_onClose}
+														nextStep={nextStep}
+														buy={buy}
+														token0={token0}
+														token1={token1}
+														setOrderToPlace={
+															setOrderToPlace
+														}
+													/>
+												</Box>
+											</Step>
+											<Step label={"Place"}>
+												<Box mt={4}>
+													<PlaceOrder
+														orderAmount={
+															token0Amount
+														}
+														amountToPlace={
+															orderToPlace
+														}
+														nextStep={_onClose}
+														buy={buy}
+														token0={token0}
+														token1={token1}
+														price={price}
+													/>
+												</Box>
+											</Step>
+										</Steps>
+									) : (
+										<PlaceOrder
+											orderAmount={token0Amount}
+											amountToPlace={orderToPlace}
+											nextStep={_onClose}
+											buy={buy}
+											token0={token0}
+											token1={token1}
+											price={price}
+										/>
+									)
 								) : (
-									<PlaceOrder
-										orderAmount={token0Amount}
-										amountToPlace={orderToPlace}
-										nextStep={_onClose}
+									<OrdersToExecute
+										limit={limit}
+										price={price}
+										orders={orders}
+										pair={pair}
+										amountToFill={token0Amount}
+										close={_onClose}
+										nextStep={nextStep}
 										buy={buy}
 										token0={token0}
 										token1={token1}
-										price={price}
+										setOrderToPlace={setOrderToPlace}
 									/>
 								)
-							) : 
-							
-							<OrdersToExecute
-							limit={limit}
-												price={price}
-												orders={orders}
-												pair={pair}
-												amountToFill={token0Amount}
-												nextStep={_onClose}
-												buy={buy}
-												token0={token0}
-												token1={token1}
-												setOrderToPlace={
-													setOrderToPlace
-												}
-											/>
-
-							: (
-								(
-									<>
-										<Skeleton
-											height="40px"
-											bg="green.500"
-											color="white"
-											mt={4}
-											fadeDuration={1}
-										></Skeleton>
-										<Skeleton
-											height="40px"
-											bg="green.500"
-											color="white"
-											mt={2}
-											fadeDuration={1}
-										></Skeleton>
-										<Skeleton
-											height="40px"
-											bg="green.500"
-											color="white"
-											mt={2}
-											mb={4}
-											fadeDuration={1}
-										></Skeleton>
-									</>
-								)
+							) : (
+								<>
+									<Skeleton
+										height="40px"
+										bg="green.500"
+										color="white"
+										mt={4}
+										fadeDuration={1}
+									></Skeleton>
+									<Skeleton
+										height="40px"
+										bg="green.500"
+										color="white"
+										mt={2}
+										fadeDuration={1}
+									></Skeleton>
+									<Skeleton
+										height="40px"
+										bg="green.500"
+										color="white"
+										mt={2}
+										mb={4}
+										fadeDuration={1}
+									></Skeleton>
+								</>
 							)}
 						</Flex>
 					</ModalBody>

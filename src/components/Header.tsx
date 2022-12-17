@@ -6,6 +6,7 @@ import {
 	Button,
 	useDisclosure,
 	Tooltip,
+	Divider,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useEffect, useContext, useState } from 'react';
@@ -317,9 +318,12 @@ const DesktopNav = () => {
 
 	return (
 		<Stack direction={'row'} spacing={2} align="center" mt={1}>
+			{/* <Divider orientation='vertical'/> */}
 			<MenuOption href={'/trade'} title={'Spot'} />
-			<MenuOption href={'/'} title={'Margin'} disabled={true} />
-			<MenuOption href={'/lend'} title={'Lend'} />
+			{/* <Divider orientation='vertical'/> */}
+			<MenuOption href={'/lend'} title={'Money Market'} />
+			{/* <Divider orientation='vertical'/> */}
+			<MenuOption href={'/margin'} title={'Margin'} disabled={true} />
 			{/* <MenuOption href={'/'} title={'Options'} disabled={true} /> */}
 		</Stack>
 	);

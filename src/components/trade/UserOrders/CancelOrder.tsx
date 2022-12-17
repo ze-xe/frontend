@@ -65,7 +65,7 @@ export default function CancelOrder({
 		let exchange = await getContract('Exchange', chain);
 		send(
 			exchange,
-			'updateLimitOrder',
+			'cancelOrder',
 			[
 				(chain == ChainID.NILE ? '0x' : '') + order.id,
                 '0',
@@ -148,7 +148,7 @@ export default function CancelOrder({
                         <Text>Order Amount</Text>
                         <Text mb={2}>{order.amount/(10**token0?.decimals)} {token0?.symbol}</Text>
                         <Text>Exchange Rate</Text>
-                        <Text mb={2}>{order.exchangeRate/(10**pair?.exchangeRateDecimals)} {token1?.symbol}/{token0?.symbol}</Text>
+                        <Text mb={2}>{order.exchangeRate/(10**18)} {token1?.symbol}/{token0?.symbol}</Text>
                         <Text>Order Type</Text>
                         <Text mb={2}>{order.orderType == '0' ? 'Buy' : 'Sell'}</Text>
 					</ModalBody>

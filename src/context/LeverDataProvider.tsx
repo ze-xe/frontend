@@ -25,6 +25,7 @@ const coingeckoIds = {
 	NEAR: "near",
 	AURORA: "aurora-near",
 	USDC: "usd-coin",
+	ZEXE: "zexe"
 };
 
 const dummyPrices = {
@@ -37,6 +38,7 @@ const dummyPrices = {
 	NEAR: "3.2",
 	AURORA: "0.8",
 	USDC: "1",
+	ZEXE: "0.01"
 };
 
 import erc20 from "../abis/ERC20.json";
@@ -159,6 +161,7 @@ function LeverDataProvider({ children }: any) {
 							id
 							name
 							symbol
+							decimals
 							lastPriceUSD
 						}
 						rates {
@@ -169,6 +172,7 @@ function LeverDataProvider({ children }: any) {
 						totalDepositBalanceUSD
 						totalBorrowBalanceUSD
 						maximumLTV
+						rewardTokenEmissionsUSD
 					}
 				}`,
 					}

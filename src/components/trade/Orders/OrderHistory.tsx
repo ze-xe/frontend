@@ -35,7 +35,7 @@ export default function OrderHistory({pair}) {
 				<Text fontSize="xs" fontWeight={"bold"}>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize="xs" fontWeight={"bold"}>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
-			{(pairExecutedData[pair?.id]) && pairExecutedData[pair?.id].slice(0,45).map((order: any, index: number) => {
+			{(pairExecutedData[pair?.id]) && pairExecutedData[pair?.id].slice(0,47).map((order: any, index: number) => {
 				return <Order order={order} pair={pair} index={index} key={index} />;
 			})}
 		</Box>

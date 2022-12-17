@@ -166,8 +166,8 @@ export default function PlaceOrder({
 
 					{amountToPlace == 0 ? (
 						<>
-							<Box my={4}>
-								<Text fontSize={"lg"} fontWeight="bold">
+							<Box my={4} bg='green.800' py={2} px={4}>
+								<Text fontSize={"md"}>
 									Limit order was executed successfully!
 								</Text>
 							</Box>

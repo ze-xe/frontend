@@ -75,6 +75,7 @@ export default function LendModal({ market, token }) {
 
 	const updateSliderValue = (value: number) => {
 		setSliderValue(value);
+		if(!token?.balance) return
 		setInputAmount(
 			(
 				(value * (token?.balance / 10 ** token?.decimals)) /
@@ -94,6 +95,7 @@ export default function LendModal({ market, token }) {
 	};
 
 	const amountExceedsBalance = () => {
+		if(!token?.balance) return true
 		return Number(inputAmount) > token?.balance / 10 ** token?.decimals;
 	};
 
@@ -182,7 +184,9 @@ export default function LendModal({ market, token }) {
 	return (
 		<>
 			<Box>
-				<IconButton size={'lg'} icon={<PlusSquareIcon boxSize={'20px'} />}  variant={'ghost'} onClick={onOpen} aria-label={""}/>
+				<Button size={'md'}  variant={'outline'} onClick={onOpen} aria-label={""}>
+				Deposit <PlusSquareIcon boxSize={'20px'} ml={2} />
+				</Button>
 			</Box>
 
 			<Modal isOpen={isOpen} onClose={_onClose} isCentered>
@@ -193,7 +197,7 @@ export default function LendModal({ market, token }) {
 					</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody mb={2}>
-						{Number(inputAmount) < Number(market?.allowance) ? (
+						{Number(inputAmount +1) < Number(market?.allowance) ? (
 							<Box>
 								<Text
 									textAlign={"right"}
@@ -202,7 +206,7 @@ export default function LendModal({ market, token }) {
 									mt={-2}
 								>
 									Balance{" "}
-									{token?.balance / 10 ** token?.decimals}
+									{token?.balance ? token?.balance / 10 ** token?.decimals : 0}
 								</Text>
 
 								<InputGroup>
@@ -212,11 +216,7 @@ export default function LendModal({ market, token }) {
 										borderRadius={0}
 									>
 										<Image
-											src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${
-												imageIds[
-													market.inputToken.symbol
-												]
-											}.png`}
+											src={`/assets/crypto_logos/${market.inputToken.symbol.toLowerCase()}.png`}
 											alt={""}
 											width={30}
 											height={30}
@@ -316,14 +316,14 @@ export default function LendModal({ market, token }) {
 								<Button
 									width={"100%"}
 									bgColor="primary"
-									disabled={amountExceedsBalance() || loading}
+									disabled={inputAmount == '0' || amountExceedsBalance() || loading}
 									isLoading={loading}
 									loadingText="Sign the transaction in your wallet"
 									onClick={deposit}
 								>
-									{amountExceedsBalance()
+									{inputAmount == '0' ? 'Enter Amount' : amountExceedsBalance()
 										? "Insufficient Balance"
-										: "Submit"}
+										: "Deposit"}
 								</Button>
 
 								{response && (
@@ -372,9 +372,8 @@ export default function LendModal({ market, token }) {
 							<Box>
 								<Flex gap={3} mb={5}>
 									<Image
-										src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${
-											imageIds[market.inputToken.symbol]
-										}.png`}
+														src={`/assets/crypto_logos/${market.inputToken.symbol.toLowerCase()}.png`}
+
 										alt={""}
 										width={40}
 										height={40}

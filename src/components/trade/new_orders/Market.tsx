@@ -6,7 +6,7 @@ import BuyModule from './Buy';
 
 const MarketOrder = ({ pair }) => {
 	return (
-		<Flex gap={10}>
+		<Flex gap={5}>
 			<BuyModule pair={pair} limit={false}/>
 			<SellModule pair={pair} limit={false} />
 		</Flex>

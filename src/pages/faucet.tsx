@@ -28,6 +28,7 @@ const mintAmount = {
 	AURORA: 1000,
 	NEAR: 100,
 	USDC: 10000,
+	ZEXE: 1000000
 };
 
 const Big = require('big.js');

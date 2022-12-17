@@ -31,8 +31,33 @@ export class TVChartContainer extends React.PureComponent {
 	tvWidget = null;
 
 	constructor(props) {
+		console.log(props.symbol);
 		super(props);
 		this.ref = React.createRef();
+	}
+
+	componentDidUpdate() {
+		const widgetOptions = {
+			symbol: this.props.symbol,
+			// BEWARE: no trailing slash is expected in feed URL
+			datafeed: DataFeed,
+			interval: this.props.interval,
+			container: this.ref.current,
+			library_path: this.props.libraryPath,
+
+			locale: getLanguageFromURL() || "en",
+			disabled_features: ["use_localstorage_for_settings", "header_symbol_search", "header_compare", "header_undo_redo", "header_screenshot"],
+
+			theme: 'dark',
+			toolbar_bg: '#130B25',
+
+			width: '100%',
+			height: '600',
+			header_widget_buttons_mode: 'compact'
+		};
+
+		const tvWidget = new widget(widgetOptions);
+		this.tvWidget = tvWidget;
 	}
 
 	componentDidMount() {
@@ -59,6 +84,7 @@ export class TVChartContainer extends React.PureComponent {
 
 			width: '100%',
 			height: '600',
+			header_widget_buttons_mode: 'compact'
 		};
 
 		const tvWidget = new widget(widgetOptions);

@@ -181,13 +181,13 @@ export default function WithdrawModal({ market, token }) {
 	return (
 		<>
 			<Box>
-				<IconButton
-					size={"lg"}
-					icon={<MinusIcon boxSize={"20px"} />}
-					variant={"ghost"}
+				<Button
+					size={"md"}
+					
+					variant={"outline"}
 					onClick={onOpen}
 					aria-label={""}
-				/>
+				><MinusIcon boxSize={"20px"} /></Button>
 			</Box>
 
 			<Modal isOpen={isOpen} onClose={_onClose} isCentered>
@@ -217,11 +217,7 @@ export default function WithdrawModal({ market, token }) {
 										borderRadius={0}
 									>
 										<Image
-											src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${
-												imageIds[
-													market.inputToken.symbol
-												]
-											}.png`}
+														src={`/assets/crypto_logos/${market.inputToken.symbol.toLowerCase()}.png`}
 											alt={""}
 											width={30}
 											height={30}
@@ -321,14 +317,14 @@ export default function WithdrawModal({ market, token }) {
 								<Button
 									width={"100%"}
 									bgColor="primary"
-									disabled={amountExceedsBalance() || loading}
+									disabled={inputAmount == '0' || amountExceedsBalance() || loading}
 									isLoading={loading}
 									loadingText="Sign the transaction in your wallet"
 									onClick={deposit}
 								>
 									{amountExceedsBalance()
 										? "Insufficient Balance"
-										: "Submit"}
+										: inputAmount == '0' ? 'Enter Amount' : "Withdraw"}
 								</Button>
 
 								{response && (

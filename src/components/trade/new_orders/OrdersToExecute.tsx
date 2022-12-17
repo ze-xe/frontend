@@ -30,13 +30,15 @@ export default function OrdersToExecute({
 	pair,
 	amountToFill,
 	nextStep,
+	close,
 	token0,
 	token1,
 	buy,
 	setOrderToPlace,
 	price,
-	limit
+	limit,
 }) {
+	const [remainingAmount, setRemainingAmount] = React.useState(amountToFill);
 	const [totalSize, setTotalSize] = React.useState(0);
 	const [tokenAmountToSpend, setTokenAmountToSpend] = React.useState("0");
 	const [amountExecuted, setAmountExecuted] = React.useState("0");
@@ -90,6 +92,7 @@ export default function OrdersToExecute({
 						} catch (err) {}
 					});
 					setOrderToPlace(Big(_amount).sub(total).toFixed(0));
+					setRemainingAmount(Big(_amount).sub(total).toFixed(0));
 					setAmountExecuted(total.toFixed(0));
 					setConfirmed(true);
 					setResponse("Transaction Successful!");
@@ -114,15 +117,19 @@ export default function OrdersToExecute({
 			"approve",
 			[getAddress("Exchange", chain), ethers.constants.MaxUint256],
 			chain
-		).then(async(res: any) => {
-			await res.wait(1);
-			setLoading(false);
-			incrementAllowance(tokenToSpend.id, ethers.constants.MaxUint256.toString());
-		})
-		.catch((err: any) => {
-			setLoading(false);
-			console.log(err);
-		})
+		)
+			.then(async (res: any) => {
+				await res.wait(1);
+				setLoading(false);
+				incrementAllowance(
+					tokenToSpend.id,
+					ethers.constants.MaxUint256.toString()
+				);
+			})
+			.catch((err: any) => {
+				setLoading(false);
+				console.log(err);
+			});
 	};
 
 	const checkResponse = (tx_id: string) => {
@@ -211,46 +218,47 @@ export default function OrdersToExecute({
 				</>
 			) : (
 				<>
-					
-						<Box my={4}>
-							{orders.map((o: any) => {
-								if (Number(o.value.amount) > 0)
-									return (
-										<Box
-											py={2}
-											my={2}
-											bgColor="gray.900"
-											px={2}
-										>
-											<Text fontSize={"xs"}>
-												{o.signature}
-											</Text>
+					<Box my={4}>
+						{[...orders].slice(0, 2).map((o: any) => {
+							if (Number(o.value.amount) > 0)
+								return (
+									<Box
+										py={2}
+										my={2}
+										bgColor="gray.900"
+										px={2}
+									>
+										<Text fontSize={"xs"}>
+											{o.signature}
+										</Text>
 
-											<Text>
-												{tokenFormatter(null).format(
-													o.value.amount /
-														10 **
-															pair.tokens[0]
-																.decimals
-												)}{" "}
-												{pair.tokens[0].symbol} @{" "}
-												{tokenFormatter(null).format(
-													o.value.exchangeRate /
-														10 ** 18
-												)}{" "}
-												{pair.tokens[1].symbol}
-											</Text>
-										</Box>
-									);
-								else return null;
-							})}
-							{orders.length == 0 && (
-								<Text mb={2} color="gray" fontSize={"sm"}>
-									No orders to execute
-								</Text>
-							)}
-						</Box>
-					
+										<Text>
+											{tokenFormatter(null).format(
+												o.value.amount /
+													10 **
+														pair.tokens[0].decimals
+											)}{" "}
+											{pair.tokens[0].symbol} @{" "}
+											{tokenFormatter(null).format(
+												o.value.exchangeRate / 10 ** 18
+											)}{" "}
+											{pair.tokens[1].symbol}
+										</Text>
+									</Box>
+								);
+							else return null;
+						})}
+						{orders.length == 0 ? (
+							<Text mb={2} color="gray" fontSize={"sm"}>
+								No orders to execute
+							</Text>
+						) : (orders.length > 2) ? (
+							<Text mb={2} color="gray" fontSize={"sm"}>
+								... {orders.length - 2} more orders
+							</Text>
+						) : <></>
+						}
+					</Box>
 
 					<Text fontSize={"sm"} color="gray" mt={1}>
 						Amount to fill
@@ -315,19 +323,19 @@ export default function OrdersToExecute({
 									<></>
 								) : status == "success" ||
 								  orders.length == 0 ? (
-									<Button onClick={nextStep} width="100%">
-										{limit ? 'Next' : 'Close'}
+									<Button onClick={limit && Big(remainingAmount).gt(0) ? nextStep: close} width="100%">
+										{limit && Big(remainingAmount).gt(0) ? "Next" : "Close"}
 									</Button>
 								) : (
 									<Button
-										bgColor={buy ? "green2": "red2"}
+										bgColor={buy ? "green2" : "red2"}
 										width="100%"
 										onClick={execute}
 										loadingText="Sign the transaction in your wallet"
 										isLoading={loading}
 										disabled={!orders}
 									>
-										Execute {buy ? 'buy' : 'sell'} orders
+										Execute {buy ? "buy" : "sell"} orders
 									</Button>
 								)}
 							</Box>

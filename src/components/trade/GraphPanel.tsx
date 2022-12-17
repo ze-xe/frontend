@@ -2,12 +2,6 @@ import { Box, Flex, Text } from '@chakra-ui/react'
 import React from 'react'
 import dynamic from "next/dynamic";
 
-// const Graph = dynamic(() => import("./Graph"), {
-//   ssr: false
-// });
-
-// import dynamic from 'next/dynamic';
-
 const TVChartContainer = dynamic(
 	() =>
 		import('../TVChartContainer').then(mod => mod.TVChartContainer),

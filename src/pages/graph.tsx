@@ -7,8 +7,8 @@ const TVChartContainer = dynamic(
 	{ ssr: false },
 );
 
-const Index = () => {
-	return (<TVChartContainer />);
+const Index = ({symbol}) => {
+	return (<TVChartContainer symbol={symbol} />);
 };
 
 export default Index;

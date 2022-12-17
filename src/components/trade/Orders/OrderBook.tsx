@@ -11,9 +11,9 @@ const Order = ({ order, index, total, pair, orderType }) => {
 	const {setExchangeRate} = useContext(AppDataContext);
 	return (
 		<Box onClick={() => setExchangeRate(order.exchangeRate/(10**18))} _hover={{ cursor: 'pointer' }}
-		bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 100%), rgba(24, 176, 95, 100%))' : 'rgba(200, 50, 50, 100%), rgba(200, 50, 50, 100%))')}
-		bgSize={'1%'}
-		bgRepeat='no-repeat'
+		// bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 100%), rgba(24, 176, 95, 100%))' : 'rgba(200, 50, 50, 100%), rgba(200, 50, 50, 100%))')}
+		// bgSize={'1%'}
+		// bgRepeat='no-repeat'
 		>
 			<Flex
 				key={index}
@@ -23,7 +23,7 @@ const Order = ({ order, index, total, pair, orderType }) => {
 				px={4}
 				_hover={{ bgColor: orderType == 'BUY' ? 'rgba(24, 176, 95, 10%)' : 'rgba(200, 50, 50, 10%)' }}
 				bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 20%), rgba(24, 176, 95, 20%))' : 'rgba(200, 50, 50, 20%), rgba(200, 50, 50, 20%))')}
-				bgSize={600*order.amount/total + '%'}
+				bgSize={700*order.amount/total + '%'}
 				bgRepeat='no-repeat'
 				>
 				<Text fontSize={'xs'}>
@@ -62,10 +62,10 @@ export default function OrderBook({ pair }) {
 
 	return (
 		<Flex flexDir={'column'}>
-			<Flex justify={'space-between'} px={4} py={1} mb={1} mt={-2} gap={2}>
-				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[0].symbol} </Text>
-				<Text fontSize={'xs'} fontWeight='bold'>Amount {pair?.tokens[1].symbol}</Text>
-				<Text fontSize={'xs'} fontWeight='bold'>Price {pair?.tokens[1].symbol}</Text>
+			<Flex justify={'space-between'} px={2} py={2} mb={1} mt={{md: -2, lg: 0}} gap={2}>
+				<Text fontSize={'xs'}>Amount {pair?.tokens[0].symbol} </Text>
+				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
+				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>
 			</Flex>
 			{[...sellOrders].slice(0, 22).reverse().map((order: any, index: number) => {
 				return (
@@ -98,7 +98,7 @@ export default function OrderBook({ pair }) {
 				</Text>
 			</Flex>
 			<Divider mb={2} bgColor="transparent" />
-			{buyOrders.map((order: any, index: number) => {
+			{buyOrders.slice(0, 22).map((order: any, index: number) => {
 				return (
 					<Box key={index}>
 

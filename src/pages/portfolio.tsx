@@ -37,38 +37,7 @@ export default function wallet() {
 	const { tokens } = useContext(DataContext);
 	const [balance, setBalance] = React.useState(0);
 	const [tradingBalancesUSD, setTradingBalancesUSD] = React.useState([]);
-	const [totalTradingBalanceUSD, setTotalTradingBalanceUSD] =
-		React.useState(0);
-
-	React.useEffect(() => {
-		if (isConnected) _setBalance();
-		if (tokens[0])
-			if (
-				tradingBalancesUSD.length == 0 &&
-				tokens[0].price &&
-				tokens[0].tradingBalance
-			)
-				_setTradingBalanceUSD();
-	});
-
-	const _setTradingBalanceUSD = () => {
-		let _tradingBalancesUSD = [];
-		let _totalTradingBalanceUSD = 0;
-		for (let i in tokens) {
-			let _amount =
-				(tokens[i].tradingBalance * tokens[i].price) /
-				10 ** tokens[i].decimals;
-			if (isNaN(_amount)) _amount = 0;
-			_tradingBalancesUSD.push(_amount);
-			_totalTradingBalanceUSD += _amount;
-		}
-		setTradingBalancesUSD(_tradingBalancesUSD);
-		setTotalTradingBalanceUSD(_totalTradingBalanceUSD);
-	};
-	const _setBalance = async () => {
-		let _balance = await (window as any).tronWeb.trx.getBalance(address);
-		setBalance(_balance);
-	};
+	const [totalTradingBalanceUSD, setTotalTradingBalanceUSD] = React.useState(0);
 
 	return (
 		<>
@@ -77,7 +46,7 @@ export default function wallet() {
 				<link rel="icon" type="image/x-icon" href="/favicon.png"></link>
 			</Head>
 			<Flex justify={'center'}>
-				{(isConnected || isEvmConnected) ? (
+				{(isEvmConnected) ? (
 					<Box mt={2} width="100%" maxW="1400px">
 						<Flex
 							bgColor={'background2'}
@@ -96,7 +65,7 @@ export default function wallet() {
 										ml={4}
 										fontSize="xl"
 										fontWeight={'bold'}>
-										{address??evmAddress}
+										{evmAddress}
 									</Text>
 									<Text
 										ml={4}
@@ -111,10 +80,10 @@ export default function wallet() {
 							</Flex>
 							<Box>
 								<Stat textAlign={'right'}>
-									<StatLabel>Trading Balance</StatLabel>
+									<StatLabel>Balance</StatLabel>
 									<StatNumber>
 										{dollarFormatter(null).format(
-											totalTradingBalanceUSD
+											0 // totalTradingBalanceUSD
 										)}
 									</StatNumber>
 									<StatHelpText></StatHelpText>
@@ -133,8 +102,8 @@ export default function wallet() {
 									<Thead>
 										<Tr>
 											<Th borderColor={'primary'}>Asset</Th>
-											<Th borderColor={'primary'}>Trading Balance</Th>
-											<Th borderColor={'primary'}>Wallet Balance</Th>
+											{/* <Th borderColor={'primary'}>Trading Balance</Th> */}
+											<Th borderColor={'primary'}>Balance</Th>
 											<Th borderColor={'primary'}></Th>
 											<Th borderColor={'primary'} isNumeric></Th>
 										</Tr>
@@ -166,7 +135,7 @@ export default function wallet() {
 															</Text>
 														</Flex>
 													</Td>
-													<Td borderColor={'whiteAlpha.200'}>
+													{/* <Td borderColor={'whiteAlpha.200'}>
 														<Box>
 															<Text>
 																{tokenFormatter(
@@ -190,7 +159,7 @@ export default function wallet() {
 																)}
 															</Text>
 														</Box>
-													</Td>
+													</Td> */}
 													<Td borderColor={'whiteAlpha.200'}>
 														<Box>
 															<Text>

@@ -99,10 +99,9 @@ function DataProvider({ children }: any) {
 			Promise.all(requests).then(async (res) => {
 				_pairs = res[0].data.data;
 				setPairs(_pairs);
-				subscribePairHistory(_pairs);
+				fetchPairData(_pairs, chain);
 				
-				// fetchPairData(_pairs, chain);
-				// fetchPairStatus(_pairs, chain);
+				subscribePairHistory(_pairs);
 
 				if(firstTime) {
 					_tokens = res[1].data.data;
@@ -118,10 +117,7 @@ function DataProvider({ children }: any) {
 				if(address) {
 					console.log('Fetching data...');
 					getWalletBalances(address, _tokens, chain);
-					// fetchPlacedOrders(address, _pairs, chain)
-					// fetchCancelledOrders(address, _pairs, chain)
-					// fetchExecutedOrders(address, _pairs, chain)
-					// fetchUserDepositsWithdraws(address, chain)
+					fetchPlacedOrders(address, _pairs, chain);
 				}
 				fetchOrders(_pairs, chain)
 				fetchExecutedPairData(_pairs, chain);
@@ -144,8 +140,6 @@ function DataProvider({ children }: any) {
 			}
 			setPairs(_pairs);
 		})
-
-		
 	}
 
 	const fetchOrders = (pairs: any[], chain: number) => {
@@ -166,29 +160,65 @@ function DataProvider({ children }: any) {
 	}
 
 	const fetchPlacedOrders = (address: string, pairs: any[], chain: number) => {
-		let orderRequests = pairs.map((pair) => {
-			return axios.get(Endpoints[chain]+`orders_placed/${address}/${pair.id}`);
-		})
+		let orderRequests = [];
+		for(let i in pairs){
+			orderRequests.push(axios.get(Endpoints[chain]+`user/orders/placed/${address}/pair/${pairs[i].id}`, {
+				params: {
+					chainId: chain
+				}
+			}));
+			orderRequests.push(axios.get(Endpoints[chain]+`user/orders/cancelled/${address}/pair/${pairs[i].id}`, {
+				params: {
+					chainId: chain
+				}
+			}));
+			orderRequests.push(axios.get(Endpoints[chain]+`user/orders/history/${address}/pair/${pairs[i].id}`, {
+				params: {
+					chainId: chain
+				}
+			}));
+		}
 		Promise.all(orderRequests).then((res) => {
-			let newOrders = {};
-			res.forEach((order, index) => {
-				return newOrders[pairs[index].id] = order.data.data;
-			})
-			setPlacedOrders(newOrders);
+			console.log(res);
+			let _placedOrders = {};
+			let _cancelledOrders = {};
+			let _executedOrders = {};
+			for(let i = 0; i < pairs.length; i++){
+				_placedOrders[pairs[i].id] = res[i*3].data.data;
+				_cancelledOrders[pairs[i].id] = res[i*3+1].data.data;
+				_executedOrders[pairs[i].id] = res[i*3+2].data.data;
+			}
+			setCancelledOrders(_cancelledOrders);
+			setOrderHistory(_executedOrders);
+			setPlacedOrders(_placedOrders);
 		})
 	}
 	
 	// api.zexe.io/pair/pricetrend/{pair}?interval=300000
 	const fetchPairData = (pairs: any[], chain: number) => {
-		let pairRequests = pairs.map((pair) => {
-			return axios.get(Endpoints[chain]+`pair/pricetrend/${pair.id}?interval=300000`);
-		})
+		let pairRequests = []
+		for(let i in pairs){
+			pairRequests.push(axios.get(Endpoints[chain]+`pair/pricetrend/${pairs[i].id}`, {
+				params: {
+					chainId: chain,
+					interval: 300000
+				}
+			}));
+			pairRequests.push(axios.get(Endpoints[chain]+`pair/trading/status/${pairs[i].id}`, {
+				params: {
+					chainId: chain
+				}
+			}))
+		}
 		Promise.all(pairRequests).then((res) => {
 			let newPairs = {};
-			res.forEach((pair, index) => {
-				return newPairs[pairs[index].id] = pair.data.data;
-			})
+			let _pairStatus = {};
+			for(let i = 0; i < pairs.length; i++){
+				newPairs[pairs[i].id] = res[i*2].data.data;
+				_pairStatus[pairs[i].id] = res[i*2+1].data.data;
+			}
 			setPairData(newPairs);
+			setPairStats(_pairStatus);
 		})
 	}
 	
@@ -207,55 +237,6 @@ function DataProvider({ children }: any) {
 				return newPairs[pairs[index].id] = pair.data.data;
 			})
 			setPairExecutedData(newPairs);
-		})
-	}
-
-	// /orders_history/:taker/:pairId
-	const fetchExecutedOrders = async (address: string, pairs: any[], chain: number) => {
-		let pairRequests = pairs.map((pair) => {
-			return axios.get(Endpoints[chain]+`orders_history/${address}/${pair.id}`);
-		})
-		Promise.all(pairRequests).then((res) => {
-			let newPairs = {};
-			res.forEach((pair, index) => {
-				return newPairs[pairs[index].id] = pair.data.data;
-			})
-			setOrderHistory(newPairs);
-		})
-	}
-
-	// /user/order/cancelled/:maker/:pairId
-	const fetchCancelledOrders = async (address: string, pairs: any[], chain: number) => {
-		let pairRequests = pairs.map((pair) => {
-			return axios.get(Endpoints[chain]+`user/order/cancelled/${address}/${pair.id}`);
-		})
-		Promise.all(pairRequests).then((res) => {
-			let newPairs = {};
-			res.forEach((pair, index) => {
-				return newPairs[pairs[index].id] = pair.data.data;
-			})
-			setCancelledOrders(newPairs);
-		})
-	}
-
-	// /pair/trading/status/:pairId
-	const fetchPairStatus = async (pairs: any[], chain: number) => {
-		let pairRequests = pairs.map((pair) => {
-			return axios.get(Endpoints[chain]+`pair/trading/status/${pair.id}`);
-		})
-		Promise.all(pairRequests).then((res) => {
-			let newPairs = {};
-			res.forEach((pair, index) => {
-				return newPairs[pairs[index].id] = pair.data.data;
-			})
-			setPairStats(newPairs);
-		})
-	}
-
-	// /user/deposits/withdraws/:id
-	const fetchUserDepositsWithdraws = async (address: string, chain: number) => {
-		axios.get(Endpoints[chain]+'user/deposits/withdraws/' + address).then((res) => {
-			setUserDepositWithdraws(res.data.data);
 		})
 	}
 

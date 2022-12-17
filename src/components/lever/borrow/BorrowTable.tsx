@@ -17,7 +17,7 @@ import {
 
 import Image from "next/image";
 import { LeverDataContext } from "../../../context/LeverDataProvider";
-import { dollarFormatter } from "../../../utils/formatters";
+import { dollarFormatter, tokenFormatter } from '../../../utils/formatters';
 
 import RepayModal from "./RepayModal";
 import BorrowModal from "./BorrowModal";
@@ -48,11 +48,13 @@ export default function LendingTable() {
 						<Table variant="simple">
 							<Thead>
 								<Tr>
-									<Th borderColor={"primary"}>Asset</Th>
+									<Th borderColor={"primary"}>Borrow Asset</Th>
 									<Th borderColor={"primary"}>
 										Borrow APR (%)
 									</Th>
+									<Th borderColor={"primary"}>Balance</Th>
 									<Th borderColor={"primary"}>Liquidity</Th>
+
 
 									<Th borderColor={"primary"} isNumeric></Th>
 								</Tr>
@@ -64,13 +66,7 @@ export default function LendingTable() {
 											<Td borderColor={"whiteAlpha.200"}>
 												<Flex gap={2} align="center">
 													<Image
-														src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${
-															imageIds[
-																market
-																	.inputToken
-																	.symbol
-															]
-														}.png`}
+														src={`/assets/crypto_logos/${market.inputToken.symbol.toLowerCase()}.png`}
 														alt={""}
 														width={30}
 														height={30}
@@ -112,23 +108,54 @@ export default function LendingTable() {
 											<Td borderColor={"whiteAlpha.200"}>
 												<Text>
 													{parseFloat(
-														market.rates[1].rate
+														market.rates[0].rate
 													).toFixed(2)}{" "}
 													%
 												</Text>
 												<Text fontSize={"xs"}>
 													+{" "}
-													{parseFloat("0.0").toFixed(
-														2
-													)}{" "}
+													{parseFloat(
+														market.rewardTokenEmissionsUSD
+															? (
+																	(100 *
+																		(market
+																			.rewardTokenEmissionsUSD[0] *
+																			365)) /
+																	market.totalDepositBalanceUSD
+															  ).toString()
+															: "0"
+													).toFixed(2)}{" "}
 													%
 												</Text>
 											</Td>
 											
 											<Td borderColor={"whiteAlpha.200"}>
+												<Text>
+												{tokenFormatter(null).format(
+													market.borrowBalance / 10**market.inputToken.decimals
+												)} {market.inputToken.symbol}
+												</Text>
+
+												<Text fontSize={'xs'} mt={1}>
+												{dollarFormatter(null).format(
+													market.borrowBalance / 10**market.inputToken.decimals * market.inputToken.lastPriceUSD
+												)}
+												</Text>
+											</Td>
+
+
+											<Td borderColor={"whiteAlpha.200"}>
+											<Text>
+												{tokenFormatter(null).format(
+													market.totalDepositBalanceUSD / market.inputToken.lastPriceUSD
+													)} {market.inputToken.symbol}
+													</Text>
+
+												<Text fontSize={'xs'} mt={1}>
 												{dollarFormatter(null).format(
 													market.totalDepositBalanceUSD
 												)}
+												</Text>
 											</Td>
 
 											<Td

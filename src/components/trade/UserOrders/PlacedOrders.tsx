@@ -21,7 +21,7 @@ import UpdateOrder from './UpdateOrder';
 import { tokenFormatter } from '../../../utils/formatters';
 
 export default function PlacedOrders({ pair }) {
-	const { tokens } = useContext(DataContext);
+	const { tokens, placedOrders } = useContext(DataContext);
 	const [token0, setToken0] = React.useState(null);
 	const [token1, setToken1] = React.useState(null);
 	const [pairNow, setPairNow] = React.useState(null);
@@ -36,14 +36,14 @@ export default function PlacedOrders({ pair }) {
 				tokens.find((token) => token.symbol === pair.tokens[1].symbol)
 			);
 			setPairNow(pair.id)
-		}}
+		}
+	}
 	});
 
-	const { placedOrders } = useContext(DataContext);
 	
 	return (
 		<Box bgColor="background2">
-			{placedOrders[pair?.id]?.length > 0 ? <TableContainer>
+			{pair && placedOrders[pair?.id]?.length > 0 ? <TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>
 						<Tr>
@@ -80,27 +80,26 @@ export default function PlacedOrders({ pair }) {
 										<Td>
 											{tokenFormatter(pair?.exchangeRateDecimals).format(
 												order.exchangeRate /
-													10 **
-														pair?.exchangeRateDecimals
+													10 ** 18
 											)}{' '}
 											{token1?.symbol}/{token0?.symbol}
 										</Td>
 										<Td isNumeric>
 											<Flex justify={'end'}>
-												<UpdateOrder
+												{/* <UpdateOrder
 													pair={pair}
 													token0={token0}
 													token1={token1}
 													price={0}
 													order={order}
-												/>
-												<CancelOrder
+												/> */}
+												{/* <CancelOrder
 													pair={pair}
 													token0={token0}
 													token1={token1}
 													price={0}
 													order={order}
-												/>
+												/> */}
 											</Flex>
 										</Td>
 									</Tr>
@@ -109,8 +108,8 @@ export default function PlacedOrders({ pair }) {
 						)}
 					</Tbody>
 				</Table>
-			</TableContainer>:
-			<Box mx={4}>
+			</TableContainer>
+			: <Box mx={4}>
 				<Text color={'gray'}>No orders placed</Text>
 			</Box>
 			}

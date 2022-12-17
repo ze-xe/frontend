@@ -1,31 +1,31 @@
-import React from 'react'
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
-import PlacedOrders from './PlacedOrders'
-import ExecutedOrders from './ExecutedOrders';
-import CancelledOrders from './CancelledOrders';
+import React from "react";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import PlacedOrders from "./PlacedOrders";
+import ExecutedOrders from "./ExecutedOrders";
+import CancelledOrders from "./CancelledOrders";
 
-export default function index({pair}) {
-  return (
-    <>
-    <Tabs colorScheme={'gray'} size='sm'>
-  <TabList>
-    <Tab>Placed Orders</Tab>
-    <Tab>Order History</Tab>
-    <Tab>Cancelled Orders</Tab>
-  </TabList>
+export default function index({ pair }) {
+	return (
+		<>
+			<Tabs colorScheme={"gray"} size="sm">
+				<TabList>
+					<Tab>Placed Orders</Tab>
+					<Tab>Order History</Tab>
+					<Tab>Cancelled Orders</Tab>
+				</TabList>
 
-  <TabPanels>
-    <TabPanel mx={-4}>
-      <PlacedOrders pair={pair}/>
-    </TabPanel>
-    <TabPanel mx={-4}>
+				<TabPanels>
+					<TabPanel mx={-4}>
+						<PlacedOrders pair={pair} />
+					</TabPanel>
+					<TabPanel mx={-4}>
       <ExecutedOrders pair={pair}/>
     </TabPanel>
     <TabPanel mx={-4}>
       <CancelledOrders pair={pair}/>
     </TabPanel>
-  </TabPanels>
-</Tabs>
-    </>
-  )
+				</TabPanels>
+			</Tabs>
+		</>
+	);
 }
