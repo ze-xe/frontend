@@ -1,25 +1,21 @@
 import { Box, Flex, Tag, Text, useColorMode } from '@chakra-ui/react';
 import { Header } from '../../components/Header';
 import GraphPanel from '../../components/trade/GraphPanel';
-import TokensPanel from '../../components/trade/TokensPanel/TokensPanel';
-import OrdersPanel from '../../components/trade/Orders/OrdersPanel';
+import TokensPanel from '../../components/trade/tokens/TokensPanel';
+import OrdersPanel from '../../components/trade/orders/OrdersPanel';
 import TitlePanel from '../../components/trade/TitlePanel';
-import Swap from '../../components/trade/new_orders/Limit';
+import Swap from '../../components/trade/exchange/Limit';
 import { useContext } from 'react';
 import { DataContext } from '../../context/DataProvider';
 import { useRouter } from 'next/router';
-import PlacedOrders from '../../components/trade/UserOrders';
+import PlacedOrders from '../../components/trade/user_orders/PlacedOrders';
 import { useEffect, useState } from 'react';
-import Exchange from '../../components/trade/Exchange';
-import { WalletContext } from '../../context/Wallet';
+import Exchange from '../../components/trade/exchange';
 import Head from 'next/head';
 import { useAccount } from 'wagmi';
 
 const Trade = () => {
 	const { pairs } = useContext(DataContext);
-	const { isConnected } = useContext(WalletContext);
-
-	const { isConnected: isEvmConnected } = useAccount();
 
 	const router = useRouter();
 	const { pairId } = router.query;
@@ -53,8 +49,8 @@ const Trade = () => {
 				<Flex
 					flexDir={{ sm: 'column', md: 'row' }}
 					justifyItems={'stretch'}
-					gap={2}
-					mt={2}>
+					gap={1}
+					mt={1}>
 					<Box
 						order={{ sm: 1, md: 0 }}
 						bgColor={'background2'}
@@ -65,7 +61,7 @@ const Trade = () => {
 					<Box
 						order={{ sm: 0, md: 1 }}
 						width={{ sm: '100%', md: '60%', lg: '60%', xl: '55%' }}
-						mb={{ sm: '2', md: 2, lg: 0 }}>
+						mb={{ sm: '1', md: 1, lg: 0 }}>
 						<TitlePanel pair={pair} />
 						<GraphPanel pair={pair} />
 						<Exchange pair={pair} />

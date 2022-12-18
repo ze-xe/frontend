@@ -19,11 +19,11 @@ export default function index({ pair }) {
 						<PlacedOrders pair={pair} />
 					</TabPanel>
 					<TabPanel mx={-4}>
-      <ExecutedOrders pair={pair}/>
-    </TabPanel>
-    <TabPanel mx={-4}>
-      <CancelledOrders pair={pair}/>
-    </TabPanel>
+						<ExecutedOrders pair={pair} />
+					</TabPanel>
+					<TabPanel mx={-4}>
+						<CancelledOrders pair={pair} />
+					</TabPanel>
 				</TabPanels>
 			</Tabs>
 		</>

@@ -3,13 +3,11 @@ import { useRouter } from 'next/router'
 import { Box, Text, Flex } from '@chakra-ui/react'
 import { useContext, useEffect } from 'react';
 import { DataContext } from '../../context/DataProvider';
-import { WalletContext } from '../../context/Wallet';
 
 export default function trade() {
     
     const router = useRouter();
     const {pairs} = useContext(DataContext);
-    const {isConnecting} = useContext(WalletContext);
 
     useEffect(() => {
         if(pairs.length > 0){

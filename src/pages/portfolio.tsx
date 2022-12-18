@@ -1,7 +1,6 @@
 import React from 'react';
 import { Header } from '../components/Header';
 import { useContext } from 'react';
-import { WalletContext } from '../context/Wallet';
 import { Avatar, Box, Button, Flex, Progress, Text } from '@chakra-ui/react';
 
 import {
@@ -31,7 +30,6 @@ import Image from 'next/image';
 import { useAccount } from 'wagmi';
 
 export default function wallet() {
-	const { address, isConnected } = useContext(WalletContext);
 	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
 
 	const { tokens } = useContext(DataContext);

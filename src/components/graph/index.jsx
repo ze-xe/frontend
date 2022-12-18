@@ -1,6 +1,7 @@
 import * as React from "react";
 import styles from "./index.module.css";
 import { widget, version } from "../../../public/static/charting_library";
+
 import axios from "axios";
 import { Endpoints } from "../../utils/const";
 import { ChainID } from "../../utils/chains";
@@ -13,7 +14,7 @@ function getLanguageFromURL() {
 		: decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-export class TVChartContainer extends React.PureComponent {
+export class Graph extends React.PureComponent {
 	static defaultProps = {
 		symbol: "BTC_USDC",
 		interval: "15",
@@ -31,7 +32,6 @@ export class TVChartContainer extends React.PureComponent {
 	tvWidget = null;
 
 	constructor(props) {
-		console.log(props.symbol);
 		super(props);
 		this.ref = React.createRef();
 	}
@@ -53,7 +53,6 @@ export class TVChartContainer extends React.PureComponent {
 
 			width: '100%',
 			height: '600',
-			header_widget_buttons_mode: 'compact'
 		};
 
 		const tvWidget = new widget(widgetOptions);
@@ -86,7 +85,6 @@ export class TVChartContainer extends React.PureComponent {
 			height: '600',
 			header_widget_buttons_mode: 'compact'
 		};
-
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
 

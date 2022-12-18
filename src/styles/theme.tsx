@@ -82,22 +82,22 @@ const theme = extendTheme({
     },
     Input: {
       baseStyle: {
-        borderRadius: '0px'
+        borderRadius: '2px'
       }
     },
     NumberInput: {
       baseStyle: {
-        borderRadius: '0px'
+        borderRadius: '2px',
       }
     },
     InputGroup: {
       baseStyle: {
-        borderRadius: '0px'
+        borderRadius: '2px'
       }
     },
     InputLeftElement: {
       baseStyle: {
-        borderRadius: '0px'
+        borderRadius: '2px'
       }
     }
   }

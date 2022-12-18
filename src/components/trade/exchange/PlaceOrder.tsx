@@ -6,7 +6,6 @@ import Link from "next/link";
 import React, { useContext, useEffect } from "react";
 import { useAccount, useSignTypedData } from "wagmi";
 import { DataContext } from "../../../context/DataProvider";
-import { WalletContext } from "../../../context/Wallet";
 import { getAddress, getContract, send } from "../../../utils/contract";
 import Image from "next/image";
 import { imageIds } from "../../../utils/const";
@@ -30,7 +29,6 @@ export default function PlaceOrder({
 		useSignTypedData();
 
 	const { chain, explorer, incrementAllowance } = useContext(DataContext);
-	const { address: TronAddress } = useContext(WalletContext);
 	const { address: EvmAddress } = useAccount();
 
 	const tokenToSpend = buy ? token1 : token0;
@@ -106,7 +104,7 @@ export default function PlaceOrder({
 		};
 
 		const value = {
-			maker: TronAddress ?? EvmAddress,
+			maker: EvmAddress,
 			token0: token0.id,
 			token1: token1.id,
 			amount: _amount,

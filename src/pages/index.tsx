@@ -12,7 +12,7 @@ import {
 	Divider,
 } from "@chakra-ui/react";
 
-import { Footer } from "../components/Footer";
+import { Footer } from "../components/landing/Footer";
 import { useColorMode } from "@chakra-ui/react";
 import Link from "next/link";
 import Head from "next/head";

@@ -2,8 +2,8 @@ import { Box, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import LimitOrder from './new_orders/Limit';
-import MarketOrder from './new_orders/Market';
+import LimitOrder from './Limit';
+import MarketOrder from './Market';
 
 const Exchange = ({pair}) => {
 	const [hydrated, setHydrated] = React.useState(false);

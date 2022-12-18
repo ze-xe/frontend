@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { DUMMY_ADDRESS, HELPER, Endpoints, ADDRESSES, coingeckoIds, dummyPrices } from '../utils/const';
 const { Big } = require('big.js');
-import tronWeb from '../utils/tronWeb';
 import axios from 'axios';
 import { call, getABI, getAddress, getContract } from '../utils/contract';
 import { ChainID, chains, chainMapping } from '../utils/chains';
-import Exchange from '../components/trade/Exchange';
+import Exchange from '../components/trade/exchange';
 import { getBalancesAndApprovals } from '../utils/balances';
 import { BigNumber } from 'ethers';
 import socket from '../utils/socket';

@@ -13,11 +13,15 @@ import { CheckCircleIcon, LinkIcon } from "@chakra-ui/icons";
 import { BsDiscord, BsGithub, BsTwitter } from "react-icons/bs";
 
 export const Footer = () => (
+  <Box position={"fixed"}
+  bottom="0"
+  width={"100%"}>
+
+  
+    <Divider bgColor={"whiteAlpha.200"} />
 	<Flex
-		position={"fixed"}
-		bottom="0"
-		width={"100%"}
-		bgColor={"whiteAlpha.200"}
+		
+		bgColor={"background2"}
 	>
 		<Flex gap={5} justify="left" minH={8} align="center" ml={'10%'}>
 
@@ -58,4 +62,5 @@ export const Footer = () => (
 </Flex>
 		</Flex>
 	</Flex>
+  </Box>
 );

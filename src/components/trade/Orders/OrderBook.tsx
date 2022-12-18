@@ -62,7 +62,7 @@ export default function OrderBook({ pair }) {
 
 	return (
 		<Flex flexDir={'column'}>
-			<Flex justify={'space-between'} px={2} py={2} mb={1} mt={{md: -2, lg: 0}} gap={2}>
+			<Flex justify={'space-between'} px={2} py={2} mb={1} mt={{sm: -2, md: -2, lg: -2, xl: 0}} gap={2}>
 				<Text fontSize={'xs'}>Amount {pair?.tokens[0].symbol} </Text>
 				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
 				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>

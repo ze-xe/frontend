@@ -47,7 +47,6 @@ import {
 import { getContract, send } from "../../../utils/contract";
 import { DataContext } from "../../../context/DataProvider";
 import { useAccount } from "wagmi";
-import { WalletContext } from "../../../context/Wallet";
 import { ethers } from "ethers";
 import { ADDRESSES, imageIds } from "../../../utils/const";
 import Big from "big.js";
@@ -71,7 +70,6 @@ export default function LendModal({ market, token }) {
 	const { incrementAllowance } = useContext(LeverDataContext);
 
 	const { isConnected: isEvmConnected, address: EvmAddress } = useAccount();
-	const { isConnected, address: TronAddress } = useContext(WalletContext);
 
 	const updateSliderValue = (value: number) => {
 		setSliderValue(value);

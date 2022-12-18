@@ -24,7 +24,6 @@ import {
 } from "@chakra-ui/react";
 
 import { DataContext } from "../../../context/DataProvider";
-import { WalletContext } from "../../../context/Wallet";
 import { useAccount } from "wagmi";
 import { Endpoints } from "../../../utils/const";
 import OrdersToExecute from "./OrdersToExecute";
@@ -50,8 +49,6 @@ export default function BuySellModal({
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [orders, setOrders] = React.useState<any[] | null>(null);
 	const [orderToPlace, setOrderToPlace] = React.useState(null);
-
-	const { isConnected } = useContext(WalletContext);
 
 	const { isConnected: isEvmConnected } = useAccount();
 
@@ -130,13 +127,13 @@ export default function BuySellModal({
 				onClick={_onOpen}
 				disabled={
 					!Big(token0Amount).gt(0) ||
-					!(isConnected || isEvmConnected) ||
+					!(isEvmConnected) ||
 					amountExceedsBalance() ||
 					price == "" ||
 					Number(price) <= 0
 				}
 			>
-				{!(isConnected || isEvmConnected)
+				{!(isEvmConnected)
 					? "Connect Wallet"
 					: !Big(token0Amount).gt(0)
 					? "Enter Amount"

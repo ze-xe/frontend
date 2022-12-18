@@ -10,8 +10,6 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useEffect, useContext, useState } from 'react';
-import { MdArrowDropDown } from 'react-icons/md';
-import { DarkModeSwitch } from './DarkModeSwitch';
 import {
 	Menu,
 	MenuButton,
@@ -28,7 +26,6 @@ import { useRouter } from 'next/router';
 // import ConnectButton from './ConnectButton';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
-import { WalletContext } from '../context/Wallet';
 import { DataContext } from '../context/DataProvider';
 
 import {
@@ -51,8 +48,6 @@ export const Header = ({ title }: { title: string }) => {
 	const router = useRouter();
 	const { isOpen, onToggle } = useDisclosure();
 
-	const { connectionError, connect, isConnected, isConnecting, setConnectionError } =
-		useContext(WalletContext);
 	const { isFetchingData, isDataReady, fetchData, setChain } = useContext(DataContext);
 	const [init, setInit] = useState(false);
 	const { fetchData: fetchLeverData } = useContext(LeverDataContext);
@@ -132,17 +127,6 @@ export const Header = ({ title }: { title: string }) => {
 	}
 	return (
 		<>
-			{connectionError && (
-				<Text
-					textAlign={'center'}
-					width="100%"
-					fontSize={'sm'}
-					fontWeight="bold"
-					p={2}
-					bgColor="gray.600">
-					⚠️ {connectionError}
-				</Text>
-			)}
 			<Flex
 				justifyContent="space-between"
 				align="center"
@@ -150,7 +134,8 @@ export const Header = ({ title }: { title: string }) => {
 				bgColor={'background2'}
 				// color={"white"}
 				py={1}
-				px={6}>
+				pl={6}
+				pr={2}>
 				<Flex
 					flex={{ base: 1, md: 'auto' }}
 					ml={{ base: -2 }}

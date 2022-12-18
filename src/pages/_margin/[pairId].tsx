@@ -1,23 +1,21 @@
 import { Box, Flex, Tag, Text, useColorMode } from '@chakra-ui/react';
 import { Header } from '../../components/Header';
 import GraphPanel from '../../components/trade/GraphPanel';
-import TokensPanel from '../../components/trade/TokensPanel/TokensPanel';
-import OrdersPanel from '../../components/trade/Orders/OrdersPanel';
+import TokensPanel from '../../components/trade/tokens/TokensPanel';
+import OrdersPanel from '../../components/trade/orders/OrdersPanel';
 import TitlePanel from '../../components/trade/TitlePanel';
-import Swap from '../../components/trade/new_orders/Limit';
+import Swap from '../../components/trade/exchange/Limit';
 import { useContext } from 'react';
 import { DataContext } from '../../context/DataProvider';
 import { useRouter } from 'next/router';
-import PlacedOrders from '../../components/trade/UserOrders';
+import PlacedOrders from '../../components/trade/user_orders/PlacedOrders';
 import { useEffect, useState } from 'react';
-import Exchange from '../../components/trade/Exchange';
-import { WalletContext } from '../../context/Wallet';
+import Exchange from '../../components/trade/exchange';
 import Head from 'next/head';
 import { useAccount } from 'wagmi';
 
 const Trade = () => {
 	const { pairs } = useContext(DataContext);
-	const { isConnected } = useContext(WalletContext);
 
 	const { isConnected: isEvmConnected } = useAccount();
 

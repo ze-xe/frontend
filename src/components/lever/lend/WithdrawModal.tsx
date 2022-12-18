@@ -54,7 +54,6 @@ import {
 import { getContract, send } from "../../../utils/contract";
 import { DataContext } from "../../../context/DataProvider";
 import { useAccount } from "wagmi";
-import { WalletContext } from "../../../context/Wallet";
 import { ethers } from "ethers";
 import Big from "big.js";
 import { ChainID } from "../../../utils/chains";
@@ -75,7 +74,6 @@ export default function WithdrawModal({ market, token }) {
 
 	const { chain, explorer } = useContext(DataContext);
 	const { isConnected: isEvmConnected, address: EvmAddress } = useAccount();
-	const { isConnected, address: TronAddress } = useContext(WalletContext);
 
 	const updateSliderValue = (value: number) => {
 		setSliderValue(value);

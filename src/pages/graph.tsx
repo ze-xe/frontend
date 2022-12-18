@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 
 const TVChartContainer = dynamic(
 	() =>
-		import('../components/TVChartContainer').then(mod => mod.TVChartContainer),
+		import('../components/graph').then(mod => mod.TVChartContainer),
 	{ ssr: false },
 );
 

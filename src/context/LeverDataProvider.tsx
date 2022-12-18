@@ -1,7 +1,6 @@
 import * as React from "react";
 import { DUMMY_ADDRESS, HELPER, Endpoints, ADDRESSES } from "../utils/const";
 const { Big } = require("big.js");
-import tronWeb from "../utils/tronWeb";
 import axios from "axios";
 import { call, getABI, getAddress, getContract } from "../utils/contract";
 import { ChainID, chains, chainMapping } from "../utils/chains";
