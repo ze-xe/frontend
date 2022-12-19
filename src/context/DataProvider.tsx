@@ -8,6 +8,7 @@ import Exchange from '../components/trade/exchange';
 import { getBalancesAndApprovals } from '../utils/balances';
 import { BigNumber } from 'ethers';
 import socket from '../utils/socket';
+import { io } from 'socket.io-client';
 
 const DataContext = React.createContext<DataValue>({} as DataValue);
 
@@ -30,21 +31,9 @@ function DataProvider({ children }: any) {
 	const [cancelledOrders, setCancelledOrders] = React.useState<any>({});
 
 	const [tokens, setTokens] = React.useState<any[]>([]);
-	const [userDepositWithdraws, setUserDepositWithdraws] = React.useState<any>([]);
 	const [chain, setChain] = React.useState(null);
 	const [block, setBlock] = React.useState(null);
-
-	const [dollarFormatter, setDollarFormatter] = React.useState<null | {}>(
-		new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'USD',
-		})
-	);
-	const [tokenFormatter, setTokenFormatter] = React.useState<null | {}>(
-		new Intl.NumberFormat('en-US', {
-			minimumFractionDigits: 2,
-		})
-	);
+	const [refresh, setRefresh] = React.useState(false);
 
 	React.useEffect(() => {}, [])	
 
@@ -101,7 +90,6 @@ function DataProvider({ children }: any) {
 				fetchPairData(_pairs, chain);
 				
 				subscribePairHistory(_pairs);
-				subscribePairOrders(_pairs);
 
 				if(firstTime) {
 					_tokens = res[1].data.data;
@@ -130,32 +118,18 @@ function DataProvider({ children }: any) {
 	};
 
 	const subscribePairHistory = (_pairs: any[]) => {
-		socket.on('PAIR_HISTORY', ({pair, amount, buy, exchangeRate}) => {
-			for(let i in _pairs) {
-				if(_pairs[i].id === pair) {
-					_pairs[i].priceDiff = Big(_pairs[i].exchangeRate).minus(exchangeRate).toString();
-					_pairs[i].exchangeRate = exchangeRate;
-					console.log('found pair', _pairs[i]);
-				}
-			}
-			console.log('pairs', _pairs);
-			setPairs(_pairs);
-		})
-	}
-
-	const subscribePairOrders = (_pairs: any[]) => {
-		socket.on('PAIR_ORDERS', (res) => {
-			console.log('PAIR_ORDERS', res);
-			// for(let i in _pairs) {
-			// 	if(_pairs[i].id === pair) {
-			// 		_pairs[i].priceDiff = Big(_pairs[i].exchangeRate).minus(exchangeRate).toString();
-			// 		_pairs[i].exchangeRate = exchangeRate;
-			// 		console.log('found pair', _pairs[i]);
-			// 	}
-			// }
-			// console.log('pairs', _pairs);
-			// setPairs(_pairs);
-		})
+		// const socket = io('http://localhost:3010')
+		// socket.on('PAIR_HISTORY', ({pair, amount, buy, exchangeRate}) => {
+		// 	for(let i in _pairs) {
+		// 		if(_pairs[i].id === pair) {
+		// 			_pairs[i].priceDiff = Big(_pairs[i].exchangeRate).minus(exchangeRate).toString();
+		// 			_pairs[i].exchangeRate = exchangeRate;
+		// 			console.log('found pair', _pairs[i]);
+		// 		}
+		// 	}
+		// 	console.log('pairs', _pairs);
+		// 	setPairs(_pairs);
+		// })
 	}
 
 	const fetchOrders = (pairs: any[], chain: number) => {
@@ -169,9 +143,45 @@ function DataProvider({ children }: any) {
 		Promise.all(orderRequests).then((res) => {
 			let newOrders = {};
 			res.forEach((order, index) => {
-				return newOrders[order.data.data.pair] = order.data.data;
+				return newOrders[order.data.data.pair.toLowerCase()] = order.data.data;
 			})
 			setOrders(newOrders);
+			let _refresh = refresh;
+			socket.on('PAIR_ORDER', ({amount, buy, exchangeRate, pair}) => {
+				let _orders = buy ? newOrders[pair.toLowerCase()].buyOrders : newOrders[pair.toLowerCase()].sellOrders.reverse();
+				
+				for(let i = 0; i < _orders.length; i++){
+					console.log(exchangeRate, _orders[i].exchangeRate);
+					if(_orders[i].exchangeRate === exchangeRate){
+						console.log('Found order');
+						_orders[i].amount = Big(_orders[i].amount).plus(amount).toString();
+						break;
+					}
+					else if(_orders[i].exchangeRate < exchangeRate){
+						if(i === 0){
+							_orders.splice(i, 0, {amount, exchangeRate});
+						} else if(_orders[i-1].exchangeRate > exchangeRate){
+							_orders.splice(i, 0, {amount, exchangeRate});
+						}
+						break;
+					} else if(i === _orders.length - 1){
+						_orders.push({amount, exchangeRate});
+						break
+					}
+				}
+				if(_orders.length === 0){
+					_orders.push({amount, exchangeRate});
+				}
+				if(buy){
+					newOrders[pair.toLowerCase()].buyOrders = _orders;
+				} else {
+					newOrders[pair.toLowerCase()].sellOrders = _orders.reverse();
+				}
+				setOrders(newOrders);
+				_refresh = !_refresh;
+				setRefresh(_refresh);
+				return;
+			})
 		})
 	}
 
@@ -195,12 +205,11 @@ function DataProvider({ children }: any) {
 			}));
 		}
 		Promise.all(orderRequests).then((res) => {
-			console.log(res);
 			let _placedOrders = {};
 			let _cancelledOrders = {};
 			let _executedOrders = {};
 			for(let i = 0; i < pairs.length; i++){
-				console.log('placed', res[i*3].data);
+				console.log('cancelled', res[i*3+1].data.data);
 				_placedOrders[pairs[i].id] = res[i*3].data.data;
 				_cancelledOrders[pairs[i].id] = res[i*3+1].data.data;
 				_executedOrders[pairs[i].id] = res[i*3+2].data.data;
@@ -211,7 +220,7 @@ function DataProvider({ children }: any) {
 		})
 	}
 	
-	// api.zexe.io/pair/pricetrend/{pair}?interval=300000
+	// GRAPH
 	const fetchPairData = (pairs: any[], chain: number) => {
 		let pairRequests = []
 		for(let i in pairs){
@@ -239,7 +248,7 @@ function DataProvider({ children }: any) {
 		})
 	}
 	
-	// /pair/orders/history/:id
+	// ORDER_HISTORY
 	const fetchExecutedPairData = async (pairs: any[], chain: number) => {
 		let pairRequests = pairs.map((pair) => {
 			return axios.get(Endpoints[chain]+`pair/orders/history/${pair.id}`, {
@@ -251,7 +260,7 @@ function DataProvider({ children }: any) {
 		Promise.all(pairRequests).then((res) => {
 			let newPairs = {};
 			res.forEach((pair, index) => {
-				return newPairs[pairs[index].id] = pair.data.data;
+				return newPairs[pairs[index].id.toLowerCase()] = pair.data.data;
 			})
 			setPairExecutedData(newPairs);
 		})
@@ -263,8 +272,6 @@ function DataProvider({ children }: any) {
 		pairData,
 		tokens,
 		dataFetchError,
-		dollarFormatter,
-		tokenFormatter,
 		isFetchingData,
 		fetchData,
 		orders,
@@ -273,7 +280,6 @@ function DataProvider({ children }: any) {
 		cancelledOrders,
 		orderHistory,
 		pairStats,
-		userDepositWithdraws,
 		chain, setChain,
 		explorer,
 		incrementAllowance
@@ -290,8 +296,6 @@ interface DataValue {
 	pairData: any[];
 	tokens: any[];
 	dataFetchError: string | null;
-	dollarFormatter: any;
-	tokenFormatter: any;
 	isFetchingData: boolean;
 	orders: any;
 	fetchData: (address :string, chainId: ChainID, loop?: boolean) => void;
@@ -300,7 +304,6 @@ interface DataValue {
 	cancelledOrders: any,
 	orderHistory: any,
 	pairStats: any,
-	userDepositWithdraws: any,
 	chain: number, setChain: (chain: number) => void,
 	explorer: () => string,
 	incrementAllowance: (token: string, amount: string) => Promise<void>

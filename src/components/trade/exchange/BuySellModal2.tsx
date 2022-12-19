@@ -71,12 +71,13 @@ export default function BuySellModal2({
 		useSignTypedData();
 
 	const amountExceedsBalance = () => {
+		if(!token1 || !token0) return true
 		const amount = buy ? token0Amount * price : token0Amount;
 		const balance = buy
-			? token1?.balance / 10 ** token1?.decimals
-			: token0?.balance / 10 ** token0?.decimals;
+			? token1.balance / 10 ** token1.decimals
+			: token0.balance / 10 ** token0.decimals;
 
-		if (isNaN(Number(amount))) return false;
+		if (isNaN(Number(amount)) || isNaN(Number(balance))) return true;
 		return Big(amount).gt(balance);
 	};
 
@@ -330,6 +331,7 @@ export default function BuySellModal2({
 					onClick={execute}
 					disabled={
 						loading ||
+						isNaN(Number(token0Amount)) || 
 						!Big(token0Amount).gt(0) ||
 						!isEvmConnected ||
 						amountExceedsBalance() ||
@@ -341,7 +343,7 @@ export default function BuySellModal2({
 				>
 					{!isEvmConnected
 						? "Connect Wallet"
-						: !Big(token0Amount).gt(0)
+						: (isNaN(Number(token0Amount)) || !Big(token0Amount).gt(0))
 						? "Enter Amount"
 						: amountExceedsBalance()
 						? "Insufficient Trading Balance"

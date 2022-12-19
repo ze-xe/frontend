@@ -40,6 +40,7 @@ export default function ExecutedOrders({ pair }) {
 		}
 		for(let i in cancelledOrders[pair?.id]){
 			cancelledOrders[pair?.id][i].cancelled = true;
+			cancelledOrders[pair?.id][i].fillAmount = cancelledOrders[pair?.id][i].balanceAmount;
 			orders.push(cancelledOrders[pair?.id][i]);
 		}
 		return orders;
@@ -93,7 +94,7 @@ export default function ExecutedOrders({ pair }) {
 										</Td>
 										<Td borderColor="gray.900">
 											{tokenFormatter(
-												pair?.exchangeRateDecimals
+												null
 											).format(
 												order.exchangeRate / 10 ** 18
 											)}{" "}
