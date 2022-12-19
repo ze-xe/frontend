@@ -14,6 +14,9 @@ function getLanguageFromURL() {
 		: decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+const GREEN = "#18B05F";
+const RED = "#C83232";
+
 export class Graph extends React.PureComponent {
 	static defaultProps = {
 		symbol: "BTC_USDC",
@@ -46,13 +49,54 @@ export class Graph extends React.PureComponent {
 			library_path: this.props.libraryPath,
 
 			locale: getLanguageFromURL() || "en",
-			disabled_features: ["use_localstorage_for_settings", "header_symbol_search", "header_compare", "header_undo_redo", "header_screenshot"],
-
+			disabled_features: [
+				"use_localstorage_for_settings", 
+				"header_symbol_search", "header_compare", 
+				"header_undo_redo", 
+				"header_screenshot",
+				"link_to_tradingview",
+				"chart_property_page_trading",
+				"chart_crosshair_menu",
+				"hide_last_na_study_output"
+			],
+			enabled_features: [
+				"minimalistic_logo",
+				"narrow_chart_enabled",
+				"study_templates",
+				"show_logo_on_all_charts"
+			],
+			logo: {
+				image: "/favicon.png",
+				link: "https://www.zexe.io/"
+			},
+			theme: 'dark',
+			toolbar_bg: 'transparent',
+			loading_screen: {
+				backgroundColor: "transparent",
+			},
+			client_id: 'zexe.io',
+			overrides: {
+				"paneProperties.background": "#09001F",
+				"paneProperties.backgroundType": "solid",
+				"mainSeriesProperties.candleStyle.wickUpColor": GREEN,
+				"mainSeriesProperties.candleStyle.wickDownColor": '#C83232',
+				"paneProperties.vertGridProperties.color": "#363c4e",
+				"paneProperties.horzGridProperties.color": "#363c4e",
+		   },
+			// enabled_features: ["study_templates"],
+			// charts_storage_url: this.props.chartsStorageUrl,
+			// charts_storage_api_version: this.props.chartsStorageApiVersion,
+			// client_id: this.props.clientId,
+			// user_id: this.props.userId,
+			// fullscreen: this.props.fullscreen,
+			// autosize: this.props.autosize,
+			// studies_overrides: this.props.studiesOverrides,
 			theme: 'dark',
 			toolbar_bg: '#130B25',
 
 			width: '100%',
 			height: '600',
+			header_widget_buttons_mode: 'compact'
 		};
 
 		const tvWidget = new widget(widgetOptions);
@@ -67,9 +111,46 @@ export class Graph extends React.PureComponent {
 			interval: this.props.interval,
 			container: this.ref.current,
 			library_path: this.props.libraryPath,
-
+			custom_css_url: '/css/style.css',
 			locale: getLanguageFromURL() || "en",
-			disabled_features: ["use_localstorage_for_settings", "header_symbol_search", "header_compare", "header_undo_redo", "header_screenshot"],
+			disabled_features: [
+				"use_localstorage_for_settings", 
+				"header_symbol_search", "header_compare", 
+				"header_undo_redo", 
+				"header_screenshot",
+				"link_to_tradingview",
+				"chart_property_page_trading",
+				"chart_crosshair_menu",
+				"hide_last_na_study_output"
+			],
+			enabled_features: [
+				"minimalistic_logo",
+				"narrow_chart_enabled",
+				"study_templates",
+				"show_logo_on_all_charts"
+			],
+			logo: {
+				image: "/favicon.png",
+				link: "https://www.zexe.io/"
+			},
+			theme: 'dark',
+			toolbar_bg: 'transparent',
+			loading_screen: {
+				backgroundColor: "transparent",
+			},
+			client_id: 'zexe.io',
+			overrides: {
+				"paneProperties.background": "#09001F",
+				"paneProperties.backgroundType": "solid",
+				"mainSeriesProperties.candleStyle.wickUpColor": GREEN,
+				"mainSeriesProperties.candleStyle.wickDownColor": RED,
+				"mainSeriesProperties.candleStyle.upColor": GREEN,
+				"mainSeriesProperties.candleStyle.downColor": RED,
+				"mainSeriesProperties.candleStyle.borderUpColor": GREEN,
+				"mainSeriesProperties.candleStyle.borderDownColor": RED,
+				"paneProperties.vertGridProperties.color": "#363c4e",
+				"paneProperties.horzGridProperties.color": "#363c4e",
+		   },
 			// enabled_features: ["study_templates"],
 			// charts_storage_url: this.props.chartsStorageUrl,
 			// charts_storage_api_version: this.props.chartsStorageApiVersion,
