@@ -7,7 +7,8 @@ export function getABI(contractName: string) {
   return contractBuild.abi;
 }
 
-export function getAddress(contractName: string, chain: number = ChainID.NILE) {
+export function getAddress(contractName: string, chain: number = ChainID.ARB_GOERLI) {
+  if(!chain) chain = ChainID.ARB_GOERLI;
   return ADDRESSES[chain][contractName]
 }
 

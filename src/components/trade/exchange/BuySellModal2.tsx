@@ -151,6 +151,7 @@ export default function BuySellModal2({
 		let _amount = Big(token0Amount)
 			.times(10 ** token0.decimals)
 			.toFixed(0);
+		// if we're buying && market order: use token1Amount
 		if (buy && !limit) {
 			_amount = Big(token1Amount)
 				.times(10 ** token1.decimals)
@@ -187,9 +188,10 @@ export default function BuySellModal2({
 				status: "loading",
 				duration: null,
 			});
+			console.log(_amount);
 			const res = await send(
 				exchange,
-				"executeMultipleLimitOrders",
+				(buy && !limit) ? "executeMultipleMarketOrders": "executeMultipleLimitOrders",
 				[
 					_orders.map((order: any) => order.signature),
 					_orders.map((order: any) => order.value),
@@ -213,7 +215,6 @@ export default function BuySellModal2({
 			_amount = Big(_amount).sub(total).toFixed(0);
 		}
 		if (Big(_amount).gt(0)) {
-
 			toastIdRef.current = toast({
 				title: "Placing order...",
 				description: "Placing limit order offchain",

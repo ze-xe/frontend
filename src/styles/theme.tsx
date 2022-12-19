@@ -87,17 +87,17 @@ const theme = extendTheme({
     },
     NumberInput: {
       baseStyle: {
-        borderRadius: '2px',
+        borderRadius: '0px',
       }
     },
     InputGroup: {
       baseStyle: {
-        borderRadius: '2px'
+        borderRadius: '0px'
       }
     },
     InputLeftElement: {
       baseStyle: {
-        borderRadius: '2px'
+        borderRadius: '0px'
       }
     }
   }
