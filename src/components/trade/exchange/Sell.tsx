@@ -22,7 +22,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import { tokenFormatter } from "../../../utils/formatters";
 import { AppDataContext } from "../../../context/AppData";
-import BuySellModal from "./BuySellModal";
+import BuySellModal from "./BuySellModal2";
 
 const Big = require("big.js");
 
@@ -90,29 +90,6 @@ export default function BuyModule({ pair, limit }) {
 			}
 		}
 	});
-
-	// check response in intervals
-	const checkResponse = (tx_id: string) => {
-		axios
-			.get(
-				"https://nile.trongrid.io/wallet/gettransactionbyid?value=" +
-					tx_id
-			)
-			.then((res) => {
-				if (!res.data.ret) {
-					setTimeout(() => {
-						checkResponse(tx_id);
-					}, 2000);
-				} else {
-					setLoading(false);
-					if (res.data.ret[0].contractRet == "SUCCESS") {
-						setResponse("Transaction Successful!");
-					} else {
-						setResponse("Transaction Failed. Please try again.");
-					}
-				}
-			});
-	};
 
 	const setSlider = (e) => {
 		setSliderValue(e);

@@ -15,7 +15,6 @@ import Image from 'next/image';
 import React from 'react';
 import { useContext } from 'react';
 import { DataContext } from '../context/DataProvider';
-import { WalletContext } from '../context/Wallet';
 import { getABI, getContract, send } from '../utils/contract';
 
 const mintAmount = {
@@ -80,7 +79,6 @@ function RadioCard(props) {
 
 export default function faucets() {
 	const { tokens, chain, explorer } = useContext(DataContext);
-	const { address, isConnected } = useContext(WalletContext);
 	const { address: evmAddress, isConnected: isEvmConnected } = useAccount();
 	const [hydrated, setHydrated] = React.useState(false);
 
@@ -115,7 +113,7 @@ export default function faucets() {
 			tokenContract,
 			'mint',
 			[
-				address ?? evmAddress,
+				evmAddress,
 				Big(mintAmount[token.symbol]).times(1e18).toFixed(0),
 			],
 			chain
@@ -276,8 +274,8 @@ export default function faucets() {
 							bgGradient={'linear(to-r, #E11860, #CB1DC3)'}
 							size="lg"
 							isLoading={loading}
-							disabled={!(isConnected || isEvmConnected) || loading}>
-							{isConnected || isEvmConnected
+							disabled={!isEvmConnected || loading}>
+							{isEvmConnected
 								? 'Mint'
 								: 'Connect Wallet'}
 						</Button>

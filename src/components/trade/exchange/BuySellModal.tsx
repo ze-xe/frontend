@@ -103,6 +103,7 @@ export default function BuySellModal({
 			)
 			.then((resp) => {
 				let _orders = resp.data.data;
+				console.log(_orders);
 				setOrders(_orders);
 			});
 	};

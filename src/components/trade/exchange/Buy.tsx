@@ -21,7 +21,7 @@ import { DataContext } from '../../../context/DataProvider';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { getABI, getAddress } from '../../../utils/contract';
-import BuySellModal from './BuySellModal';
+import BuySellModal from './BuySellModal2';
 import { tokenFormatter } from '../../../utils/formatters';
 import { AppDataContext } from '../../../context/AppData';
 const Big = require('big.js');

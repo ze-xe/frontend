@@ -50,7 +50,7 @@ function DataProvider({ children }: any) {
 
 
 	const explorer = () => {
-		return chain === ChainID.NILE ? 'https://nile.explorer.org/#/transaction/' : chainMapping[chain]?.blockExplorers.default.url+'tx/';
+		return chainMapping[chain]?.blockExplorers.default.url+'tx/';
 	}
 
 	const incrementAllowance = async (marketId: any, amount: string) => {
@@ -101,6 +101,7 @@ function DataProvider({ children }: any) {
 				fetchPairData(_pairs, chain);
 				
 				subscribePairHistory(_pairs);
+				subscribePairOrders(_pairs);
 
 				if(firstTime) {
 					_tokens = res[1].data.data;
@@ -137,7 +138,23 @@ function DataProvider({ children }: any) {
 					console.log('found pair', _pairs[i]);
 				}
 			}
+			console.log('pairs', _pairs);
 			setPairs(_pairs);
+		})
+	}
+
+	const subscribePairOrders = (_pairs: any[]) => {
+		socket.on('PAIR_ORDERS', (res) => {
+			console.log('PAIR_ORDERS', res);
+			// for(let i in _pairs) {
+			// 	if(_pairs[i].id === pair) {
+			// 		_pairs[i].priceDiff = Big(_pairs[i].exchangeRate).minus(exchangeRate).toString();
+			// 		_pairs[i].exchangeRate = exchangeRate;
+			// 		console.log('found pair', _pairs[i]);
+			// 	}
+			// }
+			// console.log('pairs', _pairs);
+			// setPairs(_pairs);
 		})
 	}
 

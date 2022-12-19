@@ -57,7 +57,7 @@ export default function OrdersToExecute({
 		let _amount = Big(amountToFill)
 			.times(10 ** pair.tokens[0].decimals)
 			.toFixed(0);
-		console.log(_amount);
+		console.log(orders);
 		const exchange = await getContract("Exchange", chain);
 		send(
 			exchange,
@@ -72,31 +72,27 @@ export default function OrdersToExecute({
 			.then(async (res: any) => {
 				setLoading(false);
 				setResponse("Transaction sent! Waiting for confirmation...");
-				if (chain == ChainID.NILE) {
-					setHash(res);
-					checkResponse(res);
-				} else {
-					setHash(res.hash);
-					const receipt = await res.wait(1);
-					const exchangeItf = await getInterface("Exchange", chain);
-					// parse orders from receipt.logs
-					let total = Big(0);
+				setHash(res.hash);
+				const receipt = await res.wait(1);
+				const exchangeItf = await getInterface("Exchange", chain);
+				// parse orders from receipt.logs
+				let total = Big(0);
 
-					receipt.logs.forEach((log: any) => {
-						try {
-							const parsed = exchangeItf.parseLog(log);
-							if (parsed.name == "OrderExecuted") {
-								console.log(parsed);
-								total = total.plus(parsed.args.fillAmount);
-							}
-						} catch (err) {}
-					});
-					setOrderToPlace(Big(_amount).sub(total).toFixed(0));
-					setRemainingAmount(Big(_amount).sub(total).toFixed(0));
-					setAmountExecuted(total.toFixed(0));
-					setConfirmed(true);
-					setResponse("Transaction Successful!");
-				}
+				receipt.logs.forEach((log: any) => {
+					try {
+						const parsed = exchangeItf.parseLog(log);
+						if (parsed.name == "OrderExecuted") {
+							console.log(parsed);
+							total = total.plus(parsed.args.fillAmount);
+						}
+					} catch (err) {}
+				});
+				setOrderToPlace(Big(_amount).sub(total).toFixed(0));
+				setRemainingAmount(Big(_amount).sub(total).toFixed(0));
+				setAmountExecuted(total.toFixed(0));
+				setConfirmed(true);
+				setResponse("Transaction Successful!");
+				
 			})
 			.catch((err: any) => {
 				console.log(err);
@@ -129,31 +125,6 @@ export default function OrdersToExecute({
 			.catch((err: any) => {
 				setLoading(false);
 				console.log(err);
-			});
-	};
-
-	const checkResponse = (tx_id: string) => {
-		axios
-			.get(
-				"https://nile.trongrid.io/wallet/gettransactionbyid?value=" +
-					tx_id
-			)
-			.then((res) => {
-				if (!res.data.ret) {
-					setTimeout(() => {
-						checkResponse(tx_id);
-					}, 2000);
-				} else {
-					setConfirmed(true);
-					if (res.data.ret[0].contractRet == "SUCCESS") {
-						setResponse("Transaction Successful!");
-					} else {
-						setResponse("Transaction Failed. Please try again.");
-					}
-				}
-			})
-			.catch((err: any) => {
-				setLoading(false);
 			});
 	};
 
