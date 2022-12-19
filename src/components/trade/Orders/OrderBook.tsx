@@ -63,9 +63,9 @@ export default function OrderBook({ pair }) {
 	return (
 		<Flex flexDir={'column'}>
 			<Flex justify={'space-between'} px={2} py={2} mb={1} mt={{sm: -2, md: -2, lg: -2, xl: 0}} gap={2}>
-				<Text fontSize={'xs'}>Amount {pair?.tokens[0].symbol} </Text>
-				<Text fontSize={'xs'}>Amount {pair?.tokens[1].symbol}</Text>
-				<Text fontSize={'xs'}>Price {pair?.tokens[1].symbol}</Text>
+				<Text fontSize={'xs'} fontWeight='bold' color={'gray.300'}>{pair?.tokens[0].symbol} </Text>
+				<Text fontSize={'xs'} fontWeight='bold' color={'gray.300'}>{pair?.tokens[1].symbol}</Text>
+				<Text fontSize={'xs'} fontWeight='bold' color={'gray.300'}>{pair?.tokens[1].symbol}/{pair?.tokens[0].symbol}</Text>
 			</Flex>
 			{[...sellOrders].slice(0, 22).reverse().map((order: any, index: number) => {
 				return (
@@ -81,7 +81,7 @@ export default function OrderBook({ pair }) {
 					</Box>
 				);
 			})}
-			<Divider mt={2} bgColor="transparent" />
+			<Divider bgColor="transparent" />
 			<Flex py={2} align="end" gap={2} color={pair?.priceDiff < 0 ? 'red2' : 'green2'} justify="end">
 				<Flex textAlign={'right'} mb={1.5} mr={-1}>
 				
@@ -97,7 +97,7 @@ export default function OrderBook({ pair }) {
 					{tokenFormatter(pair?.exchangeRateDecimals).format(pair?.exchangeRate / (10**18))}
 				</Text>
 			</Flex>
-			<Divider mb={2} bgColor="transparent" />
+			<Divider bgColor="transparent" />
 			{buyOrders.slice(0, 22).map((order: any, index: number) => {
 				return (
 					<Box key={index}>

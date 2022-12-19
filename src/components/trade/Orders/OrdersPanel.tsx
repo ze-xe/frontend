@@ -45,7 +45,7 @@ export default function OrdersPanel({ pair }) {
 			<Box
 				display={{ sm: "none", md: "none", lg: "none", xl: "flex" }}
 				width={"100%"}
-				gap={2}
+				gap={1}
 				height={"100%"}
 			>
 				<Box width={"50%"} bgColor={"background2"}>

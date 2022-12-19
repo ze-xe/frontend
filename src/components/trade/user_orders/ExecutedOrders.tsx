@@ -1,5 +1,5 @@
-import { Box, Text, IconButton, Flex } from '@chakra-ui/react';
-import React from 'react';
+import { Box, Text, IconButton, Flex } from "@chakra-ui/react";
+import React from "react";
 import {
 	Table,
 	Thead,
@@ -10,76 +10,119 @@ import {
 	Td,
 	TableCaption,
 	TableContainer,
-} from '@chakra-ui/react';
-import { EditIcon } from '@chakra-ui/icons';
-import { MdOutlineCancel } from 'react-icons/md';
-import CancelOrder from './CancelOrder';
-import { useEffect } from 'react';
-import { useContext } from 'react';
-import { DataContext } from '../../../context/DataProvider';
-import UpdateOrder from './UpdateOrder';
-import { tokenFormatter } from '../../../utils/formatters';
+} from "@chakra-ui/react";
+import { EditIcon } from "@chakra-ui/icons";
+import { MdOutlineCancel } from "react-icons/md";
+import CancelOrder from "./CancelOrder";
+import { useEffect } from "react";
+import { useContext } from "react";
+import { DataContext } from "../../../context/DataProvider";
+import UpdateOrder from "./UpdateOrder";
+import { tokenFormatter } from "../../../utils/formatters";
+
+import {
+	Tag,
+	TagLabel,
+	TagLeftIcon,
+	TagRightIcon,
+	TagCloseButton,
+} from "@chakra-ui/react";
 
 export default function ExecutedOrders({ pair }) {
+	const { orderHistory, cancelledOrders } = useContext(DataContext);
 
-	const { orderHistory } = useContext(DataContext);
-	
+	const getOrders = () => {
+		let orders = [];
+		let _orderHistory = orderHistory[pair?.id];
+		for(let i in _orderHistory){
+			_orderHistory[i].cancelled = false;
+			orders.push(_orderHistory[i]);
+		}
+		for(let i in cancelledOrders[pair?.id]){
+			cancelledOrders[pair?.id][i].cancelled = true;
+			orders.push(cancelledOrders[pair?.id][i]);
+		}
+		return orders;
+	};
+
 	return (
 		<Box bgColor="background2">
-			{orderHistory[pair?.id]?.length ? <TableContainer>
-				<Table size="sm" borderColor={'gray.800'}>
-					<Thead>
-						<Tr>
-							<Th>Order</Th>
-							<Th>Amount</Th>
-							<Th>Exchange Rate</Th>
-						</Tr>
-					</Thead>
-					<Tbody>
-						{orderHistory[pair?.id]?.slice(0, 10).map(
-							(order: any, index: number) => {
+			{getOrders() ? (
+				<TableContainer>
+					<Table size="sm" borderColor={"gray.800"}>
+						<Thead>
+							<Tr>
+								<Th borderColor="gray.800">Order</Th>
+								<Th borderColor="gray.800">Amount</Th>
+								<Th borderColor="gray.800">Exchange Rate</Th>
+								<Th borderColor="gray.800" isNumeric></Th>
+							</Tr>
+						</Thead>
+						<Tbody>
+							{getOrders().map((order: any, index: number) => {
 								return (
 									<Tr>
-										<Td
-										color={
-												order.orderType == '0'
-													? 'red2'
-													: 'green2'
-											}>
-											<Text fontSize={'xs'} ml={1} fontWeight='bold'>
-											{order.orderType == '0'
-												? 'SELL'
-												: 'BUY'}
-												</Text>
+										<Td borderColor="gray.900">
+											<Text
+												fontSize={"xs"}
+												fontWeight="bold"
+											>
+												<Tag
+													size={"sm"}
+													bgColor={
+														order.buy
+														? "green.700"
+														: "red.700"
+													}
+													variant="solid"
+													rounded={2}
+												>
+													{order.buy ?
+													"BUY"
+													: "SELL"}
+												</Tag>
+											</Text>
 										</Td>
-										<Td>
+										<Td borderColor="gray.900">
 											{tokenFormatter(null).format(
 												order.fillAmount /
-													10 ** pair.tokens[0]?.decimals
-											)}{' '}
+													10 **
+														pair.tokens[0]?.decimals
+											)}{" "}
 											{pair.tokens[0]?.symbol}
 										</Td>
-										<Td>
-											{tokenFormatter(pair?.exchangeRateDecimals).format(
-												order.exchangeRate /
-													10 **
-														pair?.exchangeRateDecimals
-											)}{' '}
-											{pair.tokens[1]?.symbol}/{pair.tokens[0]?.symbol}
+										<Td borderColor="gray.900">
+											{tokenFormatter(
+												pair?.exchangeRateDecimals
+											).format(
+												order.exchangeRate / 10 ** 18
+											)}{" "}
+											{pair.tokens[1]?.symbol}/
+											{pair.tokens[0]?.symbol}
 										</Td>
-										
+										<Td borderColor="gray.900" isNumeric maxW={'100px'}>
+											{order.cancelled ? (
+												<Tag size={'sm'} rounded={1}
+												>
+													Cancelled
+												</Tag>
+											) : (
+												<Tag size={'sm'} rounded={2}>
+													Executed
+												</Tag>
+											)}
+											</Td>
 									</Tr>
 								);
-							}
-						)}
-					</Tbody>
-				</Table>
-			</TableContainer>
-			:
-			<Box mx={4}>
-				<Text color={'gray'}>No executed orders</Text>
-			</Box>
-			}
+							})}
+						</Tbody>
+					</Table>
+				</TableContainer>
+			) : (
+				<Box mx={4}>
+					<Text color={"gray"}>No executed orders</Text>
+				</Box>
+			)}
 		</Box>
 	);
 }

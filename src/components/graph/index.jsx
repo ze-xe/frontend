@@ -47,7 +47,7 @@ export class Graph extends React.PureComponent {
 			interval: this.props.interval,
 			container: this.ref.current,
 			library_path: this.props.libraryPath,
-
+			custom_css_url: '/css/style.css',
 			locale: getLanguageFromURL() || "en",
 			disabled_features: [
 				"use_localstorage_for_settings", 
@@ -79,7 +79,11 @@ export class Graph extends React.PureComponent {
 				"paneProperties.background": "#09001F",
 				"paneProperties.backgroundType": "solid",
 				"mainSeriesProperties.candleStyle.wickUpColor": GREEN,
-				"mainSeriesProperties.candleStyle.wickDownColor": '#C83232',
+				"mainSeriesProperties.candleStyle.wickDownColor": RED,
+				"mainSeriesProperties.candleStyle.upColor": GREEN,
+				"mainSeriesProperties.candleStyle.downColor": RED,
+				"mainSeriesProperties.candleStyle.borderUpColor": GREEN,
+				"mainSeriesProperties.candleStyle.borderDownColor": RED,
 				"paneProperties.vertGridProperties.color": "#363c4e",
 				"paneProperties.horzGridProperties.color": "#363c4e",
 		   },

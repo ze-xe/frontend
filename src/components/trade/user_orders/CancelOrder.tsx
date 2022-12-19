@@ -67,23 +67,18 @@ export default function CancelOrder({
 			exchange,
 			'cancelOrder',
 			[
-				(chain == ChainID.NILE ? '0x' : '') + order.id,
-                '0',
+				order.signature,
+                order.value,
 			],
 			chain
 		)
 		.then(async (res: any) => {
 			setLoading(false);
 			setResponse('Transaction sent! Waiting for confirmation...');
-			if (chain == ChainID.NILE) {
-				setHash(res);
-				checkResponse(res);
-			} else {
-				setHash(res.hash);
-				await res.wait(1);
-				setConfirmed(true);
-				setResponse('Transaction Successful!');
-			}
+			setHash(res.hash);
+			await res.wait(1);
+			setConfirmed(true);
+			setResponse('Transaction Successful!');
 		})
 		.catch((err: any) => {
 			setLoading(false);
@@ -92,28 +87,6 @@ export default function CancelOrder({
 		});
 	};
 
-	// // check response in intervals
-	const checkResponse = (tx_id: string) => {
-		axios
-			.get(
-				'https://nile.trongrid.io/wallet/gettransactionbyid?value=' +
-					tx_id
-			)
-			.then((res) => {
-				if (!res.data.ret) {
-					setTimeout(() => {
-						checkResponse(tx_id);
-					}, 2000);
-				} else {
-					setConfirmed(true);
-					if (res.data.ret[0].contractRet == 'SUCCESS') {
-						setResponse('Transaction Successful!');
-					} else {
-						setResponse('Transaction Failed. Please try again.');
-					}
-				}
-			});
-	};
 
 	const _onOpen = () => {
 		onOpen();
@@ -127,14 +100,14 @@ export default function CancelOrder({
 
 	return (
 		<>
-			<IconButton
+			<Button
                 size={'sm'}
                 my={-2}
-                variant='ghost'
-                icon={<MdCancel />}
+				variant='ghost'
                 onClick={_onOpen}
                 aria-label={''}>
-			</IconButton>
+			<MdCancel /> <Text ml={2}>Cancel</Text>
+			</Button>
             
 			<Modal isOpen={isOpen} onClose={_onClose} isCentered size={'xl'}>
 				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
@@ -146,11 +119,11 @@ export default function CancelOrder({
                         <Text mb={4}>You are about to cancel the following order:</Text>
 
                         <Text>Order Amount</Text>
-                        <Text mb={2}>{order.amount/(10**token0?.decimals)} {token0?.symbol}</Text>
+                        <Text mb={2}>{order.value.amount/(10**token0?.decimals)} {token0?.symbol}</Text>
                         <Text>Exchange Rate</Text>
-                        <Text mb={2}>{order.exchangeRate/(10**18)} {token1?.symbol}/{token0?.symbol}</Text>
+                        <Text mb={2}>{order.value.exchangeRate/(10**18)} {token1?.symbol}/{token0?.symbol}</Text>
                         <Text>Order Type</Text>
-                        <Text mb={2}>{order.orderType == '0' ? 'Buy' : 'Sell'}</Text>
+                        <Text mb={2}>{order.value.buy ? 'Buy' : 'Sell'}</Text>
 					</ModalBody>
 
 					<ModalFooter>
@@ -196,7 +169,8 @@ export default function CancelOrder({
 							) : (
 								<>
 									<Button
-										bgColor="gray.700"
+										bgColor="orange.700"
+										_hover={{ bgColor: 'orange.600' }}
 										mr={3}
 										width="100%"
 										onClick={update}

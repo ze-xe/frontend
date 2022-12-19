@@ -178,6 +178,7 @@ export default function BuySellModal2({
 			)
 		).data.data;
 
+		console.log(_orders);
 		if (_orders.length > 0) {
 			const exchange = await getContract("Exchange", chain);
 			toast.close(toastIdRef.current);
@@ -344,9 +345,7 @@ export default function BuySellModal2({
 						? "Enter Amount"
 						: amountExceedsBalance()
 						? "Insufficient Trading Balance"
-						: buy
-						? "Limit Buy"
-						: "Limit Sell"}
+						: (limit ? "Limit " : "Market ") + (buy ? "Buy" : "Sell")}
 				</Button>
 			) : (
 				<Button

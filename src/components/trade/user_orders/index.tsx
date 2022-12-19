@@ -9,9 +9,9 @@ export default function index({ pair }) {
 		<>
 			<Tabs colorScheme={"gray"} size="sm">
 				<TabList>
-					<Tab>Placed Orders</Tab>
+					<Tab>Active Orders</Tab>
 					<Tab>Order History</Tab>
-					<Tab>Cancelled Orders</Tab>
+					{/* <Tab>Cancelled Orders</Tab> */}
 				</TabList>
 
 				<TabPanels>
@@ -21,9 +21,9 @@ export default function index({ pair }) {
 					<TabPanel mx={-4}>
 						<ExecutedOrders pair={pair} />
 					</TabPanel>
-					<TabPanel mx={-4}>
+					{/* <TabPanel mx={-4}>
 						<CancelledOrders pair={pair} />
-					</TabPanel>
+					</TabPanel> */}
 				</TabPanels>
 			</Tabs>
 		</>

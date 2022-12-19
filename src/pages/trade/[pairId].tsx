@@ -8,7 +8,7 @@ import Swap from '../../components/trade/exchange/Limit';
 import { useContext } from 'react';
 import { DataContext } from '../../context/DataProvider';
 import { useRouter } from 'next/router';
-import PlacedOrders from '../../components/trade/user_orders/PlacedOrders';
+import PlacedOrders from '../../components/trade/user_orders';
 import { useEffect, useState } from 'react';
 import Exchange from '../../components/trade/exchange';
 import Head from 'next/head';
@@ -74,7 +74,7 @@ const Trade = () => {
 					</Flex>
 				</Flex>
 				
-				<Box bgColor={'background2'} my={2} width="100%">
+				<Box bgColor={'background2'} my={1} width="100%">
 					<PlacedOrders pair={pair} />
 				</Box>
 				

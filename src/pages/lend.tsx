@@ -30,9 +30,9 @@ export default function lend() {
 	const boxStyle = {
 		px: 4,
 		py: 10,
-		my: 2,
+		my: 1,
 		bgColor: "background2",
-		width: "33%"
+		width: 100/3 + "%"
 	}
 
 	useEffect(() => {
@@ -59,7 +59,7 @@ export default function lend() {
 	}
 	return (
 		<>
-			<Box py={10} mt={2} bgColor={"background2"}>
+			<Box py={10} mt={1} bgColor={"background2"}>
 				<Heading mx={4}>Lend your assets</Heading>
 				<Text mt={2} mx={4}>
 					Earn with high APR % 💰
@@ -68,7 +68,7 @@ export default function lend() {
 
 			<Flex flexDir={"column"}>
 				<Box width={"100%"}>
-					<Flex justify="space-between">
+					<Flex justify="space-between" gap={1}>
 						<Box
 							{...boxStyle}
 						>
@@ -110,7 +110,7 @@ export default function lend() {
 					<LendingTable />
 				</Box>
 				<Box width={"100%"}>
-					<Flex justify="space-between">
+					<Flex justify="space-between" gap={1}>
 						<Box
 						    {...boxStyle}
 						>

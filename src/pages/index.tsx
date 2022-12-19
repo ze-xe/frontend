@@ -94,7 +94,7 @@ const Index = () => {
 							<BsCurrencyExchange {...featuresIcon} />
 							<Text {...featuresTitle}>Spot Trading</Text>
 							<Text {...featuresText}>
-								Market and limit orders with stop losses
+								Market and limit orders with conditional execution
 							</Text>
 						</Box>
 
@@ -108,7 +108,7 @@ const Index = () => {
 							<RiExchangeFundsFill {...featuresIcon} />
 							<Text {...featuresTitle}>Margin and Futures</Text>
 							<Text {...featuresText}>
-								With upto 10x leverage
+								With upto 25x leverage with upto 50+ token pairs
 							</Text>
 						</Box>
 
@@ -120,9 +120,9 @@ const Index = () => {
 
 						<Box w={"200px"}>
 							<GiCardExchange {...featuresIcon} />
-							<Text {...featuresTitle}>Perpetuals</Text>
+							<Text {...featuresTitle}>Option Calls</Text>
 							<Text {...featuresText}>
-								Take advantage of upswings in the market
+								Take advantage of up/down swings in the market
 							</Text>
 						</Box>
 

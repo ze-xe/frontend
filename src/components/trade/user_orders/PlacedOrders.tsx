@@ -1,4 +1,4 @@
-import { Box, Text, IconButton, Flex } from '@chakra-ui/react';
+import { Box, Text, IconButton, Flex, Tag } from '@chakra-ui/react';
 import React from 'react';
 import {
 	Table,
@@ -43,14 +43,14 @@ export default function PlacedOrders({ pair }) {
 	
 	return (
 		<Box bgColor="background2">
-			{pair && placedOrders[pair?.id]?.length > 0 ? <TableContainer>
+			{placedOrders[pair?.id] ? <TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>
 						<Tr>
-							<Th>Order</Th>
-							<Th>Amount</Th>
-							<Th>Exchange Rate</Th>
-							<Th isNumeric></Th>
+							<Th borderColor='gray.800'>Order</Th>
+							<Th borderColor='gray.800'>Amount</Th>
+							<Th borderColor='gray.800'>Exchange Rate</Th>
+							<Th isNumeric borderColor='gray.800'></Th>
 						</Tr>
 					</Thead>
 					<Tbody>
@@ -60,31 +60,45 @@ export default function PlacedOrders({ pair }) {
 									<Tr>
 										<Td
 										color={
-												order.orderType == '0'
+												!order.value.buy
 													? 'red2'
 													: 'green2'
-											}>
-											<Text fontSize={'xs'} ml={1} fontWeight='bold'>
-											{order.orderType == '0'
-												? 'SELL'
-												: 'BUY'}
-												</Text>
+											}
+											borderColor='gray.900'
+											>
+											<Tag
+													size={"sm"}
+													bgColor={
+														order.value.buy
+															? "green.700"
+															: "red.700"
+													}
+													variant="solid"
+													rounded={2}
+												>
+													{order.value.buy ?
+													"BUY"
+													: "SELL"}
+												</Tag>
 										</Td>
-										<Td>
+										<Td
+										borderColor='gray.900'>
 											{tokenFormatter(null).format(
-												order.amount /
+												order.value.amount /
 													10 ** token0?.decimals
 											)}{' '}
 											{token0?.symbol}
 										</Td>
-										<Td>
+										<Td
+										borderColor='gray.900'>
 											{tokenFormatter(pair?.exchangeRateDecimals).format(
-												order.exchangeRate /
+												order.value.exchangeRate /
 													10 ** 18
 											)}{' '}
 											{token1?.symbol}/{token0?.symbol}
 										</Td>
-										<Td isNumeric>
+										<Td isNumeric
+										borderColor='gray.900' maxW={'100px'}>
 											<Flex justify={'end'}>
 												{/* <UpdateOrder
 													pair={pair}
@@ -93,13 +107,13 @@ export default function PlacedOrders({ pair }) {
 													price={0}
 													order={order}
 												/> */}
-												{/* <CancelOrder
+												<CancelOrder
 													pair={pair}
 													token0={token0}
 													token1={token1}
 													price={0}
 													order={order}
-												/> */}
+												/>
 											</Flex>
 										</Td>
 									</Tr>

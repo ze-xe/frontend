@@ -200,6 +200,7 @@ function DataProvider({ children }: any) {
 			let _cancelledOrders = {};
 			let _executedOrders = {};
 			for(let i = 0; i < pairs.length; i++){
+				console.log('placed', res[i*3].data);
 				_placedOrders[pairs[i].id] = res[i*3].data.data;
 				_cancelledOrders[pairs[i].id] = res[i*3+1].data.data;
 				_executedOrders[pairs[i].id] = res[i*3+2].data.data;

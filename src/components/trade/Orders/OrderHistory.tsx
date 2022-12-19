@@ -8,8 +8,8 @@ const Order = ({ order, pair, index }) => {
 
 	return (
 		<Flex justify={'space-between'} width="100%"
-            color={order.orderType == '1' ? 'red2' : 'green2'}
-            bgColor="background2"
+            color={order.buy ? 'green2' : 'red2'}
+            bgColor={order.buy ? "rgba(24, 176, 95, 10%)" : "rgba(200, 50, 50, 10%)"}
 			py={'3px'}
 			px={4}
         >
@@ -32,9 +32,9 @@ export default function OrderHistory({pair}) {
 	return (
 		<Box >
 			<Flex justify={'space-between'} px={2} py={2} mb={1} mt={{sm: -2, md: -2, lg: -2, xl: 0}} gap={2} bgColor='background2'>
-				<Text fontSize="xs">Amount {pair?.tokens[0].symbol}</Text>
-				<Text fontSize="xs">Amount {pair?.tokens[1].symbol}</Text>
-				<Text fontSize="xs">Price {pair?.tokens[1].symbol}</Text>
+			<Text fontSize={'xs'} fontWeight='bold' color={'gray.300'}>{pair?.tokens[0].symbol} </Text>
+				<Text fontSize={'xs'} fontWeight='bold' color={'gray.300'}>{pair?.tokens[1].symbol}</Text>
+				<Text fontSize={'xs'} fontWeight='bold' color={'gray.300'}>{pair?.tokens[1].symbol}/{pair?.tokens[0].symbol}</Text>
 			</Flex>
 			{(pairExecutedData[pair?.id]) && pairExecutedData[pair?.id].slice(0,47).map((order: any, index: number) => {
 				return <Order order={order} pair={pair} index={index} key={index} />;
