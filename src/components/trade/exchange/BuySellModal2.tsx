@@ -39,6 +39,7 @@ import {
 	send,
 } from "../../../utils/contract";
 import { ethers } from "ethers";
+import { tokenFormatter } from "../../../utils/formatters";
 
 export default function BuySellModal2({
 	pair,
@@ -177,14 +178,12 @@ export default function BuySellModal2({
 			)
 		).data.data;
 
-		console.log(_orders)
-
 		if (_orders.length > 0) {
 			const exchange = await getContract("Exchange", chain);
 			toast.close(toastIdRef.current);
 			toastIdRef.current = toast({
 				title: "Sending transaction...",
-				description: "Executing orders within limit",
+				description: `Executing orders within ${tokenFormatter(null).format(price)} ${token1.symbol}/${token0.symbol} limit`,
 				status: "loading",
 				duration: null,
 			});
@@ -214,10 +213,11 @@ export default function BuySellModal2({
 			
 			_amount = Big(_amount).sub(total).toFixed(0);
 		}
-		if (Big(_amount).gt(0)) {
+		if (Big(_amount).gt(0) && limit) {
+			toast.close(toastIdRef.current);
 			toastIdRef.current = toast({
 				title: "Placing order...",
-				description: "Placing limit order offchain",
+				description: `Creating limit order of ${tokenFormatter(null).format(_amount/1e18)} ${token0.symbol} at ${tokenFormatter(null).format(price)} ${token1.symbol}/${token0.symbol}`,
 				status: "loading",
 				duration: null,
 			});
@@ -289,7 +289,7 @@ export default function BuySellModal2({
 			toast.close(toastIdRef.current);
 			toast({
 				title: "Order executed successfully!",
-				description: "Order was executed within limit!",
+				description: "Amount was filled within limit!",
 				status: "success",
 			});
 		}
