@@ -34,6 +34,8 @@ function DataProvider({ children }: any) {
 	const [chain, setChain] = React.useState(null);
 	const [block, setBlock] = React.useState(null);
 	const [refresh, setRefresh] = React.useState(false);
+	const [refresh2, setRefresh2] = React.useState(false);
+	const [refresh3, setRefresh3] = React.useState(false);
 
 	React.useEffect(() => {}, [])	
 
@@ -88,7 +90,6 @@ function DataProvider({ children }: any) {
 				_pairs = res[0].data.data;
 				setPairs(_pairs);
 				fetchPairData(_pairs, chain);
-				
 				subscribePairHistory(_pairs);
 
 				if(firstTime) {
@@ -117,19 +118,22 @@ function DataProvider({ children }: any) {
 		setIsFetchingData(false);
 	};
 
-	const subscribePairHistory = (_pairs: any[]) => {
-		// const socket = io('http://localhost:3010')
-		// socket.on('PAIR_HISTORY', ({pair, amount, buy, exchangeRate}) => {
-		// 	for(let i in _pairs) {
-		// 		if(_pairs[i].id === pair) {
-		// 			_pairs[i].priceDiff = Big(_pairs[i].exchangeRate).minus(exchangeRate).toString();
-		// 			_pairs[i].exchangeRate = exchangeRate;
-		// 			console.log('found pair', _pairs[i]);
-		// 		}
-		// 	}
-		// 	console.log('pairs', _pairs);
-		// 	setPairs(_pairs);
-		// })
+	const subscribePairHistory = (__pairs: any[]) => {
+		const _pairs = __pairs;
+		let _refresh3 = refresh3;
+		socket.on('PAIR_HISTORY', ({pair, amount, buy, exchangeRate}) => {
+			for(let i in _pairs) {
+				if(_pairs[i].id === pair) {
+					_pairs[i].priceDiff = Big(exchangeRate).minus(_pairs[i].exchangeRate).toString();
+					_pairs[i].exchangeRate = exchangeRate;
+					console.log('found pair', _pairs[i]);
+				}
+			}
+			console.log('pairs', _pairs);
+			setPairs(_pairs);
+			_refresh3 = !_refresh3;
+			setRefresh3(_refresh3);
+		})
 	}
 
 	const fetchOrders = (pairs: any[], chain: number) => {
@@ -149,11 +153,11 @@ function DataProvider({ children }: any) {
 			let _refresh = refresh;
 			socket.on('PAIR_ORDER', ({amount, buy, exchangeRate, pair}) => {
 				let _orders = buy ? newOrders[pair.toLowerCase()].buyOrders : newOrders[pair.toLowerCase()].sellOrders.reverse();
+				console.log(_orders);
 				
 				for(let i = 0; i < _orders.length; i++){
 					console.log(exchangeRate, _orders[i].exchangeRate);
 					if(_orders[i].exchangeRate === exchangeRate){
-						console.log('Found order');
 						_orders[i].amount = Big(_orders[i].amount).plus(amount).toString();
 						break;
 					}
@@ -171,6 +175,11 @@ function DataProvider({ children }: any) {
 				}
 				if(_orders.length === 0){
 					_orders.push({amount, exchangeRate});
+				}
+				for(let i in _orders){
+					if(Big(_orders[i].amount).lt(1e10)){
+						_orders.splice(i, 1);
+					}
 				}
 				if(buy){
 					newOrders[pair.toLowerCase()].buyOrders = _orders;
@@ -218,6 +227,13 @@ function DataProvider({ children }: any) {
 			setOrderHistory(_executedOrders);
 			setPlacedOrders(_placedOrders);
 		})
+	}
+
+	const addPlacedOrder = (order: any) => {
+		let _placedOrders = placedOrders;
+		_placedOrders[order.pair.toLowerCase()].splice(0, 0, order); 
+		setPlacedOrders(_placedOrders);
+		setRefresh2(!refresh2);
 	}
 	
 	// GRAPH
@@ -282,7 +298,8 @@ function DataProvider({ children }: any) {
 		pairStats,
 		chain, setChain,
 		explorer,
-		incrementAllowance
+		incrementAllowance,
+		addPlacedOrder
 	};
 
 	return (
@@ -306,7 +323,8 @@ interface DataValue {
 	pairStats: any,
 	chain: number, setChain: (chain: number) => void,
 	explorer: () => string,
-	incrementAllowance: (token: string, amount: string) => Promise<void>
+	incrementAllowance: (token: string, amount: string) => Promise<void>,
+	addPlacedOrder: (order: any) => void
 }
 
 export { DataProvider, DataContext };

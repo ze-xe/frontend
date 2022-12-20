@@ -12,6 +12,7 @@ const Order = ({ order, pair, index }) => {
             bgColor={order.buy ? "rgba(24, 176, 95, 10%)" : "rgba(200, 50, 50, 10%)"}
 			py={'3px'}
 			px={4}
+			mb={0.5}
         >
 			<Text fontSize={'xs'}>
 				{tokenFormatter(null).format(order.fillAmount/(10**pair?.tokens[0].decimals))} 

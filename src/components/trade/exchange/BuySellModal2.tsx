@@ -58,17 +58,14 @@ export default function BuySellModal2({
 	const toast = useToast();
 	const toastIdRef = React.useRef();
 
-	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [orders, setOrders] = React.useState<any[] | null>(null);
 	const [orderToPlace, setOrderToPlace] = React.useState(null);
 
 	const [loading, setLoading] = React.useState(false);
 
 	const { address, isConnected: isEvmConnected } = useAccount();
 
-	const { chain, incrementAllowance } = useContext(DataContext);
-	const { data, isError, isLoading, isSuccess, signTypedDataAsync } =
-		useSignTypedData();
+	const { chain, incrementAllowance, addPlacedOrder } = useContext(DataContext);
+	const { data, isError, isLoading, isSuccess, signTypedDataAsync } = useSignTypedData();
 
 	const amountExceedsBalance = () => {
 		if(!token1 || !token0) return true
@@ -114,40 +111,6 @@ export default function BuySellModal2({
 			});
 	};
 
-	const _onOpen = () => {
-		onOpen();
-		let _amount = Big(token0Amount)
-			.times(10 ** token0.decimals)
-			.toFixed(0);
-		if (buy && !limit) {
-			_amount = Big(token1Amount)
-				.times(10 ** token1.decimals)
-				.toFixed(0);
-		}
-
-		axios
-			.get(
-				Endpoints[chain] +
-					`order/${limit ? "limit" : "market"}/matched/` +
-					pair.id,
-				{
-					params: {
-						amount: _amount,
-						exchangeRate: Big(price)
-							.times(10 ** 18)
-							.toFixed(0),
-						buy,
-						chainId: chain,
-					},
-				}
-			)
-			.then((resp) => {
-				let _orders = resp.data.data;
-				console.log(_orders);
-				setOrders(_orders);
-			});
-	};
-
 	const execute = async () => {
 		setLoading(true);
 		let _amount = Big(token0Amount)
@@ -179,7 +142,8 @@ export default function BuySellModal2({
 			)
 		).data.data;
 
-		console.log(_orders);
+		console.log(_orders)
+
 		if (_orders.length > 0) {
 			const exchange = await getContract("Exchange", chain);
 			toast.close(toastIdRef.current);
@@ -268,6 +232,7 @@ export default function BuySellModal2({
 						chainId: chain.toString(),
 					})
 					.then((res) => {
+						addPlacedOrder({signature: signature, pair: pair.id, value: value})
 						setLoading(false);
 						toast.close(toastIdRef.current);
 						toast({
@@ -305,17 +270,6 @@ export default function BuySellModal2({
 			status: "error",
 		});
 	}
-	};
-
-	const { nextStep, prevStep, setStep, reset, activeStep } = useSteps({
-		initialStep: 0,
-	});
-
-	const _onClose = () => {
-		setOrderToPlace(null);
-		setOrders(null);
-		onClose();
-		reset();
 	};
 
 	const tokenAmountToSpend = buy ? token1Amount : token0Amount;
@@ -360,125 +314,6 @@ export default function BuySellModal2({
 					Approve {tokenToSpend?.symbol}
 				</Button>
 			)}
-			<Modal
-				isOpen={isOpen}
-				onClose={_onClose}
-				isCentered
-				size={"xl"}
-				scrollBehavior="inside"
-			>
-				<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
-				<ModalOverlay />
-				<ModalContent bgColor={"gray.1000"} pb={4}>
-					<ModalHeader>
-						{orders
-							? orders.length > 0 && !(activeStep >= 1)
-								? "Execute orders within limit"
-								: "Place order"
-							: "Review Order"}
-					</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody>
-						<Flex flexDir="column" width="100%">
-							{orders ? (
-								limit ? (
-									orders.length > 0 ? (
-										<Steps activeStep={activeStep}>
-											<Step label={"Execute"}>
-												<Box mt={4}>
-													<OrdersToExecute
-														limit={limit}
-														price={price}
-														orders={orders}
-														pair={pair}
-														amountToFill={
-															token0Amount
-														}
-														close={_onClose}
-														nextStep={nextStep}
-														buy={buy}
-														token0={token0}
-														token1={token1}
-														setOrderToPlace={
-															setOrderToPlace
-														}
-													/>
-												</Box>
-											</Step>
-											<Step label={"Place"}>
-												<Box mt={4}>
-													<PlaceOrder
-														orderAmount={
-															token0Amount
-														}
-														amountToPlace={
-															orderToPlace
-														}
-														nextStep={_onClose}
-														buy={buy}
-														token0={token0}
-														token1={token1}
-														price={price}
-													/>
-												</Box>
-											</Step>
-										</Steps>
-									) : (
-										<PlaceOrder
-											orderAmount={token0Amount}
-											amountToPlace={orderToPlace}
-											nextStep={_onClose}
-											buy={buy}
-											token0={token0}
-											token1={token1}
-											price={price}
-										/>
-									)
-								) : (
-									<OrdersToExecute
-										limit={limit}
-										price={price}
-										orders={orders}
-										pair={pair}
-										amountToFill={token0Amount}
-										close={_onClose}
-										nextStep={nextStep}
-										buy={buy}
-										token0={token0}
-										token1={token1}
-										setOrderToPlace={setOrderToPlace}
-									/>
-								)
-							) : (
-								<>
-									<Skeleton
-										height="40px"
-										bg="green.500"
-										color="white"
-										mt={4}
-										fadeDuration={1}
-									></Skeleton>
-									<Skeleton
-										height="40px"
-										bg="green.500"
-										color="white"
-										mt={2}
-										fadeDuration={1}
-									></Skeleton>
-									<Skeleton
-										height="40px"
-										bg="green.500"
-										color="white"
-										mt={2}
-										mb={4}
-										fadeDuration={1}
-									></Skeleton>
-								</>
-							)}
-						</Flex>
-					</ModalBody>
-				</ModalContent>
-			</Modal>
 		</>
 	);
 }

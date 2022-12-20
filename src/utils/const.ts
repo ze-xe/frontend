@@ -19,16 +19,16 @@ export const ADDRESSES = {
 		Vault: '0x4811419e3c5e1d91Ac83427562a455C22B5eA95F',
 	},
 	[ChainID.ARB_GOERLI]: {
-		Exchange: '0xf0eeA3DC35CDAB740D04A8E08E32d184F6918Fe6',
+		Exchange: '0x24c987fa29f40BA629FB47e8fd9d929Dee4b5760',
 		Multicall: '0x511f64296fa72526231E5A55615d8e4eE5a2d4cF',
-		Lever: '0x93DF85a2B89DbC443D9AbbBa9216Ce066127dC0B'
+		Lever: '0xdE6C331910163C16EaF6F6BCc0E184CBC0CE0853'
 	}
 };
 
 export const Endpoints = {
 	[ChainID.NILE]: 'https://api.zexe.io/',
 	[ChainID.AURORA]: 'https://aurora.api.zexe.io/',
-	[ChainID.ARB_GOERLI]: 'http://localhost:3010/' // 'http://65.20.81.124:8090/',
+	[ChainID.ARB_GOERLI]: 'http://65.20.81.124:8090/',
 };
 
 // list of tokens

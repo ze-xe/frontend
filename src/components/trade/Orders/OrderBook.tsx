@@ -21,6 +21,7 @@ const Order = ({ order, index, total, pair, orderType }) => {
 				color={orderType == 'BUY' ? 'green2' : 'red2'}
 				py={'3px'}
 				px={4}
+				mb={0.5}
 				_hover={{ bgColor: orderType == 'BUY' ? 'rgba(24, 176, 95, 10%)' : 'rgba(200, 50, 50, 10%)' }}
 				bgGradient={'linear(to-r,' + (orderType == 'BUY' ? 'rgba(24, 176, 95, 20%), rgba(24, 176, 95, 20%))' : 'rgba(200, 50, 50, 20%), rgba(200, 50, 50, 20%))')}
 				bgSize={700*order.amount/total + '%'}

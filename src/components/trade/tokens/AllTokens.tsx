@@ -27,7 +27,7 @@ export default function AllTokens({search}) {
 						align={'center'}
 						justify="space-between"
 						px={4}
-						py={3}
+						py={4}
 						_hover={{ bgColor: 'whiteAlpha.100' }}>
 						<Flex align="center">
 							<Image

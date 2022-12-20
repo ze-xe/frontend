@@ -54,7 +54,7 @@ export default function PlacedOrders({ pair }) {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{placedOrders[pair?.id]?.slice(0, 10).map(
+						{placedOrders[pair?.id]?.slice(0, 3).map(
 							(order: any, index: number) => {
 								return (
 									<Tr>

@@ -32,10 +32,10 @@ export default function TokensPanel() {
 				size={'sm'}
 				colorScheme="gray"
 				overflow={'auto'}>
-				<TabList px={4}>
-					<Tab>All</Tab>
-					<Tab>Trending</Tab>
-					<Tab>New</Tab>
+				<TabList>
+					<Tab px={0} width='15%'>All</Tab>
+					<Tab px={0} width='30%'>Trending</Tab>
+					<Tab px={0} width='20%'>New</Tab>
 				</TabList>
 				<TabPanels>
 					<TabPanel px={0}>
