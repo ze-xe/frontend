@@ -9,8 +9,8 @@ import {
 	Flex,
 	Text,
 } from "@chakra-ui/react";
-import OrderBook from "../orders/OrderBook";
-import OrderHistory from "../orders/OrderHistory";
+import OrderBook from "./OrderBook";
+import OrderHistory from "./OrderHistory";
 
 export default function OrdersPanel({ pair }) {
 	return (
