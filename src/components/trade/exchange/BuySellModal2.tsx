@@ -56,7 +56,7 @@ export default function BuySellModal2({
 	if (price == "") price = "0";
 
 	const toast = useToast();
-	const toastIdRef = React.useRef();
+	const toastIdRef = React.useRef<any>();
 
 	const [orderToPlace, setOrderToPlace] = React.useState(null);
 
@@ -147,7 +147,7 @@ export default function BuySellModal2({
 		if (_orders.length > 0) {
 			const exchange = await getContract("Exchange", chain);
 			toast.close(toastIdRef.current);
-			toastIdRef.current = toast({
+			(toastIdRef as any).current = toast({
 				title: "Sending transaction...",
 				description: `Executing orders within ${tokenFormatter(null).format(price)} ${token1.symbol}/${token0.symbol} limit`,
 				status: "loading",
@@ -181,7 +181,7 @@ export default function BuySellModal2({
 		}
 		if (Big(_amount).gt(0) && limit) {
 			toast.close(toastIdRef.current);
-			toastIdRef.current = toast({
+			(toastIdRef as any).current = toast({
 				title: "Placing order...",
 				description: `Creating limit order of ${tokenFormatter(null).format(_amount/1e18)} ${token0.symbol} at ${tokenFormatter(null).format(price)} ${token1.symbol}/${token0.symbol}`,
 				status: "loading",
