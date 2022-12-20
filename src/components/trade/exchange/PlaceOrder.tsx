@@ -8,7 +8,7 @@ import { useAccount, useSignTypedData } from "wagmi";
 import { DataContext } from "../../../context/DataProvider";
 import { getAddress, getContract, send } from "../../../utils/contract";
 import Image from "next/image";
-import { imageIds } from "../../../utils/const";
+import { imageIds, Endpoints } from '../../../utils/const';
 export default function PlaceOrder({
 	orderAmount,
 	amountToPlace,
@@ -120,7 +120,7 @@ export default function PlaceOrder({
 		}).then((signature) => {
 			console.log(signature);
 			axios
-				.post("http://localhost:3010/order/create", {
+				.post(Endpoints[chain] + "order/create", {
 					signature,
 					data: value,
 					chainId: chain.toString(),

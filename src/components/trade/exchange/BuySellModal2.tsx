@@ -226,7 +226,7 @@ export default function BuySellModal2({
 			}).then((signature) => {
 				console.log(signature);
 				axios
-					.post("http://localhost:3010/order/create", {
+					.post(Endpoints[chain] + "order/create", {
 						signature,
 						data: value,
 						chainId: chain.toString(),
