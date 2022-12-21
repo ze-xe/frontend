@@ -158,46 +158,47 @@ export default function ExecutedOrders({ pair }) {
 						</Table>
 					</TableContainer>
 					<Pagination
-					pagesCount={pagesCount}
-					currentPage={currentPage}
-					onPageChange={setCurrentPage}
-				>
-					<PaginationContainer justify={"space-between"} mt={2}>
-						<PaginationPrevious
-							fontSize={"sm"}
-							height={"35px"}
-							bgColor="background1"
-							color={"gray.400"}
-							_hover={{ bgColor: "whiteAlpha.200" }}
-							minW="100px"
-						>
-							<AiOutlineArrowLeft /> <Text ml={2}>Previous</Text>
-						</PaginationPrevious>
-						<PaginationPageGroup>
-							{pages.map((page: number) => (
-								<PaginationPage
-									height={"35px"}
-									bgColor="background1"
-									color={"gray.400"}
-									_hover={{ bgColor: "whiteAlpha.200" }}
-									minW="40px"
-									key={`pagination_page_${page}`}
-									page={page}
-								/>
-							))}
-						</PaginationPageGroup>
-						<PaginationNext
-							fontSize={"sm"}
-							height={"35px"}
-							bgColor="background1"
-							color={"gray.400"}
-							_hover={{ bgColor: "whiteAlpha.200" }}
-							minW="100px"
-						>
-							<Text mr={2}>Next</Text> <AiOutlineArrowRight />
-						</PaginationNext>
-					</PaginationContainer>
-				</Pagination>
+						pagesCount={pagesCount}
+						currentPage={currentPage}
+						onPageChange={setCurrentPage}
+					>
+						<PaginationContainer justify={"space-between"} mt={2}>
+							<PaginationPrevious
+								fontSize={"sm"}
+								height={"35px"}
+								bgColor="background1"
+								color={"gray.400"}
+								_hover={{ bgColor: "whiteAlpha.200" }}
+								minW="100px"
+							>
+								<AiOutlineArrowLeft />{" "}
+								<Text ml={2}>Previous</Text>
+							</PaginationPrevious>
+							<PaginationPageGroup>
+								{pages.map((page: number) => (
+									<PaginationPage
+										height={"35px"}
+										bgColor="background1"
+										color={"gray.400"}
+										_hover={{ bgColor: "whiteAlpha.200" }}
+										minW="40px"
+										key={`pagination_page_${page}`}
+										page={page}
+									/>
+								))}
+							</PaginationPageGroup>
+							<PaginationNext
+								fontSize={"sm"}
+								height={"35px"}
+								bgColor="background1"
+								color={"gray.400"}
+								_hover={{ bgColor: "whiteAlpha.200" }}
+								minW="100px"
+							>
+								<Text mr={2}>Next</Text> <AiOutlineArrowRight />
+							</PaginationNext>
+						</PaginationContainer>
+					</Pagination>
 				</>
 			) : (
 				<Box mx={4}>

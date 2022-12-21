@@ -1,7 +1,6 @@
 import { Box, Flex, Tag, Text, useColorMode } from '@chakra-ui/react';
 import GraphPanel from '../../components/trade/GraphPanel';
 import TokensPanel from '../../components/trade/tokens/TokensPanel';
-//@ts-ignore
 import OrdersPanel from '../../components/trade/orders/OrdersPanel';
 import TitlePanel from '../../components/trade/TitlePanel';
 import { useContext } from 'react';
