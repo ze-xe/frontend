@@ -113,19 +113,7 @@ export default function LendingTable() {
 													%
 												</Text>
 												<Text fontSize={"xs"}>
-													+{" "}
-													{parseFloat(
-														market.rewardTokenEmissionsUSD
-															? (
-																	(100 *
-																		(market
-																			.rewardTokenEmissionsUSD[0] *
-																			365)) /
-																	market.totalDepositBalanceUSD
-															  ).toString()
-															: "0"
-													).toFixed(2)}{" "}
-													%
+													+{" "}{tokenFormatter(2).format(market.rewardsAPR ? market.rewardsAPR[0] : '0')}{" "}%
 												</Text>
 											</Td>
 											
@@ -147,13 +135,13 @@ export default function LendingTable() {
 											<Td borderColor={"whiteAlpha.200"}>
 											<Text>
 												{tokenFormatter(null).format(
-													market.totalDepositBalanceUSD / market.inputToken.lastPriceUSD
+													(market.totalDepositBalanceUSD - market.totalBorrowBalanceUSD) / market.inputToken.lastPriceUSD
 													)} {market.inputToken.symbol}
 													</Text>
 
 												<Text fontSize={'xs'} mt={1}>
 												{dollarFormatter(null).format(
-													market.totalDepositBalanceUSD
+													market.totalDepositBalanceUSD - market.totalBorrowBalanceUSD
 												)}
 												</Text>
 											</Td>

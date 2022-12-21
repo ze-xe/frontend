@@ -95,7 +95,7 @@ export default function BuyModule({ pair, limit }) {
 		setSliderValue(e);
 		if (!token0 || !price) return;
 		const token0Amount = Big(e)
-			.times(token0?.balance ?? 0)
+			.times((token0?.balance ?? 0) - (token0?.inOrderBalance ?? 0))
 			.div(100)
 			.div(10 ** token1?.decimals);
 		setAmount(token0Amount.toNumber().toString());
@@ -194,8 +194,8 @@ export default function BuyModule({ pair, limit }) {
 					<Text fontSize={"xs"}>
 						Balance{" "}
 						{tokenFormatter(null).format(
-							(token0?.balance ?? 0) / 10 ** token0?.decimals
-						)}
+							((token0?.balance ?? 0) - (token0?.inOrderBalance ?? 0)) / 10 ** token0?.decimals
+						)} {token0?.symbol}
 					</Text>
 				</Flex>
 				<NumberInput

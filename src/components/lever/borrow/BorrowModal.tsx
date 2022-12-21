@@ -61,6 +61,7 @@ import { ChainID } from "../../../utils/chains";
 import axios from "axios";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { LeverDataContext } from "../../../context/LeverDataProvider";
+import { tokenFormatter } from '../../../utils/formatters';
 
 export default function LendModal({ market, token }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -81,14 +82,14 @@ export default function LendModal({ market, token }) {
 		setSliderValue(value);
 		setInputAmount(
 			(
-				(value * (parseFloat(availableToBorrow)/market.inputTokenPriceUSD)) /
+				(value * maxBorrow/market.inputTokenPriceUSD) /
 				100
 			).toString()
 		);
 	};
 
 	const updateMax = () => {
-		setInputAmount((parseFloat(availableToBorrow)/market.inputTokenPriceUSD).toString());
+		setInputAmount((maxBorrow/market.inputTokenPriceUSD).toString());
 		setSliderValue(100);
 	};
 
@@ -98,7 +99,7 @@ export default function LendModal({ market, token }) {
 	};
 
 	const amountExceedsBalance = () => {
-		return Number(inputAmount) > parseFloat(availableToBorrow)/market.inputTokenPriceUSD
+		return Number(inputAmount) > maxBorrow/market.inputTokenPriceUSD
 	};
 
 	const borrow = async () => {
@@ -163,6 +164,8 @@ export default function LendModal({ market, token }) {
 		onClose();
 	};
 
+	const maxBorrow = Math.min(parseFloat(availableToBorrow), market?.totalDepositBalanceUSD - market?.totalBorrowBalanceUSD)
+
 	return (
 		<>
 			<Box>
@@ -188,7 +191,7 @@ export default function LendModal({ market, token }) {
 									mt={-2}
 								>
 									Max{" "}
-									{parseFloat(availableToBorrow)/market.inputTokenPriceUSD}
+									{tokenFormatter(null).format(maxBorrow/market.inputTokenPriceUSD)} {market.inputToken.symbol}
 								</Text>
 
 								<InputGroup>

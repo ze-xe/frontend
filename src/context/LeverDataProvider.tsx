@@ -115,6 +115,7 @@ function LeverDataProvider({ children }: any) {
 					.div(1e18)
 					.toString();
 				_markets[i / 4].borrowBalance = BigNumber.from(res[1][i + 3]).toString();
+				_markets[i / 4].rewardsAPR = [((100 * (_markets[i / 4].rewardTokenEmissionsUSD[0] * 365)) / _markets[i / 4].totalDepositBalanceUSD), ((100 * (_markets[i / 4].rewardTokenEmissionsUSD[1] * 365)) / _markets[i / 4].totalDepositBalanceUSD)];
 
 				_totalCollateralBalance = _totalCollateralBalance.add(
 					Big(_markets[i / 4].collateralBalance).mul(_markets[i / 4].inputTokenPriceUSD)
@@ -122,6 +123,7 @@ function LeverDataProvider({ children }: any) {
 				_totalBorrowBalance = _totalBorrowBalance.add(
 					Big(_markets[i / 4].borrowBalance).mul(_markets[i / 4].inputTokenPriceUSD).div(1e18)
 				);
+
 				_availableToBorrow = _availableToBorrow.add(
 					Big(_markets[i / 4].collateralBalance).mul(_markets[i / 4].inputTokenPriceUSD).mul(_markets[i / 4].maximumLTV).div(100)
 				);

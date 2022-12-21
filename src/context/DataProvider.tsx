@@ -97,6 +97,12 @@ function DataProvider({ children }: any) {
 					for(let i in _tokens){
 						let token = _tokens[i];
 						token.price = await getPrice(token.symbol)
+						let resp = await axios.get(Endpoints[chain]+`user/inorder/balance/${address}/token/${token.id}`, {
+							params: {
+								chainId: chain
+							}
+						});
+						token.inOrderBalance = resp.data.data[0]?.inOrderBalance.toString() ?? '0';
 					}
 					setTokens(_tokens);
 					console.log('pairs', _pairs);

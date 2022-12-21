@@ -5,6 +5,8 @@ import { widget, version } from "../../../public/static/charting_library";
 import axios from "axios";
 import { Endpoints } from "../../utils/const";
 import { ChainID } from "../../utils/chains";
+import socket from "../../utils/socket";
+import { id } from "ethers/lib/utils.js";
 
 function getLanguageFromURL() {
 	const regex = new RegExp("[\\?&]lang=([^&#]*)");
@@ -217,12 +219,13 @@ const configurationData = {
 	// supports_marks: false,
 	// supports_timescale_marks: false,
 	// supports_time: true,
-	supported_resolutions: ["5", "15", "30"],
+	supported_resolutions: ["5", "15", "30", "60", "240", "360", "720", "1D", "1W", "1M"],
 };
+
+let lastData = {};
 
 const DataFeed = {
 	onReady: (callback) => {
-		console.log("[onReady]: Method call");
 		setTimeout(() => callback(configurationData)); // callback must be called asynchronously.
 	},
 
@@ -273,7 +276,6 @@ const DataFeed = {
 		onErrorCallback
 	) => {
 		// console.log("[getBars]: Method call", firstDataRequest);
-		// console.log(symbolInfo.pairId, from, to, resolution);
 		axios
 			.get(
 				Endpoints[ChainID.ARB_GOERLI] +
@@ -289,6 +291,7 @@ const DataFeed = {
 				}
 			)
 			.then((resp) => {
+				if(firstDataRequest) lastData = resp.data.data.exchangeRate[resp.data.data.exchangeRate.length - 1];
 				if (resp.data.data.length == 0) {
 					onHistoryCallback([], { noData: true });
 					return;
@@ -315,21 +318,25 @@ const DataFeed = {
 			"[subscribeBars]: Method call with subscribeUID:",
 			subscribeUID
 		);
-		// window.interval = setInterval(
-		// 	() =>
-		// console.log(Date.now() - 100000)
-				// onRealtimeCallback([{
-				// 	time: '1671087897000',
-				// 	open: 1,
-				// 	high: 2,
-				// 	low: 1,
-				// 	close: 2,
-				// 	volume: 100,
-				// }])
-		// 	10000
-		// );
-
-		// subscribeKline({ symbol: symbolInfo.name, interval, uniqueID: subscribeUID, }, cb => onRealtimeCallback(cb))
+		socket.on('PAIR_HISTORY', ({pair, amount, buy, exchangeRate}) => {
+			if (pair.toLowerCase() == symbolInfo.pairId.toLowerCase()) {
+				let time = Date.now();
+				console.log(lastData.time, parseInt(interval)*60*1000, time, lastData.time + parseInt(interval)*60*1000 < time);
+				if(lastData.time + parseInt(interval)*60*1000 < time) lastData.close = exchangeRate/1e18;
+				else {
+					lastData = {
+						time,
+						open: exchangeRate/1e18,
+						close: exchangeRate/1e18,
+						high: exchangeRate/1e18,
+						low: exchangeRate/1e18,
+					}
+				}
+				
+				console.log('bar', lastData);
+				onRealtimeCallback(lastData);
+			}
+		})
 	},
 	unsubscribeBars: (subscriberUID) => {
 		console.log(

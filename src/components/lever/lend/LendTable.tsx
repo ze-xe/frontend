@@ -118,17 +118,7 @@ export default function LendingTable() {
 												</Text>
 												<Text fontSize={"xs"}>
 													+{" "}
-													{parseFloat(
-														market.rewardTokenEmissionsUSD
-															? (
-																	(100 *
-																		(market
-																			.rewardTokenEmissionsUSD[1] *
-																			365)) /
-																	market.totalDepositBalanceUSD
-															  ).toString()
-															: "0"
-													).toFixed(2)}{" "}
+													{tokenFormatter(2).format(market.rewardsAPR ? market.rewardsAPR[0] : '0')}{" "}
 													%
 												</Text>
 											</Td>

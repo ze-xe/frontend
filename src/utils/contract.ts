@@ -47,6 +47,6 @@ export function send(contract: any, method: string, params: any[], chain: number
   if(chain == ChainID.NILE){
     return contract[method](...params).send();
   } else {
-    return contract[method](...params);
+    return contract[method](...params, { gasPrice: ethers.utils.parseUnits('1.6', 'gwei') });
   }
 }

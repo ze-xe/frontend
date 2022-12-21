@@ -20,6 +20,17 @@ import { DataContext } from '../../../context/DataProvider';
 import UpdateOrder from './UpdateOrder';
 import { tokenFormatter } from '../../../utils/formatters';
 
+import {
+	Pagination,
+	usePagination,
+	PaginationNext,
+	PaginationPage,
+	PaginationPrevious,
+	PaginationContainer,
+	PaginationPageGroup,
+} from "@ajna/pagination";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from 'react-icons/ai';
+
 export default function PlacedOrders({ pair }) {
 	const { tokens, placedOrders } = useContext(DataContext);
 	const [token0, setToken0] = React.useState(null);
@@ -40,10 +51,16 @@ export default function PlacedOrders({ pair }) {
 	}
 	});
 
-	
+	const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
+		initialState: { currentPage: 1 },
+		pagesCount: Math.ceil((placedOrders[pair?.id] ? placedOrders[pair?.id].length : 0) / 3),
+	});
+
 	return (
 		<Box bgColor="background2">
-			{placedOrders[pair?.id] ? <TableContainer>
+			{placedOrders[pair?.id] && <>{placedOrders[pair?.id].length > 0 ? 
+			<>
+			<TableContainer>
 				<Table size="sm" borderColor={'gray.800'}>
 					<Thead>
 						<Tr>
@@ -123,10 +140,54 @@ export default function PlacedOrders({ pair }) {
 					</Tbody>
 				</Table>
 			</TableContainer>
+			
+			<Pagination
+						pagesCount={pagesCount}
+						currentPage={currentPage}
+						onPageChange={setCurrentPage}
+					>
+						<PaginationContainer justify={"space-between"} mt={2}>
+							<PaginationPrevious
+								fontSize={"sm"}
+								height={"35px"}
+								bgColor="background1"
+								color={"gray.400"}
+								_hover={{ bgColor: "whiteAlpha.200" }}
+								minW="100px"
+							>
+								<AiOutlineArrowLeft />{" "}
+								<Text ml={2}>Previous</Text>
+							</PaginationPrevious>
+							<PaginationPageGroup>
+								{pages.map((page: number) => (
+									<PaginationPage
+										height={"35px"}
+										bgColor="background1"
+										color={"gray.400"}
+										_hover={{ bgColor: "whiteAlpha.200" }}
+										minW="40px"
+										key={`pagination_page_${page}`}
+										page={page}
+									/>
+								))}
+							</PaginationPageGroup>
+							<PaginationNext
+								fontSize={"sm"}
+								height={"35px"}
+								bgColor="background1"
+								color={"gray.400"}
+								_hover={{ bgColor: "whiteAlpha.200" }}
+								minW="100px"
+							>
+								<Text mr={2}>Next</Text> <AiOutlineArrowRight />
+							</PaginationNext>
+						</PaginationContainer>
+					</Pagination>
+			</>
 			: <Box mx={4}>
-				<Text color={'gray'}>No orders placed</Text>
+				<Text color={'gray'}>No active orders</Text>
 			</Box>
-			}
+			} </>}
 		</Box>
 	);
 }
