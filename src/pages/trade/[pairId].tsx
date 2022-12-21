@@ -16,7 +16,7 @@ const Trade = () => {
 	const { pairs } = useContext(DataContext);
 
 	const router = useRouter();
-	const { pairId } = router.query;
+	const { pairId } = router.query; 
 	const [pair, setPair] = useState(null);
 
 	// pairId = USD_ETH
