@@ -1,10 +1,9 @@
 import { Box, Flex, Tag, Text, useColorMode } from '@chakra-ui/react';
-import { Header } from '../../components/Header';
 import GraphPanel from '../../components/trade/GraphPanel';
 import TokensPanel from '../../components/trade/tokens/TokensPanel';
+//@ts-ignore
 import OrdersPanel from '../../components/trade/orders/OrdersPanel';
 import TitlePanel from '../../components/trade/TitlePanel';
-import Swap from '../../components/trade/exchange/Limit';
 import { useContext } from 'react';
 import { DataContext } from '../../context/DataProvider';
 import { useRouter } from 'next/router';
@@ -12,7 +11,6 @@ import PlacedOrders from '../../components/trade/user_orders';
 import { useEffect, useState } from 'react';
 import Exchange from '../../components/trade/exchange';
 import Head from 'next/head';
-import { useAccount } from 'wagmi';
 
 const Trade = () => {
 	const { pairs } = useContext(DataContext);
